@@ -19,3 +19,16 @@
 *.exe
 *.out
 *.app
+
+# IPCH and other pre compiled files
+ipch/
+*.tlog
+*.log
+*.pdb
+*.ipch
+*.idb
+*.suo
+*.user
+*.ncb
+*.sbr
+*.opensdf
