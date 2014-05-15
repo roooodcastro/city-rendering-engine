@@ -32,3 +32,8 @@ ipch/
 *.ncb
 *.sbr
 *.opensdf
+*.sdf
+
+# Debug and Release folders
+Debug/
+Release/
