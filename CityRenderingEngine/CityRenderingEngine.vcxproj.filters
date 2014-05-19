@@ -31,16 +31,133 @@
     <Filter Include="Header Files\engine\math">
       <UniqueIdentifier>{f271e2fc-051a-431a-b4f8-3bd3c94f1b00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\engine\input">
+      <UniqueIdentifier>{f06f435d-b6e7-4b61-a9f2-81ac74543dc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine\input">
+      <UniqueIdentifier>{2428d514-e157-4ca1-ae67-9923fc8c63c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\physics">
+      <UniqueIdentifier>{0630507c-5bb2-466e-863d-f566ee632119}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine\physics">
+      <UniqueIdentifier>{f8bf5cbc-2d6d-4752-af8e-d5006b76a3a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\physics\collision">
+      <UniqueIdentifier>{3c9182c2-0c95-4b2b-9fa2-cf555c54f600}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine\physics\collision">
+      <UniqueIdentifier>{5cf66d72-395b-4f5f-93f3-7cbe0f07cf39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\ui">
+      <UniqueIdentifier>{7cc9473e-02c6-4740-9be7-d19677146e52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine\ui">
+      <UniqueIdentifier>{679f0a92-3b4e-47f5-9ab5-c842072a2d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\rendering">
+      <UniqueIdentifier>{2f207cdb-a172-4012-a952-2d376dc63524}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine\rendering">
+      <UniqueIdentifier>{332fff1f-5406-4d4e-8994-3a9f6dad1471}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\math\Vector2.cpp">
-      <Filter>Source Files\engine\math</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Naquadah.cpp">
       <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\math\Matrix4.cpp">
+      <Filter>Source Files\engine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\math\Matrix3.cpp">
+      <Filter>Source Files\engine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Entity.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameTimer.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ResourcesManager.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\input\Keyboard.cpp">
+      <Filter>Source Files\engine\input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\input\ConfigurationManager.cpp">
+      <Filter>Source Files\engine\input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\Simulation.cpp">
+      <Filter>Source Files\engine\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\PhysicalBody.cpp">
+      <Filter>Source Files\engine\physics</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\collision\CollisionDetector.cpp">
+      <Filter>Source Files\engine\physics\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\collision\BroadphaseDetector.cpp">
+      <Filter>Source Files\engine\physics\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\collision\NoPartitioning.cpp">
+      <Filter>Source Files\engine\physics\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\collision\SortAndSweep.cpp">
+      <Filter>Source Files\engine\physics\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\collision\WorldPartitioning.cpp">
+      <Filter>Source Files\engine\physics\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\physics\collision\CollisionBody.cpp">
+      <Filter>Source Files\engine\physics\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ui\UserInterface.cpp">
+      <Filter>Source Files\engine\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ui\TextItem.cpp">
+      <Filter>Source Files\engine\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ui\PanelItem.cpp">
+      <Filter>Source Files\engine\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ui\InterfaceItem.cpp">
+      <Filter>Source Files\engine\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ui\ImageItem.cpp">
+      <Filter>Source Files\engine\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ui\ButtonItem.cpp">
+      <Filter>Source Files\engine\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Texture.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Shader.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Model.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Material.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Colour.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Scene.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Light.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\input\FileIO.cpp">
+      <Filter>Source Files\engine\input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\Renderer.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +166,108 @@
     </ClInclude>
     <ClInclude Include="engine\Naquadah.h">
       <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Matrix3.h">
+      <Filter>Header Files\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Matrix4.h">
+      <Filter>Header Files\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Vector3.h">
+      <Filter>Header Files\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Vector4.h">
+      <Filter>Header Files\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Entity.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GameTimer.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ResourcesManager.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Resource.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Common.h">
+      <Filter>Header Files\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\ConfigurationManager.h">
+      <Filter>Header Files\engine\input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\Keyboard.h">
+      <Filter>Header Files\engine\input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\PhysicalBody.h">
+      <Filter>Header Files\engine\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\Simulation.h">
+      <Filter>Header Files\engine\physics</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\collision\BroadphaseDetector.h">
+      <Filter>Header Files\engine\physics\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\collision\CollisionBody.h">
+      <Filter>Header Files\engine\physics\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\collision\CollisionDetector.h">
+      <Filter>Header Files\engine\physics\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\collision\NoPartitioning.h">
+      <Filter>Header Files\engine\physics\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\collision\SortAndSweep.h">
+      <Filter>Header Files\engine\physics\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\physics\collision\WorldPartitioning.h">
+      <Filter>Header Files\engine\physics\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ui\ButtonItem.h">
+      <Filter>Header Files\engine\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ui\ImageItem.h">
+      <Filter>Header Files\engine\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ui\InterfaceItem.h">
+      <Filter>Header Files\engine\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ui\PanelItem.h">
+      <Filter>Header Files\engine\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ui\TextItem.h">
+      <Filter>Header Files\engine\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ui\UserInterface.h">
+      <Filter>Header Files\engine\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Colour.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Material.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Model.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Shader.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Texture.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Scene.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Light.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\FileIO.h">
+      <Filter>Header Files\engine\input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Renderer.h">
+      <Filter>Header Files\engine\rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

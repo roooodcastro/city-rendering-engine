@@ -142,13 +142,76 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="engine\math\Vector2.cpp" />
+    <ClCompile Include="engine\Entity.cpp" />
+    <ClCompile Include="engine\GameTimer.cpp" />
+    <ClCompile Include="engine\input\ConfigurationManager.cpp" />
+    <ClCompile Include="engine\input\FileIO.cpp" />
+    <ClCompile Include="engine\input\Keyboard.cpp" />
+    <ClCompile Include="engine\rendering\Light.cpp" />
+    <ClCompile Include="engine\rendering\Renderer.cpp" />
+    <ClCompile Include="engine\Scene.cpp" />
+    <ClCompile Include="engine\math\Matrix3.cpp" />
+    <ClCompile Include="engine\math\Matrix4.cpp" />
     <ClCompile Include="engine\Naquadah.cpp" />
+    <ClCompile Include="engine\physics\collision\BroadphaseDetector.cpp" />
+    <ClCompile Include="engine\physics\collision\CollisionBody.cpp" />
+    <ClCompile Include="engine\physics\collision\CollisionDetector.cpp" />
+    <ClCompile Include="engine\physics\collision\NoPartitioning.cpp" />
+    <ClCompile Include="engine\physics\collision\SortAndSweep.cpp" />
+    <ClCompile Include="engine\physics\collision\WorldPartitioning.cpp" />
+    <ClCompile Include="engine\physics\PhysicalBody.cpp" />
+    <ClCompile Include="engine\physics\Simulation.cpp" />
+    <ClCompile Include="engine\rendering\Colour.cpp" />
+    <ClCompile Include="engine\rendering\Material.cpp" />
+    <ClCompile Include="engine\rendering\Model.cpp" />
+    <ClCompile Include="engine\rendering\Shader.cpp" />
+    <ClCompile Include="engine\rendering\Texture.cpp" />
+    <ClCompile Include="engine\ResourcesManager.cpp" />
+    <ClCompile Include="engine\ui\ButtonItem.cpp" />
+    <ClCompile Include="engine\ui\ImageItem.cpp" />
+    <ClCompile Include="engine\ui\InterfaceItem.cpp" />
+    <ClCompile Include="engine\ui\PanelItem.cpp" />
+    <ClCompile Include="engine\ui\TextItem.cpp" />
+    <ClCompile Include="engine\ui\UserInterface.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Entity.h" />
+    <ClInclude Include="engine\GameTimer.h" />
+    <ClInclude Include="engine\input\ConfigurationManager.h" />
+    <ClInclude Include="engine\input\FileIO.h" />
+    <ClInclude Include="engine\input\Keyboard.h" />
+    <ClInclude Include="engine\rendering\Light.h" />
+    <ClInclude Include="engine\rendering\Renderer.h" />
+    <ClInclude Include="engine\Scene.h" />
+    <ClInclude Include="engine\math\Common.h" />
+    <ClInclude Include="engine\math\Matrix3.h" />
+    <ClInclude Include="engine\math\Matrix4.h" />
     <ClInclude Include="engine\math\Vector2.h" />
+    <ClInclude Include="engine\math\Vector3.h" />
+    <ClInclude Include="engine\math\Vector4.h" />
     <ClInclude Include="engine\Naquadah.h" />
+    <ClInclude Include="engine\physics\collision\BroadphaseDetector.h" />
+    <ClInclude Include="engine\physics\collision\CollisionBody.h" />
+    <ClInclude Include="engine\physics\collision\CollisionDetector.h" />
+    <ClInclude Include="engine\physics\collision\NoPartitioning.h" />
+    <ClInclude Include="engine\physics\collision\SortAndSweep.h" />
+    <ClInclude Include="engine\physics\collision\WorldPartitioning.h" />
+    <ClInclude Include="engine\physics\PhysicalBody.h" />
+    <ClInclude Include="engine\physics\Simulation.h" />
+    <ClInclude Include="engine\rendering\Colour.h" />
+    <ClInclude Include="engine\rendering\Material.h" />
+    <ClInclude Include="engine\rendering\Model.h" />
+    <ClInclude Include="engine\rendering\Shader.h" />
+    <ClInclude Include="engine\rendering\Texture.h" />
+    <ClInclude Include="engine\Resource.h" />
+    <ClInclude Include="engine\ResourcesManager.h" />
+    <ClInclude Include="engine\ui\ButtonItem.h" />
+    <ClInclude Include="engine\ui\ImageItem.h" />
+    <ClInclude Include="engine\ui\InterfaceItem.h" />
+    <ClInclude Include="engine\ui\PanelItem.h" />
+    <ClInclude Include="engine\ui\TextItem.h" />
+    <ClInclude Include="engine\ui\UserInterface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

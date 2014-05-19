@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <iostream>
 #include "math/Vector2.h"
+#include "math/Common.h"
+#include <SDL.h>
+#include <GL/glew.h>
 
 class Naquadah {
 public:
@@ -46,11 +49,16 @@ public:
 
 protected:
 
-	/* The single instance of this class. */
+	/* The single instance of this class. Defaults to null, is created and configured using the method initialize(). */
 	static Naquadah *instance;
 
-	/* The size of the game window. If the game is in fullscreen, it will simply return the screen resolution. */
+	/* The size of the window. If the game's in fullscreen, it'll return the screen resolution. Defaults to (0, 0). */
 	Vector2 windowSize;
 	/* True if the game is in fullscreen mode. Defaults to false. */
 	bool fullscreen;
+
+	/* The current scene being simulated. Defaults to null. */
+	//Scene *currentScene;
+	/* The next scene to be simulated. This should not hold a value for more than 1 frame. Defaults to null. */
+	//Scene *nextScene;
 };
