@@ -21,8 +21,11 @@
 #include <cctype>
 #include <locale>
 #include "Texture.h"
+#include "Colour.h"
 #include "../ResourcesManager.h"
 #include "../input/FileIO.h"
+
+class Texture;
 
 class Material : public Resource {
 public:

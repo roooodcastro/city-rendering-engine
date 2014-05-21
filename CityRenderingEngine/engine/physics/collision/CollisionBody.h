@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "Vector3.h"
-#include "PhysicalBody.h"
+#include "../../math/Vector3.h"
+#include "../PhysicalBody.h"
 
 class PhysicalBody;
 

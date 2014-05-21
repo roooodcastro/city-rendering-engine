@@ -149,12 +149,12 @@ void TextItem::update(unsigned millisElapsed) {
 			// Replace the colour with a new one, with different alpha value
 			if (fadeControl == 1) {
 				Colour nextColour = fadeColour;
-				nextColour.setAlpha(alpha);
+				nextColour.alpha = alpha;
 				setColour(nextColour);
 				hidden = false;
 			} else {
 				Colour nextColour = *colour;
-				nextColour.setAlpha(alpha);
+				nextColour.alpha = alpha;
 				setColour(nextColour);
 			}
 		}

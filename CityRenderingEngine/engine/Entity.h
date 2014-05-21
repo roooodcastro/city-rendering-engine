@@ -1,19 +1,19 @@
 #pragma once
 
 #include <vector>
-#include "Vector3.h"
-#include "Matrix4.h"
-#include "Model.h"
-#include "Shader.h"
-#include "GameApp.h"
-#include "Texture.h"
-#include "BoundingBox.h"
-#include "PhysicalBody.h"
+#include "math/Vector3.h"
+#include "math/Matrix4.h"
+#include "rendering/Model.h"
+#include "rendering/Shader.h"
+#include "Naquadah.h"
+#include "rendering/Texture.h"
+//#include "BoundingBox.h"
+//#include "PhysicalBody.h"
 
-class GameApp;
+class Naquadah;
 class Model;
 class Shader;
-class PhysicalBody;
+//class PhysicalBody;
 
 class Entity {
 public:
@@ -44,8 +44,8 @@ public:
 	Matrix4 getModelMatrix() { return *modelMatrix; }
 	void setModel(Model *model) { this->model = model; }
 	Model *getModel() { return model; }
-	void setPhysicalBody(PhysicalBody &body);
-	PhysicalBody *getPhysicalBody() { return physicalBody; }
+	//void setPhysicalBody(PhysicalBody &body);
+	//PhysicalBody *getPhysicalBody() { return physicalBody; }
 
 	/*
 	 * This functions returns all the children, grandchildren, etc of an entity, recursively.
@@ -106,5 +106,5 @@ protected:
 	/*
 	 * The physical body of this entity
 	 */
-	PhysicalBody *physicalBody;
+	//PhysicalBody *physicalBody;
 };

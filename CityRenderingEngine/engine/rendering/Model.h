@@ -26,8 +26,9 @@
 #include "Shader.h"
 #include "../ResourcesManager.h"
 
-class GameApp;
+class Naquadah;
 class Material;
+class Shader;
 
 /*
  * Face stores the attributes of a face, and is used to correctly order and render every vertex, uv map, material

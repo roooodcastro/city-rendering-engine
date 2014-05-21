@@ -15,10 +15,10 @@
 class Colour {
 public:
     
-    byte red;
-    byte green;
-    byte blue;
-    byte alpha;
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+    uint8_t alpha;
 
     /* Initializes a new White Colour. */
     Colour(void) : red(255), green(255), blue(255), alpha(255) {}
@@ -26,7 +26,7 @@ public:
     /* Parses a hexadecimal in the format RGBA to a Colour. */
     Colour(uint32_t colour);
     /* Parses individual colour values to a Colour. Values should range from 0 to 255. */
-    Colour(byte red, byte green, byte blue, byte alpha);
+    Colour(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
     /* Parses individual float colour values to a Colour. Values should range from 0.0f to 1.0f. */
     Colour(float red, float green, float blue, float alpha);
     ~Colour(void) {}
@@ -36,7 +36,7 @@ public:
     /* Sets the colour in hexadecimal format BGRA. */
     void setColourRev(uint32_t colour);
     /* Sets the colour using individual values ranging from 0 to 255. */
-    void setColour(byte red, byte green, byte blue, byte alpha);
+    void setColour(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
     /* Sets the colour using individual float values ranging from 0.0f to 1.0f. */
     void setColour(float red, float green, float blue, float alpha);
 

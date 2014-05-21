@@ -2,7 +2,7 @@
 
 Entity::Entity(void) {
 	this->childEntities = new std::vector<Entity*>();
-	physicalBody = new PhysicalBody(this, 0, Vector3());
+	//physicalBody = new PhysicalBody(this, 0, Vector3());
 	modelMatrix = new Matrix4();
 	customShader = NULL;
 	model = NULL;
@@ -16,14 +16,14 @@ Entity::Entity(const Entity &copy) {
 	this->childEntities = new std::vector<Entity*>(*(copy.childEntities));
 	this->model = new Model(*(copy.model));
 	this->customShader = new Shader(*(copy.customShader));
-	this->physicalBody = new PhysicalBody(*(copy.physicalBody));
+	//this->physicalBody = new PhysicalBody(*(copy.physicalBody));
 }
 
 Entity::Entity(Vector3 &position, Vector3 &velocity, Vector3 &rotation, Vector3 &scale) {
 	this->childEntities = new std::vector<Entity*>();
-	physicalBody = new PhysicalBody(this, 0, position);
-	physicalBody->setRotation(rotation);
-	physicalBody->setScale(scale);
+	//physicalBody = new PhysicalBody(this, 0, position);
+	//physicalBody->setRotation(rotation);
+	//physicalBody->setScale(scale);
 	modelMatrix = new Matrix4();
 	model = NULL;
 	customShader = NULL;
@@ -41,8 +41,8 @@ Entity::~Entity(void) {
 	childEntities = NULL;
 	delete customShader;
 	customShader = NULL;
-	delete physicalBody;
-	physicalBody = NULL;
+	//delete physicalBody;
+	//physicalBody = NULL;
 }
 
 Entity &Entity::operator=(const Entity &other) {
@@ -71,7 +71,7 @@ Entity &Entity::operator=(const Entity &other) {
 		}
 	}
 	*(this->childEntities) = *(other.childEntities);
-	*(this->physicalBody) = *(other.physicalBody);
+	//*(this->physicalBody) = *(other.physicalBody);
 	return *this;
 }
 
@@ -135,9 +135,9 @@ void Entity::onKeyUp(SDL_Keysym key) {
 
 
 void Entity::calculateModelMatrix() {
-	Vector3 calcPos = Vector3(*(this->getPhysicalBody()->getPosition()));
-	Vector3 calcRot = Vector3(*(this->getPhysicalBody()->getRotation()));
-	Vector3 calcSiz = Vector3(*(this->getPhysicalBody()->getScale()));
+	//Vector3 calcPos = Vector3(*(this->getPhysicalBody()->getPosition()));
+	//Vector3 calcRot = Vector3(*(this->getPhysicalBody()->getRotation()));
+	//Vector3 calcSiz = Vector3(*(this->getPhysicalBody()->getScale()));
 	/*
 	 * If is a child, we add up the parent's attributes.
 	 *
@@ -155,14 +155,14 @@ void Entity::calculateModelMatrix() {
 	 * I may or may not try to fix this.
 	 */
 	if (parent != NULL) {
-		calcPos = calcPos + *(parent->getPhysicalBody()->getPosition());
+		//calcPos = calcPos + *(parent->getPhysicalBody()->getPosition());
 		//calcRot = calcRot + *(parent->getPhysicalBody()->getRotation());
-		calcSiz = calcSiz * *(parent->getPhysicalBody()->getScale());
+		//calcSiz = calcSiz * *(parent->getPhysicalBody()->getScale());
 	}
 
 	// Now that we calculated the final attributes, build the matrix
-	Matrix4 rotationMatrix = Matrix4::Rotation(calcRot.x, Vector3(1, 0, 0)) * Matrix4::Rotation(calcRot.y, Vector3(0, 1, 0)) * Matrix4::Rotation(calcRot.z, Vector3(0, 0, 1));
-	*modelMatrix = Matrix4::Translation(calcPos) * rotationMatrix * Matrix4::Scale(calcSiz);
+	//Matrix4 rotationMatrix = Matrix4::Rotation(calcRot.x, Vector3(1, 0, 0)) * Matrix4::Rotation(calcRot.y, Vector3(0, 1, 0)) * Matrix4::Rotation(calcRot.z, Vector3(0, 0, 1));
+	//*modelMatrix = Matrix4::Translation(calcPos) * rotationMatrix * Matrix4::Scale(calcSiz);
 
 	// Finally, do the same for the children
 	for(std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
@@ -194,8 +194,8 @@ void Entity::update(unsigned millisElapsed) {
 
 void Entity::draw(unsigned millisElapsed) {
 	if (model != NULL) {
-		GLuint program = GameApp::getInstance()->getDefaultShader()->getShaderProgram();
-		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) modelMatrix);
+		//GLuint program = Naquadah::getInstance()->getDefaultShader()->getShaderProgram();
+		//glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) modelMatrix);
 		model->draw();
 	}
 	for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
@@ -205,22 +205,22 @@ void Entity::draw(unsigned millisElapsed) {
 	// If debug mode enabled, draw the collision spheres to track their position and check if collisions are correct
 	bool debug = false;
 	if (debug) {
-		GLuint program = GameApp::getInstance()->getDefaultShader()->getShaderProgram();
+		//GLuint program = GameApp::getInstance()->getDefaultShader()->getShaderProgram();
 		Model *sphere = (Model*) Model::getOrCreate("SPHERE_MESH", "resources/models/sphere.mdl");
 		if (sphere != NULL) {
-			std::vector<CollisionBody*> *colBodies = physicalBody->getCollisionBodies();
-			for (unsigned i = 0; i < min(colBodies->size(), 2); i++) {
-				CollisionBody *colBody = (*colBodies)[i];
-				if (colBody->getType() == BodyType::SPHERE) {
-					Vector3 calcPos = Vector3(*(colBody->getAbsolutePosition()));
-					Vector3 calcSiz = Vector3(colBody->getRadius(), colBody->getRadius(), colBody->getRadius());
+			//std::vector<CollisionBody*> *colBodies = physicalBody->getCollisionBodies();
+			//for (unsigned i = 0; i < min(colBodies->size(), 2); i++) {
+			//	CollisionBody *colBody = (*colBodies)[i];
+			//	if (colBody->getType() == BodyType::SPHERE) {
+			//		Vector3 calcPos = Vector3(*(colBody->getAbsolutePosition()));
+			//		Vector3 calcSiz = Vector3(colBody->getRadius(), colBody->getRadius(), colBody->getRadius());
 
-					// Now that we calculated the final attributes, build the matrix
-					Matrix4 colModelMatrix = Matrix4::Translation(calcPos) * Matrix4::Scale(calcSiz);
-					glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) &colModelMatrix);
-					sphere->draw();
-				}
-			}
+			//		// Now that we calculated the final attributes, build the matrix
+			//		Matrix4 colModelMatrix = Matrix4::Translation(calcPos) * Matrix4::Scale(calcSiz);
+			//		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) &colModelMatrix);
+			//		sphere->draw();
+			//	}
+			//}
 		}
 	}
 
@@ -263,9 +263,9 @@ void Entity::setCustomShader(Shader &customShader) {
 	}
 }
 
-void Entity::setPhysicalBody(PhysicalBody &body) {
-	*(this->physicalBody) = body;
-}
+//void Entity::setPhysicalBody(PhysicalBody &body) {
+//	*(this->physicalBody) = body;
+//}
 
 std::vector<Entity*> Entity::getAllChildren(Entity *entity) {
 	std::vector<Entity*> children = std::vector<Entity*>();

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "InterfaceItem.h"
-#include "GameApp.h"
-#include "Sound.h"
+#include "../Naquadah.h"
+#include "../rendering/Model.h"
+//#include "Sound.h"
 
 enum ButtonState {
 	BUTTON_NORMAL,

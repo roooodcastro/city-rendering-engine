@@ -11,8 +11,8 @@
 #pragma once
 
 #include <vector>
-#include "GameApp.h"
-#include "GameTimer.h"
+//#include "GameApp.h"
+#include "../GameTimer.h"
 #include "PhysicalBody.h"
 
 class BroadphaseDetector;
@@ -21,53 +21,53 @@ class PhysicalBody;
 class Simulation {
 public:
 
-	~Simulation(void);
-	Simulation &operator=(const Simulation &other);
+    Simulation(void);
+    ~Simulation(void);
+    Simulation &operator=(const Simulation &other);
 
-	static Simulation *getInstance();
+    static Simulation *getInstance();
 
-	/* Resets the simulation, deleting it */
-	static void resetSimulation() { delete instance; instance = NULL; }
+    /* Resets the simulation, deleting it */
+    static void resetSimulation() { delete instance; instance = NULL; }
 
-	/* Starts the simulation */
-	void startSimulation();
-	/* Stops the simulation */
-	void stopSimulation();
+    /* Starts the simulation */
+    void startSimulation();
+    /* Stops the simulation */
+    void stopSimulation();
 
-	GameTimer *getTimer() { return timer; }
-	void setBroadphaseDetector(BroadphaseDetector *broadphaseDetector) { this->broadphaseDetector = broadphaseDetector; }
-	BroadphaseDetector *getBroadphaseDetector() { return broadphaseDetector; }
-	void setPaused(bool paused) { this->paused = paused; }
-	bool isPaused() { return paused; }
+    GameTimer *getTimer() { return timer; }
+    void setBroadphaseDetector(BroadphaseDetector *broadphaseDetector) { this->broadphaseDetector = broadphaseDetector; }
+    BroadphaseDetector *getBroadphaseDetector() { return broadphaseDetector; }
+    void setPaused(bool paused) { this->paused = paused; }
+    bool isPaused() { return paused; }
 
-	/* Sets the gravity value for all entities */
-	void setGravity(float gravity) { this->gravity = gravity; }
-	float getGravity() { return gravity; }
+    /* Sets the gravity value for all entities */
+    void setGravity(float gravity) { this->gravity = gravity; }
+    float getGravity() { return gravity; }
 
-	static const float GRAVITY_EARTH;
-	static const float GRAVITY_MOON;
-	static const float GRAVITY_ZERO;
+    static const float GRAVITY_EARTH;
+    static const float GRAVITY_MOON;
+    static const float GRAVITY_ZERO;
 
 protected:
 
-	/* Protected constructors, as this is a singleton class */
-	Simulation(void);
-	Simulation(const Simulation &copy);
+    /* Protected constructors, as this is a singleton class */
+    Simulation(const Simulation &copy);
 
-	/* This is the function that the timer will call every tick, to update the simulation */
-	static void timerCallback(double millisElapsed);
+    /* This is the function that the timer will call every tick, to update the simulation */
+    static void timerCallback(double millisElapsed);
 
-	/* Game timer controlling the physics */
-	GameTimer *timer;
-	/* Broadphase detector, to partition the world and reduce number of collision checks */
-	BroadphaseDetector *broadphaseDetector;
-	/* The gravity acceleration for this simulation. Default: 0. Earth's gravity: -9.78m/s*s */
-	float gravity;
+    /* Game timer controlling the physics */
+    GameTimer *timer;
+    /* Broadphase detector, to partition the world and reduce number of collision checks */
+    BroadphaseDetector *broadphaseDetector;
+    /* The gravity acceleration for this simulation. Default: 0. Earth's gravity: -9.78m/s*s */
+    float gravity;
 
-	/* Simulation control flags */
-	bool running;
-	bool paused;
+    /* Simulation control flags */
+    bool running;
+    bool paused;
 
-	/* The singleton instance of this class */
-	static Simulation *instance;
+    /* The singleton instance of this class */
+    static Simulation *instance;
 };

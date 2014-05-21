@@ -22,11 +22,11 @@ InterfaceItem(ITEM_BUTTON, position, rotation, size) {
 
 ButtonItem::ButtonItem(Vector2 &position, float rotation, Vector2 &size, const char *resourceName, const char *normal, const char *hovered, const char *pressed, const char *selected) :
 	InterfaceItem(ITEM_BUTTON, position, rotation, size) {
-		this->normalTex = Texture::getOrCreate((string(resourceName) + "_normal").c_str(), normal);
+		this->normalTex = Texture::getOrCreate((std::string(resourceName) + "_normal").c_str(), normal);
 		this->texture = this->normalTex;
-		this->hoveredTex = Texture::getOrCreate((string(resourceName) + "_hovered").c_str(), hovered);
-		this->pressedTex = Texture::getOrCreate((string(resourceName) + "_pressed").c_str(), pressed);
-		this->selectedTex = Texture::getOrCreate((string(resourceName) + "_selected").c_str(), selected);
+		this->hoveredTex = Texture::getOrCreate((std::string(resourceName) + "_hovered").c_str(), hovered);
+		this->pressedTex = Texture::getOrCreate((std::string(resourceName) + "_pressed").c_str(), pressed);
+		this->selectedTex = Texture::getOrCreate((std::string(resourceName) + "_selected").c_str(), selected);
 		this->selected = false;
 }
 
@@ -42,7 +42,7 @@ void ButtonItem::onMouseMoved(Vector2 &position, Vector2 &amount) {
 		if (isMouseHovering(position)) {
 			if (state != BUTTON_HOVERED) {
 				// Play a little SFX
-				Sound::playSfx("ButtonHoverSfx", 16);
+				//Sound::playSfx("ButtonHoverSfx", 16);
 			}
 			state = BUTTON_HOVERED;
 		} else if (selected) {
@@ -63,7 +63,7 @@ void ButtonItem::onMouseDoubleClick(Uint8 button, Vector2 &position) {
 void ButtonItem::onMouseButtonDown(Uint8 button, Vector2 &position) {
 	if (isMouseHovering(position) && button == SDL_BUTTON_LEFT) {
 		if (state != BUTTON_PRESSED) {
-			Sound::playSfx("ButtonClickSfx", 64);
+			//Sound::playSfx("ButtonClickSfx", 64);
 		}
 		state = BUTTON_PRESSED;
 	}

@@ -14,9 +14,10 @@
 #pragma once
 
 #include <vector>
-#include "Vector3.h"
+#include "../math/Vector3.h"
 #include "Simulation.h"
-#include "CollisionBody.h"
+#include "collision/CollisionBody.h"
+#include "../Entity.h"
 
 class CollisionBody;
 class Entity;

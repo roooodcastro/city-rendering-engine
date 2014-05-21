@@ -96,12 +96,6 @@
     <ClCompile Include="engine\physics\PhysicalBody.cpp">
       <Filter>Source Files\engine\physics</Filter>
     </ClCompile>
-    <ClCompile Include="engine\physics\collision\CollisionDetector.cpp">
-      <Filter>Source Files\engine\physics\collision</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\physics\collision\BroadphaseDetector.cpp">
-      <Filter>Source Files\engine\physics\collision</Filter>
-    </ClCompile>
     <ClCompile Include="engine\physics\collision\NoPartitioning.cpp">
       <Filter>Source Files\engine\physics\collision</Filter>
     </ClCompile>
@@ -210,9 +204,6 @@
       <Filter>Header Files\engine\physics\collision</Filter>
     </ClInclude>
     <ClInclude Include="engine\physics\collision\CollisionBody.h">
-      <Filter>Header Files\engine\physics\collision</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\physics\collision\CollisionDetector.h">
       <Filter>Header Files\engine\physics\collision</Filter>
     </ClInclude>
     <ClInclude Include="engine\physics\collision\NoPartitioning.h">

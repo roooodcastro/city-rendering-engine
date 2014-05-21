@@ -9,7 +9,7 @@
 #pragma once
 
 #include <vector>
-#include "Simulation.h"
+#include "../Simulation.h"
 
 class Simulation;
 class PhysicalBody;
@@ -17,13 +17,13 @@ class PhysicalBody;
 class BroadphaseDetector {
 public:
 
-	BroadphaseDetector(void);
-	virtual ~BroadphaseDetector(void);
+    BroadphaseDetector(void) {}
+    virtual ~BroadphaseDetector(void) {}
 
-	/*
-	 * The main method of the detector. This will perform the broadphase partitioning
-	 * of the bodies and perform narrowphase detections on the bodies that are near to
-	 * each other.
-	 */
-	virtual void performDetection(std::vector<PhysicalBody*> *bodies, float millisElapsed) = 0;
+    /*
+     * The main method of the detector. This will perform the broadphase partitioning
+     * of the bodies and perform narrowphase detections on the bodies that are near to
+     * each other.
+     */
+    virtual void performDetection(std::vector<PhysicalBody*> *bodies, float millisElapsed) = 0;
 };

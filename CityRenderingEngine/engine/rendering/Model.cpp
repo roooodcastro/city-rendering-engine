@@ -71,7 +71,7 @@ void Model::draw() {
     // Will only try to render if the model is loaded to the GPU
     if (loaded) {
         glBindVertexArray(vao);
-        GLuint program = Naquadah::getInstance()->getDefaultShader()->getShaderProgram();
+        //GLuint program = Naquadah::getInstance()->getDefaultShader()->getShaderProgram();
         int vertexOffset = 0;
         int vertexCount = 0;
         int currentTexId = -1;
@@ -80,7 +80,7 @@ void Model::draw() {
             vertexCount += 3;
             if (face->material->getTexture() && face->material->getTexture()->isTextureValid()) {
                 if (face->material->getTexture()->getTextureId() != currentTexId) {
-                    face->material->getTexture()->bindTexture(program, TEXTURE0);
+                    //face->material->getTexture()->bindTexture(program, TEXTURE0);
                     if (currentTexId >= 0) {
                         glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
                         vertexOffset = vertexCount;
@@ -91,7 +91,7 @@ void Model::draw() {
             }
         }
         glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
-        GameApp::logOpenGLError("MODEL_DRAW");
+        //GameApp::logOpenGLError("MODEL_DRAW");
         glBindVertexArray(0);
     }
 }
@@ -114,8 +114,8 @@ Model *Model::generateTriangle() {
     m->textureCoords[0] = Vector2(0.5f, 0.5f);
     m->textureCoords[1] = Vector2(1.0f, 1.0f);
     m->textureCoords[2] = Vector2(0, 1.0f);
-    Face *face = new Face(1, 2, 3, 1, 2, 3, 0, 0, 0, Material());
-    face->material->setTexture(Texture());
+    Face *face = new Face(1, 2, 3, 1, 2, 3, 0, 0, 0, new Material());
+    //face->material->setTexture(Texture());
     m->faces->emplace_back(face);
     m->bufferData();
     return m;
@@ -150,15 +150,15 @@ Model* Model::generateQuad() {
     m->textureCoords[4] = Vector2(1.0f, 1.0f);
     m->textureCoords[5] = Vector2(0, 1.0f);
 
-    Face *face1 = new Face(1, 2, 3, 1, 2, 3, 0, 0, 0, Material());
-    Face *face2 = new Face(4, 5, 6, 4, 5, 6, 0, 0, 0, Material());
+    Face *face1 = new Face(1, 2, 3, 1, 2, 3, 0, 0, 0, new Material());
+    Face *face2 = new Face(4, 5, 6, 4, 5, 6, 0, 0, 0, new Material());
     /* We purposely set invalid textures here, so when this model renders,
      * it won't bind any texture. This specific mesh can't bind a texture
      * on its own because these primitives will be used primarily to render
      * interface items, such as texts and buttons that have other ways of
      * binding its textures. */
-    face1->material->setTexture(Texture());
-    face2->material->setTexture(Texture());
+    //face1->material->setTexture(Texture());
+    //face2->material->setTexture(Texture());
     m->faces->emplace_back(face1);
     m->faces->emplace_back(face2);
 
@@ -294,49 +294,49 @@ void Model::load() {
                     * The vi variables represent vertex indexes, the ni represent
                     * normal indexes and ti, texture mapping indexes
                     */
-                int viX, viY, viZ, viW, niX, niY, niZ, niW, tiX, tiY, tiZ, tiW;
+                int viX, viY, viZ, niX, niY, niZ, tiX, tiY, tiZ;
 
                 if (count(line.begin(), line.end(), ' ') == 4) {
-                    // It's a quadrilateral face
-                    if (line.find("//") != std::string::npos) {
-                        // If there's a normal vector index
-                        sscanf(line.c_str(),"f %d//%d %d//%d %d//%d %d//%d", &viX ,&niX, &viY, &niY, &viZ, &niZ, &viW, &niW);
-                        vecFaces.emplace_back(new Face(viX, viY, viZ, viW, 0, 0, 0, 0, niX, niY, niZ, niW, *currentMaterial));
-                    } else if (line.find("/") != std::string::npos) {
-                        if (count(line.begin(), line.end(), '/') == 8) {
-                            // If there's both texture coordinates and normal vector
-                            sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &viX, &tiX, &niX, &viY, &tiY, &niY, &viZ, &tiZ, &niZ, &viW, &tiW, &niW);
-                            vecFaces.emplace_back(new Face(viX, viY, viZ, viW, tiX, tiY, tiZ, tiW, niX, niY, niZ, niW, *currentMaterial));
-                        } else {
-                            // If there's texture coordinate indexes
-                            sscanf(line.c_str(), "f %d/%d %d/%d %d/%d %d/%d", &viX, &tiX, &viY, &tiY, &viZ, &tiZ, &viW, &tiW);
-                            vecFaces.emplace_back(new Face(viX, viY, viZ, viW, tiX, tiY, tiZ, tiW, 0, 0, 0, 0, *currentMaterial));
-                        }
-                    } else {
-                        // If we just have vertices, no normals or texture coordinates
-                        sscanf(line.c_str(), "f %d %d %d %d", &viX, &viY, &viZ, &viW);
-                        vecFaces.emplace_back(new Face(viX, viY, viZ, viW, 0, 0, 0, 0, 0, 0, 0, 0, *currentMaterial));
-                    }
+                    //// It's a quadrilateral face
+                    //if (line.find("//") != std::string::npos) {
+                    //    // If there's a normal vector index
+                    //    sscanf(line.c_str(),"f %d//%d %d//%d %d//%d %d//%d", &viX ,&niX, &viY, &niY, &viZ, &niZ, &viW, &niW);
+                    //    vecFaces.emplace_back(new Face(viX, viY, viZ, viW, 0, 0, 0, 0, niX, niY, niZ, niW, *currentMaterial));
+                    //} else if (line.find("/") != std::string::npos) {
+                    //    if (count(line.begin(), line.end(), '/') == 8) {
+                    //        // If there's both texture coordinates and normal vector
+                    //        sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &viX, &tiX, &niX, &viY, &tiY, &niY, &viZ, &tiZ, &niZ, &viW, &tiW, &niW);
+                    //        vecFaces.emplace_back(new Face(viX, viY, viZ, viW, tiX, tiY, tiZ, tiW, niX, niY, niZ, niW, *currentMaterial));
+                    //    } else {
+                    //        // If there's texture coordinate indexes
+                    //        sscanf(line.c_str(), "f %d/%d %d/%d %d/%d %d/%d", &viX, &tiX, &viY, &tiY, &viZ, &tiZ, &viW, &tiW);
+                    //        vecFaces.emplace_back(new Face(viX, viY, viZ, viW, tiX, tiY, tiZ, tiW, 0, 0, 0, 0, *currentMaterial));
+                    //    }
+                    //} else {
+                    //    // If we just have vertices, no normals or texture coordinates
+                    //    sscanf(line.c_str(), "f %d %d %d %d", &viX, &viY, &viZ, &viW);
+                    //    vecFaces.emplace_back(new Face(viX, viY, viZ, viW, 0, 0, 0, 0, 0, 0, 0, 0, *currentMaterial));
+                    //}
                 } else {
                     // It's a triangle face
                     if (line.find("//") != std::string::npos) {
                         // If there's a normal vector index
                         sscanf(line.c_str(),"f %d//%d %d//%d %d//%d", &viX ,&niX, &viY, &niY, &viZ, &niZ);
-                        vecFaces.emplace_back(new Face(viX, viY, viZ, 0, 0, 0, niX, niY, niZ, *currentMaterial));
+                        vecFaces.emplace_back(new Face(viX, viY, viZ, 0, 0, 0, niX, niY, niZ, currentMaterial));
                     } else if (line.find("/") != std::string::npos) {
                         if (count(line.begin(), line.end(), '/') == 6) {
                             // If there's both texture coordinates and normal vector
                             sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &viX, &tiX, &niX, &viY, &tiY, &niY, &viZ, &tiZ, &niZ);
-                            vecFaces.emplace_back(new Face(viX, viY, viZ, tiX, tiY, tiZ, niX, niY, niZ, *currentMaterial));
+                            vecFaces.emplace_back(new Face(viX, viY, viZ, tiX, tiY, tiZ, niX, niY, niZ, currentMaterial));
                         } else {
                             // If there's texture coordinate indexes
                             sscanf(line.c_str(), "f %d/%d %d/%d %d/%d", &viX, &tiX, &viY, &tiY, &viZ, &tiZ);
-                            vecFaces.emplace_back(new Face(viX, viY, viZ, tiX, tiY, tiZ, 0, 0, 0, *currentMaterial));
+                            vecFaces.emplace_back(new Face(viX, viY, viZ, tiX, tiY, tiZ, 0, 0, 0, currentMaterial));
                         }
                     } else {
                         // If we just have vertices, no normals or texture coordinates
                         sscanf(line.c_str(), "f %d %d %d", &viX, &viY, &viZ);
-                        vecFaces.emplace_back(new Face(viX, viY, viZ, 0, 0, 0, 0, 0, 0, *currentMaterial));
+                        vecFaces.emplace_back(new Face(viX, viY, viZ, 0, 0, 0, 0, 0, 0, currentMaterial));
                     }
                 }
                 break;
@@ -372,7 +372,7 @@ void Model::load() {
         // First we have to count the total number of vertices
         int numTotalVertices = 0;
         for (unsigned i = 0; i < vecFaces.size(); i++) {
-            numTotalVertices += vecFaces[i]->quad ? 4 : 3;
+            numTotalVertices += 3;
         }
         this->numVertices = numTotalVertices;
         // Now we fill in the ordered vectors with all vertices
@@ -383,12 +383,12 @@ void Model::load() {
         this->normals = new Vector3[numTotalVertices];
         for (unsigned i = 0; i < vecFaces.size(); i++) {
             Face *face = vecFaces[i];
-            int numVertices = face->quad ? 4 : 3;
+            int numVertices = 3;
         
             for (int j = 0; j < numVertices; j++) {
                 this->vertices[vertexOffset + j] = *(vecVertices[face->vertexIndexes[j] - 1]);
-                Vector3 colour = face->material->getDiffuse();
-                this->colours[vertexOffset + j] = Vector4(colour.x, colour.y, colour.z, face->material->getAlpha());
+                Colour colour = face->material->getDiffuse();
+                this->colours[vertexOffset + j] = Vector4(colour.red, colour.green, colour.blue, face->material->getAlpha());
                 if (face->texCoords[j] == 0) {
                     this->textureCoords[vertexOffset + j] = Vector2();
                 } else {
@@ -438,8 +438,8 @@ void Model::unload() {
 void Model::initializePrimitiveMeshes() {
     Model *triangle = Model::generateTriangle();
     Model *quad = Model::generateQuad();
-    ResourcesManager::addResource(Model::meshTriangleName, triangle);
-    ResourcesManager::addResource(Model::meshQuadName, quad);
+    ResourcesManager::addResource(triangle);
+    ResourcesManager::addResource(quad);
 }
 
 Model *Model::getTriangleMesh() {
@@ -455,7 +455,7 @@ Model *Model::getOrCreate(const char *name, const char *fileName) {
         return (Model*) ResourcesManager::getResource(name);
     } else {
         Model *newModel = new Model(fileName, name);
-        ResourcesManager::addResource(name, newModel);
+        ResourcesManager::addResource(newModel);
         return newModel;
     }
 }

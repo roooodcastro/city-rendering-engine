@@ -20,9 +20,9 @@
  * A enumerator with the possible level types. Each type will behave differently when it's being processed by the GameApp class.
  */
 enum SceneType {
-	LEVEL_MENU, // A interactive menu screen level, this can be a menu or a end game screen, etc
-	LEVEL_STATIC_SCREEN, // A static screen level with no user input. Usually used as a loading screen
-	LEVEL_GAME, // A game level, to be used when the player is actually playing a level
+	SCENE_MENU, // A interactive menu screen level, this can be a menu or a end game screen, etc
+	SCENE_STATIC_SCREEN, // A static screen level with no user input. Usually used as a loading screen
+	SCENE_GAME, // A game level, to be used when the player is actually playing a level
 };
 
 class UserInterface;

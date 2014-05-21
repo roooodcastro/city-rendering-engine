@@ -2,10 +2,10 @@
 
 #include <vector>
 #include <algorithm>
-#include "Matrix4.h"
-#include "GameApp.h"
-#include "Vector2.h"
-#include "Texture.h"
+#include "../math/Matrix4.h"
+#include "../Naquadah.h"
+#include "../math/Vector2.h"
+#include "../rendering/Model.h"
 
 enum InterfaceItemType {
 	ITEM_BUTTON, // A clickable button

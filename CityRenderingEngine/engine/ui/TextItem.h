@@ -27,17 +27,17 @@ public:
 	virtual void onKeyUp(SDL_Keysym key); // Will fire every time a key is released
 
 	/* General getters and setters */
-	void setText(string text);
-	string getText() { return text; }
+	void setText(std::string text);
+	std::string getText() { return text; }
 	void setColour(Colour &colour);
 	Colour *getColour() { return colour; }
-	void setFont(string font);
-	string getFont() { return font; }
+	void setFont(std::string font);
+	std::string getFont() { return font; }
 	void setFontSize(int fontSize);
 	int getFontSize() { return fontSize; }
 
 	/* We set these to Arial 16, white */
-	static const string defaultFont;
+	static const std::string defaultFont;
 	static const int defaultFontSize;
 	static const Colour defaultColour;
 

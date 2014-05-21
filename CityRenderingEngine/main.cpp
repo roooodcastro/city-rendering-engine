@@ -18,10 +18,16 @@
 
 int main(int argc, char* argv[]) {
 
-	SDL_Init(SDL_INIT_EVERYTHING);
+    // Configure engine
+    ConfigurationManager::setConfigFileName("anotherFile.cfg");
+    Naquadah::initialize(Naquadah::NAQUADAH_INIT_EVERYTHING);
 
-	SDL_Quit();
+    // Create the first Scene and start the game
+    Scene *scene = new Scene(SCENE_GAME);
+    Naquadah::getInstance()->setNextScene(scene);
 
-	// Cleanup
-	return 0;
+    Naquadah::getInstance()->runGame();
+
+    // Cleanup after the game ends
+    return 0;
 }

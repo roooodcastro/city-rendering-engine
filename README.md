@@ -15,3 +15,9 @@ Use NBT file format to save generated city structure
 Generate city structure grouping it in "chunks", like Minecraft
 Read the first lines of the shaders to  find out the glsl version required, so the engine can detect if the current card/driver supports it
 Make Renderer class and keep track of the current VAO, texture and shader being used on opengl, and make every opengl call pass through it
+Make a class to help calculate those values that I need an average over the last 60 frames or so, like FPS
+Find a method to keep all measures scale-independent, so the game will work fine on all resolutions, and make this transparent to outside the engine
+Resource loader what will load resources asynchronously and call a callback function when finished
+
+Small things TODO:
+Speed up the Matrix4 multiplication operator

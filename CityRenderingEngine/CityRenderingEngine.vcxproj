@@ -99,12 +99,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;glew32.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -153,9 +153,7 @@
     <ClCompile Include="engine\math\Matrix3.cpp" />
     <ClCompile Include="engine\math\Matrix4.cpp" />
     <ClCompile Include="engine\Naquadah.cpp" />
-    <ClCompile Include="engine\physics\collision\BroadphaseDetector.cpp" />
     <ClCompile Include="engine\physics\collision\CollisionBody.cpp" />
-    <ClCompile Include="engine\physics\collision\CollisionDetector.cpp" />
     <ClCompile Include="engine\physics\collision\NoPartitioning.cpp" />
     <ClCompile Include="engine\physics\collision\SortAndSweep.cpp" />
     <ClCompile Include="engine\physics\collision\WorldPartitioning.cpp" />
@@ -193,7 +191,6 @@
     <ClInclude Include="engine\Naquadah.h" />
     <ClInclude Include="engine\physics\collision\BroadphaseDetector.h" />
     <ClInclude Include="engine\physics\collision\CollisionBody.h" />
-    <ClInclude Include="engine\physics\collision\CollisionDetector.h" />
     <ClInclude Include="engine\physics\collision\NoPartitioning.h" />
     <ClInclude Include="engine\physics\collision\SortAndSweep.h" />
     <ClInclude Include="engine\physics\collision\WorldPartitioning.h" />

@@ -45,7 +45,7 @@ static inline float generateRandom(float min, float max) {
 
 /* A few typedefs to make things shorter. */
 typedef unsigned int uint;
-typedef uint8_t byte;
+//typedef uint8_t byte;
 
 static inline std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);

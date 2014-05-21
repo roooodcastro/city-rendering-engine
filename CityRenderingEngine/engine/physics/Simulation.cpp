@@ -1,5 +1,5 @@
 #include "Simulation.h"
-#include "WorldPartitioning.h"
+#include "collision/WorldPartitioning.h"
 
 const float Simulation::GRAVITY_EARTH = -9.78f;
 const float Simulation::GRAVITY_MOON = -1.62f;
@@ -10,8 +10,8 @@ Simulation *Simulation::instance = NULL;
 Simulation::Simulation(void) {
 	running = false;
 	paused = false;
-	timer = new GameTimer(GameApp::TARGET_TPS, &Simulation::timerCallback);
-	broadphaseDetector = new WorldPartitioning(4, 4, 4, Vector3(-100, -100, -100), Vector3(100, 100, 100));
+	//timer = new GameTimer(GameApp::TARGET_TPS, &Simulation::timerCallback);
+	//broadphaseDetector = new WorldPartitioning(4, 4, 4, Vector3(-100, -100, -100), Vector3(100, 100, 100));
 }
 
 Simulation::Simulation(const Simulation &copy) {
@@ -44,42 +44,42 @@ Simulation *Simulation::getInstance() {
 
 void Simulation::timerCallback(double millisElapsed) {
 	Simulation *simulation = Simulation::getInstance();
-	Level *level = GameApp::getInstance()->getCurrentLevel();
-	if (level != NULL) {
-		// Only try to simulate physics if there's an active level to get the entities from
-		level->lockMutex();
-		std::map<std::string, Entity*> *entities = level->getEntities();
-		std::vector<PhysicalBody*> *physicalBodies = new std::vector<PhysicalBody*>();
-		// Get all physical bodies from the current level
-		unsigned numEntities = entities->size();
-		for (unsigned i = 0; i < numEntities; i++) {
-			if (i < entities->size()) {
-				auto it = entities->begin();
-				std::advance(it, i);
-				int childIndex = 0;
-				// Add all children entities as well
-				std::vector<Entity*> children = Entity::getAllChildren((*it).second);
-				for (unsigned i = 0; i < children.size(); i++) {
-					physicalBodies->emplace_back(children[i]->getPhysicalBody());
-				}
-			}
-		}
-		if (!simulation->isPaused()) {
-			// Update physics
-			for (unsigned i = 0; i < physicalBodies->size(); i++) {
-				// Calculate velocity, position, etc for each PhysicalBody;
-				PhysicalBody *physicalBody = (*physicalBodies)[i];
-				// If PhysicalBody is at rest, don't update its position
-				if (!physicalBody->isAtRest((float) millisElapsed)) {
-					physicalBody->update((float) millisElapsed);
-				}
-			}
+	//Level *level = GameApp::getInstance()->getCurrentLevel();
+	//if (level != NULL) {
+	//	// Only try to simulate physics if there's an active level to get the entities from
+	//	level->lockMutex();
+	//	std::map<std::string, Entity*> *entities = level->getEntities();
+	//	std::vector<PhysicalBody*> *physicalBodies = new std::vector<PhysicalBody*>();
+	//	// Get all physical bodies from the current level
+	//	unsigned numEntities = entities->size();
+	//	for (unsigned i = 0; i < numEntities; i++) {
+	//		if (i < entities->size()) {
+	//			auto it = entities->begin();
+	//			std::advance(it, i);
+	//			int childIndex = 0;
+	//			// Add all children entities as well
+	//			std::vector<Entity*> children = Entity::getAllChildren((*it).second);
+	//			for (unsigned i = 0; i < children.size(); i++) {
+	//				physicalBodies->emplace_back(children[i]->getPhysicalBody());
+	//			}
+	//		}
+	//	}
+	//	if (!simulation->isPaused()) {
+	//		// Update physics
+	//		for (unsigned i = 0; i < physicalBodies->size(); i++) {
+	//			// Calculate velocity, position, etc for each PhysicalBody;
+	//			PhysicalBody *physicalBody = (*physicalBodies)[i];
+	//			// If PhysicalBody is at rest, don't update its position
+	//			if (!physicalBody->isAtRest((float) millisElapsed)) {
+	//				physicalBody->update((float) millisElapsed);
+	//			}
+	//		}
 
-			// Check for collisions
-			simulation->getBroadphaseDetector()->performDetection(physicalBodies, (float) millisElapsed);
-		}
-		level->unlockMutex();
-	}
+	//		// Check for collisions
+	//		simulation->getBroadphaseDetector()->performDetection(physicalBodies, (float) millisElapsed);
+	//	}
+	//	level->unlockMutex();
+	//}
 }
 
 void Simulation::startSimulation() {

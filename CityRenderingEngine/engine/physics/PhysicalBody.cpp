@@ -198,19 +198,19 @@ void PhysicalBody::checkCollision(PhysicalBody *body1, PhysicalBody *body2, floa
 
 void PhysicalBody::addCollisionBody(CollisionBody *colBody) {
 	collisionBodies->emplace_back(colBody);
-	Matrix4 rotMatrix = Matrix4::Rotation(rotation->x, Vector3(1, 0, 0)) * Matrix4::Rotation(rotation->y, Vector3(0, 1, 0)) * Matrix4::Rotation(rotation->z, Vector3(0, 0, 1));
-	Matrix4 transform = Matrix4::Translation(getAbsolutePosition()) * rotMatrix;
-	colBody->setAbsolutePosition((transform * Matrix4::Translation(*(colBody->getPosition())) * Vector3(0, 0, 0)));
+	//Matrix4 rotMatrix = Matrix4::Rotation(rotation->x, Vector3(1, 0, 0)) * Matrix4::Rotation(rotation->y, Vector3(0, 1, 0)) * Matrix4::Rotation(rotation->z, Vector3(0, 0, 1));
+	//Matrix4 transform = Matrix4::Translation(getAbsolutePosition()) * rotMatrix;
+	//colBody->setAbsolutePosition((transform * Matrix4::Translation(*(colBody->getPosition())) * Vector3(0, 0, 0)));
 }
 
 void PhysicalBody::removeCollisionBody(CollisionBody *colBody) {
-	collisionBodies->erase(std::remove(collisionBodies->begin(), collisionBodies->end(), colBody), collisionBodies->end());
+	//collisionBodies->erase(std::remove(collisionBodies->begin(), collisionBodies->end(), colBody), collisionBodies->end());
 }
 
 Vector3 PhysicalBody::getAbsolutePosition() {
 	Vector3 absPos = Vector3(*position);
 	if (entity != NULL && entity->getParent() != NULL) {
-		absPos += entity->getParent()->getPhysicalBody()->getAbsolutePosition();
+		//absPos += entity->getParent()->getPhysicalBody()->getAbsolutePosition();
 	}
 	return absPos;
 }
@@ -218,7 +218,7 @@ Vector3 PhysicalBody::getAbsolutePosition() {
 Vector3 PhysicalBody::getAbsoluteScale() {
 	Vector3 absScale = Vector3(*scale);
 	if (entity != NULL && entity->getParent() != NULL) {
-		absScale += entity->getParent()->getPhysicalBody()->getAbsoluteScale();
+		//absScale += entity->getParent()->getPhysicalBody()->getAbsoluteScale();
 	}
 	return absScale;
 }
@@ -229,11 +229,11 @@ void PhysicalBody::setPosition(Vector3 &position) {
 	if (collisionBodies->size() > 0) {
 		// If we have collision bodies, calculate their absolute position
 		// This is done here to speed up collision detection later
-		Matrix4 rotMatrix = Matrix4::Rotation(rotation->x, Vector3(1, 0, 0)) * Matrix4::Rotation(rotation->y, Vector3(0, 1, 0)) * Matrix4::Rotation(rotation->z, Vector3(0, 0, 1));
-		Matrix4 transform = Matrix4::Translation(getAbsolutePosition()) * rotMatrix;
+		//Matrix4 rotMatrix = Matrix4::Rotation(rotation->x, Vector3(1, 0, 0)) * Matrix4::Rotation(rotation->y, Vector3(0, 1, 0)) * Matrix4::Rotation(rotation->z, Vector3(0, 0, 1));
+		//Matrix4 transform = Matrix4::Translation(getAbsolutePosition()) * rotMatrix;
 		for (unsigned i = 0; i < collisionBodies->size(); i++) {
 			CollisionBody *colBody = (*collisionBodies)[i];
-			colBody->setAbsolutePosition((transform * Matrix4::Translation(*(colBody->getPosition())) * Vector3(0, 0, 0)));
+			//colBody->setAbsolutePosition((transform * Matrix4::Translation(*(colBody->getPosition())) * Vector3(0, 0, 0)));
 		}
 	}
 }

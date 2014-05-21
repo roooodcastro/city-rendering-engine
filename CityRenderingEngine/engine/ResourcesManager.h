@@ -40,13 +40,13 @@ public:
     static bool resourceExists(std::string name);
 
     /* Starts the resource manager, instantiating the resource list */
-    static void initializate();
+    static void initialize();
 
     /* Unloads all resources and releases all memory allocated. This should be called when the game ends. */
     static void terminate();
 
     /* Returns the number of resources currently loaded in this manager. */
-    static int getResourcesCount() { return resources->size(); }
+    static int getResourcesCount() { return (int) resources->size(); }
 
 
 protected:

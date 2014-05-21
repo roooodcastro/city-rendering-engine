@@ -1,5 +1,6 @@
 /*
- * Authors: Richard Davison, Rodrigo Castro
+ * Authors: Richard Davison & Rodrigo Castro Azevedo
+ * Date: 16/05/2014
  *
  * Description: Vector3 class to represent values such as position, rotation, scaling, etc.
  *
@@ -131,7 +132,7 @@ public:
      */
 
     inline Vector3 operator+(const Vector3 &a) const {
-        return Vector3(x + a.x,y + a.y, z + a.z);
+        return Vector3(x + a.x, y + a.y, z + a.z);
     }
 
     inline Vector3 operator-(const Vector3 &a) const {
@@ -139,7 +140,7 @@ public:
     }
 
     inline Vector3 operator-() const {
-        return Vector3(-x,-y,-z);
+        return Vector3(-x, -y, -z);
     }
 
     inline void operator+=(const Vector3 &a) {
@@ -159,7 +160,7 @@ public:
     }
 
     inline Vector3 operator*(const Vector3 &a) {
-        return Vector3(x * a.x,y * a.y, z * a.z);
+        return Vector3(x * a.x, y * a.y, z * a.z);
     }
 
     inline Vector3 operator/(const Vector3 &a) {

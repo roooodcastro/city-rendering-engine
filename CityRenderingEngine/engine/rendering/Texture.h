@@ -1,8 +1,11 @@
 #pragma once
 
 #include "../Naquadah.h"
-#include "Colour.h"
 #include "../ResourcesManager.h"
+#include "Material.h"
+
+class Material;
+class Colour;
 
 enum TextureSlot {
 	TEXTURE0,

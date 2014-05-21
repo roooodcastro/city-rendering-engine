@@ -2,7 +2,7 @@
 
 std::map<std::string, Resource*> *ResourcesManager::resources = nullptr;
 
-void ResourcesManager::initializate() {
+void ResourcesManager::initialize() {
     ResourcesManager::resources = new std::map<std::string, Resource*>();
 }
 

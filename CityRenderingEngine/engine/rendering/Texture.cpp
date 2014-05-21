@@ -90,7 +90,7 @@ void Texture::load() {
 
 			// clean up
 			SDL_FreeSurface(surface);
-			GameApp::logOpenGLError("TEX_LOAD");
+			//GameApp::logOpenGLError("TEX_LOAD");
 		} else if (colour != NULL) {
 			// It's a colour texture
 			this->texWidth = 1;
@@ -104,7 +104,7 @@ void Texture::load() {
 			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-			GameApp::logOpenGLError("TEX_LOAD");
+			//GameApp::logOpenGLError("TEX_LOAD");
 		}
 
 		if (textureId >= 0) {
@@ -149,7 +149,7 @@ void Texture::bindTexture(GLuint shaderProgram, TextureSlot slot) {
 			glUniform1i(texVar, texVal);
 			glActiveTexture(texUnit);
 			glBindTexture(GL_TEXTURE_2D, textureId);
-			GameApp::logOpenGLError(((string) "TEX_BIND ") + std::to_string((long long) textureId));
+			//GameApp::logOpenGLError(((string) "TEX_BIND ") + std::to_string((long long) textureId));
 		}
 	}
 }
@@ -161,10 +161,10 @@ Texture *Texture::createFromText(std::string textureText, Colour &textColour, TT
 	int mode;
 	//Render text surface
 	SDL_Color sdlColour = SDL_Color();
-	sdlColour.r = textColour.getRed();
-	sdlColour.g = textColour.getGreen();
-	sdlColour.b = textColour.getBlue();
-	sdlColour.a = textColour.getAlpha();
+	sdlColour.r = textColour.red;
+	sdlColour.g = textColour.green;
+	sdlColour.b = textColour.blue;
+	sdlColour.a = textColour.alpha;
 	SDL_Surface* textSurface = TTF_RenderText_Blended(&font, textureText.c_str(), sdlColour);
 	if (textSurface == NULL) {
 		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
@@ -192,7 +192,7 @@ Texture *Texture::createFromText(std::string textureText, Colour &textColour, TT
 
 		// clean up
 		SDL_FreeSurface(textSurface);
-		GameApp::logOpenGLError("TEX_LOAD");
+		//GameApp::logOpenGLError("TEX_LOAD");
 
 		if (texture->textureId >= 0) {
 			texture->loaded = true;
@@ -206,7 +206,7 @@ Texture *Texture::getOrCreate(const char *name, const char *fileName) {
 		return (Texture*) ResourcesManager::getResource(name);
 	} else {
 		Texture *newTexture = new Texture(fileName, name);
-		ResourcesManager::addResource(name, newTexture);
+		ResourcesManager::addResource(newTexture);
 		return newTexture;
 	}
 }
@@ -216,7 +216,7 @@ Texture *Texture::getOrCreate(const char *name, Colour &colour) {
 		return (Texture*) ResourcesManager::getResource(name);
 	} else {
 		Texture *newTexture = new Texture(colour, name);
-		ResourcesManager::addResource(name, newTexture);
+		ResourcesManager::addResource(newTexture);
 		return newTexture;
 	}
 }
