@@ -79,6 +79,7 @@ public:
 
     static const char *meshTriangleName;
     static const char *meshQuadName;
+
 protected:
 
     void bufferData();

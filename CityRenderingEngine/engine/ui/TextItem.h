@@ -7,10 +7,10 @@ public:
 
 	TextItem(void);
 	TextItem(const TextItem &copy);
-	TextItem(string text, int fontSize);
-	TextItem(Vector2 &position, float rotation, string text, int fontSize);
+	TextItem(std::string text, int fontSize);
+	TextItem(Vector2 &position, float rotation, std::string text, int fontSize);
 	TextItem(Vector2 &position, float rotation, Vector2 &size);
-	TextItem(Vector2 &position, float rotation, Vector2 &size, string text, int fontSize);
+	TextItem(Vector2 &position, float rotation, Vector2 &size, std::string text, int fontSize);
 	virtual ~TextItem(void);
 
 	/* Mouse events */
@@ -67,8 +67,8 @@ protected:
 	 */
 	void reloadText();
 
-	string text; // The text label, what will be written
-	string font; // The text font filename (including the path)
+	std::string text; // The text label, what will be written
+	std::string font; // The text font filename (including the path)
 	int fontSize; // The font size, in points
 	Colour *colour; // The colour of the text. If a background colour is needed, an ImageItem should be put behind this text with the colour
 	/* Describes if the textItem is fading in (1), fading out (2), or not fading (0). Defaults to 0. */

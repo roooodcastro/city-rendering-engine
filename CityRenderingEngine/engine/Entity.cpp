@@ -177,7 +177,7 @@ void Entity::calculateModelMatrix() {
 	*modelMatrix = Matrix4::Translation(*(this->physicalBody->getPosition())) * rotationMatrix * Matrix4::Scale(*(this->physicalBody->getScale()));*/
 }
 
-void Entity::update(unsigned millisElapsed) {
+void Entity::update(float millisElapsed) {
 	// Apply all logic necessary
 
 	/*
@@ -192,7 +192,7 @@ void Entity::update(unsigned millisElapsed) {
 	}
 }
 
-void Entity::draw(unsigned millisElapsed) {
+void Entity::draw(float millisElapsed) {
 	if (model != NULL) {
 		//GLuint program = Naquadah::getInstance()->getDefaultShader()->getShaderProgram();
 		//glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) modelMatrix);

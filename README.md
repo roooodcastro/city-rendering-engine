@@ -21,3 +21,4 @@ Resource loader what will load resources asynchronously and call a callback func
 
 Small things TODO:
 Speed up the Matrix4 multiplication operator
+Test speed differences between comparing ints and strings (to use on the resource IDing)

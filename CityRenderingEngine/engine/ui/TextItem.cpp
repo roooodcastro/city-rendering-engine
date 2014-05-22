@@ -1,6 +1,6 @@
 #include "TextItem.h"
 
-const string TextItem::defaultFont = "resources/fonts/Arial.ttf";
+const std::string TextItem::defaultFont = "resources/fonts/Arial.ttf";
 const int TextItem::defaultFontSize = 16;
 const Colour TextItem::defaultColour = Colour(0xFFFFFFFF);
 
@@ -13,8 +13,8 @@ TextItem::TextItem(void) : InterfaceItem(ITEM_TEXT) {
 }
 
 TextItem::TextItem(const TextItem &copy) : InterfaceItem(copy) {
-	this->text = string(copy.text);
-	this->font = string(copy.font);
+	this->text = std::string(copy.text);
+	this->font = std::string(copy.font);
 	this->fontSize = copy.fontSize;
 	this->colour = new Colour(*(copy.colour));
 	this->fadeControl = copy.fadeControl;
@@ -22,7 +22,7 @@ TextItem::TextItem(const TextItem &copy) : InterfaceItem(copy) {
 	this->fadeDuration = copy.fadeDuration;
 }
 
-TextItem::TextItem(string text, int fontSize) : InterfaceItem(ITEM_TEXT) {
+TextItem::TextItem(std::string text, int fontSize) : InterfaceItem(ITEM_TEXT) {
 	font = defaultFont;
 	fontSize = fontSize;
 	colour = new Colour(defaultColour);
@@ -30,7 +30,7 @@ TextItem::TextItem(string text, int fontSize) : InterfaceItem(ITEM_TEXT) {
 	fadeControl = 0;
 }
 
-TextItem::TextItem(Vector2 &position, float rotation, string text, int fontSize) : InterfaceItem(ITEM_TEXT, position, rotation, Vector2(SIZE_NO_RESIZE, SIZE_NO_RESIZE)) {
+TextItem::TextItem(Vector2 &position, float rotation, std::string text, int fontSize) : InterfaceItem(ITEM_TEXT, position, rotation, Vector2(SIZE_NO_RESIZE, SIZE_NO_RESIZE)) {
 	font = defaultFont;
 	this->fontSize = fontSize;
 	colour = new Colour(defaultColour);
@@ -47,7 +47,7 @@ TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size) : Interface
 	fadeControl = 0;
 }
 
-TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size, string text, int fontSize) : InterfaceItem(ITEM_TEXT, position, rotation, size) {
+TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size, std::string text, int fontSize) : InterfaceItem(ITEM_TEXT, position, rotation, size) {
 	font = defaultFont;
 	this->fontSize = fontSize;
 	colour = new Colour(defaultColour);
@@ -60,7 +60,7 @@ TextItem::~TextItem(void) {
 	colour = NULL;
 }
 
-void TextItem::setText(string text) {
+void TextItem::setText(std::string text) {
 	this->text = text;
 	reloadText();
 }
@@ -70,7 +70,7 @@ void TextItem::setColour(Colour &colour) {
 	reloadText();
 }
 
-void TextItem::setFont(string font) {
+void TextItem::setFont(std::string font) {
 	this->font = font;
 	reloadText();
 }

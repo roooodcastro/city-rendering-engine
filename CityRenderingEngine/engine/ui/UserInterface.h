@@ -28,8 +28,8 @@ public:
 	void onKeyDown(SDL_Keysym key); // Will fire in every tick that a key is down
 	void onKeyUp(SDL_Keysym key); // Will fire every time a key is released
 
-	void update(unsigned millisElapsed);
-	void draw(unsigned millisElapsed);
+	void update(float millisElapsed);
+	void draw(float millisElapsed);
 
 	/* General getters and setters */
 	void addItem(InterfaceItem *item, std::string name);

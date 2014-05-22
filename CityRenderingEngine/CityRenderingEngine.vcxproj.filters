@@ -153,6 +153,9 @@
     <ClCompile Include="engine\rendering\Renderer.cpp">
       <Filter>Source Files\engine\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="engine\input\Mouse.cpp">
+      <Filter>Source Files\engine\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Vector2.h">
@@ -259,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="engine\rendering\Renderer.h">
       <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\input\Mouse.h">
+      <Filter>Header Files\engine\input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

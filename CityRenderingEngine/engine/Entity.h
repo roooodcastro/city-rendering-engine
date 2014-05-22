@@ -22,8 +22,8 @@ public:
 	Entity(Vector3 &position, Vector3 &velocity, Vector3 &rotation, Vector3 &scale);
 	virtual ~Entity(void);
 
-	virtual void update(unsigned millisElapsed);
-	virtual void draw(unsigned millisElapsed);
+	virtual void update(float millisElapsed);
+	virtual void draw(float millisElapsed);
 
 	/* Mouse events */
 	virtual void onMouseMoved(Vector2 &position, Vector2 &amount); // Will fire every time the mouse moves

@@ -12,3 +12,14 @@ std::vector<std::string> FileIO::readTextFile(std::string fileName) {
     }
     return lines;
 }
+
+std::string FileIO::mergeLines(std::vector<std::string> lines, char delimiter) {
+    if (lines.size() > 0) {
+        std::string result = lines[0];
+        for (int i = 1; i < lines.size(); i++) {
+            result += delimiter + lines[i];
+        }
+        return result;
+    }
+    return "";
+}

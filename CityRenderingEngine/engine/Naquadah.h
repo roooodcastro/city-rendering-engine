@@ -24,6 +24,7 @@
 #include <SDL_mixer.h>
 #include "math/Vector2.h"
 #include "math/Common.h"
+#include "input/Mouse.h"
 #include "input/Keyboard.h"
 #include "input/ConfigurationManager.h"
 #include "rendering/Renderer.h"
@@ -39,10 +40,6 @@ public:
 
     /* The target frame per second. The engine will calibrate the timer to maintain this FPS. Defaults to 60 FPS. */
     static int TARGET_FPS;
-    /* Custom codes for the SDL_Event, enabling the asynchronous update and render calls. */
-    static const int USER_EVENT_UPDATE = 100;
-    static const int USER_EVENT_RENDER = 101;
-    static const int USER_EVENT_PHYSIC = 102;
 
     /* Initialization codes to tell Naquadah which functionalities to initialize. */
     static const int NAQUADAH_INIT_EVERYTHING = 0x80000000;
@@ -68,13 +65,7 @@ public:
      * 'settings.cfg', but it can be changed using the method 'ConfigurationManager::setConfigFileName()'. This change
      * must be done BEFORE calling this method to initialize using the correct configurations.
      */
-    static void initialize(int initModules);
-
-    /*
-     * Returns the size of the game window. If the instance hasn't been created yet, or if the Renderer is not present,
-     * it will return (0, 0).
-     */
-    static Vector2 getWindowSize();
+    static void initialize(unsigned int initModules);
 
     /*
      * The actual game loop. Inside this loop the game will check for player input and other minor processing tasks.
@@ -118,6 +109,18 @@ public:
      * also destroy the previous scene, if there's any.
      */
     void setNextScene(Scene *nextScene) { this->nextScene = nextScene; }
+
+    /*
+     * Returns the size of the game window. If the instance hasn't been created yet, or if the Renderer is not present,
+     * it will return (0, 0).
+     */
+    static Vector2 getWindowSize();
+
+    /* Returns the Renderer for the running engine instance. Note that this can be null. */
+    static Renderer *getRenderer() { return ((instance == nullptr) ? nullptr : instance->renderer); }
+
+    /* Returns the Physics Simulation for the running engine instance. Note that this can be null. */
+    static Simulation *getSimulation() { return ((instance == nullptr) ? nullptr : instance->simulation); }
 
 protected:
 

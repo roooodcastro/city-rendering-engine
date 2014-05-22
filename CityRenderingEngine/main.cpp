@@ -19,11 +19,11 @@
 int main(int argc, char* argv[]) {
 
     // Configure engine
-    ConfigurationManager::setConfigFileName("anotherFile.cfg");
+    //ConfigurationManager::setConfigFileName("anotherFile.cfg");
     Naquadah::initialize(Naquadah::NAQUADAH_INIT_EVERYTHING);
 
     // Create the first Scene and start the game
-    Scene *scene = new Scene(SCENE_GAME);
+    Scene *scene = new Scene();
     Naquadah::getInstance()->setNextScene(scene);
 
     Naquadah::getInstance()->runGame();

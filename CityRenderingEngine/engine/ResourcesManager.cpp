@@ -46,4 +46,5 @@ bool ResourcesManager::resourceExists(std::string name) {
     if (resources != nullptr && name.size() > 0) {
         return resources->find(name) != resources->end();
     }
+    return false;
 }

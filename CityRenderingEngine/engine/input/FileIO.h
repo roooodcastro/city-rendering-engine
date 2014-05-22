@@ -25,6 +25,12 @@ public:
      */
     static std::vector<std::string> readTextFile(std::string fileName);
 
+    /*
+     * Merges a vector of text lines into a single string, using '\n' as the line delimiter, or the optional delimiter
+     * specified.
+     */
+    static std::string mergeLines(std::vector<std::string> lines, char delimiter = '\n');
+
 private:
 
     FileIO(void) {}

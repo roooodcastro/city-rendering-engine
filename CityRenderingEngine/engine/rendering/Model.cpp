@@ -256,7 +256,7 @@ void Model::load() {
 
         //go through all of the elements of coord, and decide what kind of element is that
         for (unsigned i = 0; i < lines.size(); i++) {
-            string line = *(lines[i]);
+            std::string line = *(lines[i]);
             if (line.size() < 2) {
                 continue;
             }
@@ -347,7 +347,7 @@ void Model::load() {
                     sscanf(line.c_str(), "%*s %s", matName);
                     for (unsigned i = 0; i < materials.size(); i++) {
                         Material material = *(materials[i]);
-                        if (((string) matName).compare(material.getName()) == 0) {
+                        if (((std::string) matName).compare(material.getName()) == 0) {
                             // If we find our material in the materials list, use it
                             currentMaterial = materials[i];
                             // If we don't find it, keep the current material, something has gone wrong!
@@ -360,7 +360,7 @@ void Model::load() {
                     // It's a call to load new materials from a .mtl file
                     char matFileName[200];
                     sscanf(line.c_str(), "%*s %s", matFileName);
-                    std::vector<Material*> newMaterials = Material::loadMaterialsFromFile((((string) "resources/models/") + ((string) matFileName)).c_str());
+                    std::vector<Material*> newMaterials = Material::loadMaterialsFromFile((((std::string) "resources/models/") + ((std::string) matFileName)).c_str());
                     materials.insert(materials.end(), newMaterials.begin(), newMaterials.end());
                 }
             }

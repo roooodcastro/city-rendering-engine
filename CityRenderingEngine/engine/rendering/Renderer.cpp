@@ -8,7 +8,7 @@ Renderer::Renderer(void) {
     windowSize = Vector2(1280, 720);
     if (resSplit.size() == 2) {
         windowSize.x = (float) atoi(resSplit[0].c_str());
-        windowSize.y = (float) atoi(resSplit[0].c_str());
+        windowSize.y = (float) atoi(resSplit[1].c_str());
     }
 
     // Initialize SDL graphics functionalities
@@ -57,6 +57,9 @@ Renderer::Renderer(void) {
         printf("OpenGL Error @ CONTEXT_INIT: %i", err_code);
         err_code = glGetError();
     }
+
+    // We initialize the primitive meshes that will be used by the interface
+    Model::initializePrimitiveMeshes();
 }
 
 Renderer::~Renderer(void) {
@@ -64,4 +67,29 @@ Renderer::~Renderer(void) {
 
 void Renderer::render(float millisElapsed) {
 
+}
+
+GLuint Renderer::createShaderProgram() {
+    GLuint program = glCreateProgram();
+    return program;
+}
+
+bool Renderer::compileShader(GLuint program, GLenum shaderType, const char *shaderCode) {
+    GLuint shader = glCreateShader(shaderType);
+    glShaderSource(shader, 1, &shaderCode, nullptr);
+    glCompileShader(shader);
+    GLint shaderCompiled = GL_FALSE;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &shaderCompiled);
+    return (shaderCompiled == GL_TRUE);
+}
+
+bool Renderer::linkProgram(GLuint program) {
+    glLinkProgram(program);
+    GLint linkStatus;
+    glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
+    return (linkStatus == GL_TRUE);
+}
+
+void Renderer::bindAttributeLocation(GLuint program, GLuint location, std::string attrName) {
+    glBindAttribLocation(program, location, attrName.c_str());
 }

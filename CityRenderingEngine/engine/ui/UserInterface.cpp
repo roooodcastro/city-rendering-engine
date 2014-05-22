@@ -9,7 +9,7 @@ UserInterface::UserInterface(void) {
     resourcesCounter = new TextItem(Vector2(20, 40), 0, "0 Resources Allocated", 20);
     entitiesCounter = new TextItem(Vector2(20, 70), 0, "0 Entities", 20);
     mousePosDisplay = new TextItem(Vector2(20, 100), 0, "MousePos: (0, 0)", 20);
-    interfaceShader = new Shader("shaders/vertUI.glsl", "shaders/fragUI.glsl", "", "", "");
+    interfaceShader = new Shader("shaders/vertUI.glsl", "shaders/fragUI.glsl");
     fadeOverlay = new ImageItem(Vector2(0, 0), 0, windowSize, new Texture(Colour(0x00000000), "FadeTex"));
 }
 
@@ -127,7 +127,7 @@ void UserInterface::onKeyUp(SDL_Keysym key) {
     }
 }
 
-void UserInterface::update(unsigned millisElapsed) {
+void UserInterface::update(float millisElapsed) {
     // Update inner items
     for (auto it = items->begin(); it != items->end(); ++it) {
         (*it).second->update(millisElapsed);
@@ -177,7 +177,7 @@ void UserInterface::update(unsigned millisElapsed) {
     }
 }
 
-void UserInterface::draw(unsigned millisElapsed) {
+void UserInterface::draw(float millisElapsed) {
     for (auto it = items->begin(); it != items->end(); ++it) {
         (*it).second->draw(millisElapsed, interfaceShader->getShaderProgram());
     }

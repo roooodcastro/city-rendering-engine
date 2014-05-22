@@ -27,7 +27,7 @@ Naquadah *Naquadah::getInstance() {
     return instance;
 }
 
-void Naquadah::initialize(int initModules) {
+void Naquadah::initialize(unsigned int initModules) {
     if (instance == nullptr) {
         instance = new Naquadah();
     }
@@ -43,10 +43,10 @@ void Naquadah::initialize(int initModules) {
     }
     // Init only core SDL features
     SDL_Init(SDL_INIT_EVERYTHING);
-
+    // Init keyboard and mouse managers
+    Keyboard::getInstance();
+    Mouse::getInstance();
     ResourcesManager::initialize();
-    // We initialize the primitive meshes that will be used by the interface
-    Model::initializePrimitiveMeshes();
 }
 
 void Naquadah::runGame() {
@@ -61,7 +61,86 @@ void Naquadah::runGame() {
 }
 
 void Naquadah::handleUserEvents() {
-
+    SDL_Event e;
+    bool ticked = false;
+    bool drawn = false;
+    while (SDL_PollEvent(&e)){
+        switch (e.type) {
+        case SDL_MOUSEMOTION:
+            Mouse::recordMouseMove(e.motion);
+            if (currentScene)
+                currentScene->onMouseMoved(Vector2((float) e.motion.x, (float) e.motion.y),
+                Vector2((float) e.motion.xrel, (float) e.motion.yrel));
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            Mouse::recordMouseButton(e.button);
+            if (currentScene)
+                currentScene->onMouseButtonDown(e.button.button, Vector2((float) e.button.x, (float) e.button.y));
+            break;
+        case SDL_MOUSEBUTTONUP:
+            Mouse::recordMouseButton(e.button);
+            if (currentScene) {
+                currentScene->onMouseButtonUp(e.button.button, Vector2((float) e.button.x, (float) e.button.y));
+                if (e.button.clicks == 1)
+                    currentScene->onMouseClick(e.button.button, Vector2((float) e.button.x, (float) e.button.y));
+                else if (e.button.clicks == 2) {
+                    currentScene->onMouseDoubleClick(e.button.button, Vector2((float) e.button.x, (float) e.button.y));
+                }
+            }
+            break;
+            case SDL_MOUSEWHEEL:
+                if (currentScene) {
+                    currentScene->onMouseWheelScroll(e.wheel.y);
+                }
+                break;
+        case SDL_KEYDOWN:
+            Keyboard::recordKey(e.key);
+            if (currentScene) {
+                currentScene->onKeyDown(e.key.keysym);
+            }
+            break;
+        case SDL_KEYUP:
+            Keyboard::recordKey(e.key);
+            if (currentScene) {
+                currentScene->onKeyUp(e.key.keysym);
+                currentScene->onKeyPress(e.key.keysym);
+            }
+            break;
+        case SDL_JOYAXISMOTION:
+            if (e.jaxis.which == 0) {
+                // X axis motion
+                if (e.jaxis.axis == 0) {
+                    // Fire axis motion event
+                }
+            }
+            break;
+        case SDL_JOYBUTTONDOWN:
+            // Fire buttond own event
+            break;
+        case SDL_JOYBUTTONUP:
+            // Fire button up event
+            break;	
+        case SDL_JOYDEVICEADDED:
+            // Bind the joystick to the game
+            break;
+        case SDL_JOYDEVICEREMOVED:
+            // Unbind the joystick and warn player
+            break;
+        case SDL_QUIT:
+            gameRunning = false;
+            break;
+        case SDL_WINDOWEVENT:
+            // Checks if user is still controlling the Game Window. If not, then automatically pauses the game.
+            // A list of all possible window events can be found here: https://wiki.libsdl.org/SDL_WindowEvent
+            switch (e.window.event) {
+            case SDL_WINDOWEVENT_FOCUS_LOST:
+                //SDL_Log("Window %d lost keyboard focus", e.window.windowID);
+                //setGamePaused(true);
+                break;
+            }
+            break;
+        }
+    }
 }
 
 void Naquadah::updateLogic(float millisElapsed) {
@@ -76,7 +155,7 @@ void Naquadah::updateLogic(float millisElapsed) {
         nextScene = nullptr;
     }
     if (currentScene) {
-        //currentScene->update(millisElapsed);
+        currentScene->update(millisElapsed);
     }
 }
 
@@ -99,6 +178,9 @@ void Naquadah::installTimers() {
     GameTimer::logicTimer = new GameTimer(TARGET_FPS, std::bind(&Naquadah::updateLogic, this, std::placeholders::_1));
     GameTimer::physicsTimer = new GameTimer(TARGET_FPS, std::bind(&Naquadah::updatePhysics, this, std::placeholders::_1));
     GameTimer::renderingTimer = new GameTimer(TARGET_FPS, std::bind(&Naquadah::render, this, std::placeholders::_1));
+    GameTimer::logicTimer->startTimer();
+    GameTimer::physicsTimer->startTimer();
+    GameTimer::renderingTimer->startTimer();
 }
 
 Vector2 Naquadah::getWindowSize() {
