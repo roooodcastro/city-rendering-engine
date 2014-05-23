@@ -208,41 +208,28 @@ void Scene::update(float millisElapsed) {
     unlockMutex();
 }
 
-void Scene::render(float millisElapsed) {
-    // Should first draw the interface using a ortographic projection,
-    // then switch to a perspective projection and draw all entities
-    GLuint program;
-
+void Scene::render(Renderer *renderer, float millisElapsed) {
     // Draw Entities
     for (auto it = entities->begin(); it != entities->end(); ++it) {
         // We first get the right shader to use with this entity
         Entity *entity = (*it).second;
-        //Shader shader = *(GameApp::getInstance()->getDefaultShader());
-        if (entity->getCustomShader()) {
-            //shader = *(entity->getCustomShader());
+        if (entity->getShader() != nullptr && renderer->useShader(entity->getShader())) {
+
         }
-        //program = shader.getShaderProgram();
-        if (glIsProgram(program) != GL_TRUE) {
-            std::cout << "GLSL program has become invalid!" << std::endl;
-        } else {
-            glUseProgram(program);
-        }
-        //GameApp::logOpenGLError("USE_PROGRAM @ RENDER_ENTITY");
         // Then we update the shader matrices
-        glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) &(entity->getModelMatrix()));
-        glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, false, (float*) cameraMatrix);
-        glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, false, (float*) projectionMatrix);
-        applyShaderLight(program);
+        renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+        renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+        renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+        //applyShaderLight(program);
         entity->draw(millisElapsed);
     }
 
     // Draw Interface
     if (userInterface != nullptr) {
-        program = userInterface->getInterfaceShader()->getShaderProgram();
-        glUseProgram(program);
-        glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, false, (float*) &(Matrix4::Translation(Vector3(0, 0, 1.0f))));
-        glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, false, (float*) &(Matrix4::Orthographic(-1, 1, 1920.0f, 0, 1080, 0)));
-        userInterface->draw(millisElapsed);
+        //renderer->useShader(userInterface->getInterfaceShader());
+        //glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, false, (float*) &(Matrix4::Translation(Vector3(0, 0, 1.0f))));
+        //glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, false, (float*) &(Matrix4::Orthographic(-1, 1, 1920.0f, 0, 1080, 0)));
+        //userInterface->draw(millisElapsed);
     }
 }
 

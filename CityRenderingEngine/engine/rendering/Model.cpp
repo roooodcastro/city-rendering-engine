@@ -436,10 +436,10 @@ void Model::unload() {
 }
 
 void Model::initializePrimitiveMeshes() {
-    Model *triangle = Model::generateTriangle();
-    Model *quad = Model::generateQuad();
-    ResourcesManager::addResource(triangle);
-    ResourcesManager::addResource(quad);
+    //Model *triangle = Model::generateTriangle();
+    //Model *quad = Model::generateQuad();
+    //ResourcesManager::addResource(triangle);
+    //ResourcesManager::addResource(quad);
 }
 
 Model *Model::getTriangleMesh() {

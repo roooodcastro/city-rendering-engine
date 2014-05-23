@@ -1,11 +1,12 @@
 #include "Shader.h"
 
-Shader::Shader(std::string vertexFilename, std::string fragmentFilename, std::string geometryFilename) {
+Shader::Shader(std::string shaderName, std::string vertexFilename, std::string fragmentFilename) : 
+    Resource(shaderName.c_str()) {
     this->vertexFilename = vertexFilename;
     this->fragmentFilename = fragmentFilename;
-    this->geometryFilename = geometryFilename;
-    this->tessCtrlFilename = nullptr;
-    this->tessEvalFilename = nullptr;
+    this->geometryFilename = "";
+    this->tessCtrlFilename = "";
+    this->tessEvalFilename = "";
 }
 
 Shader::~Shader(void) {}

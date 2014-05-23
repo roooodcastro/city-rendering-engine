@@ -32,11 +32,11 @@ public:
     //static const GLuint LOC_TANGENT_BUFFER = 4;
 
     /*
-     * Creates a new Shader, with the specified filenames for the shader files. The last shader, the Geometry Shader,
-     * is optional, and can be omitted. Note that the actual OpenGL shaders won't be created here, but only when the
+     * Creates a new Shader, with the specified filenames for the shader files. ShaderName is the name of the shader
+     * resource that will be created. Note that the actual OpenGL shaders won't be created here, but only when the
      * resource is loaded, using load().
      */
-    Shader(std::string vertexFilename, std::string fragmentFilename, std::string geometryFilename = nullptr);
+    Shader(std::string shaderName, std::string vertexFilename, std::string fragmentFilename);
     virtual ~Shader(void);
 
     /* This function should load the shader into OpenGL */

@@ -169,7 +169,7 @@ void Naquadah::updatePhysics(float millisElapsed) {
 void Naquadah::render(float millisElapsed) {
     // If we have the renderer, render the scene
     if (renderer != nullptr) {
-        renderer->render(millisElapsed);
+        renderer->render(currentScene, millisElapsed);
     }
 }
 

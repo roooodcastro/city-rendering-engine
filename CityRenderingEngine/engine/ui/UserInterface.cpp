@@ -9,7 +9,7 @@ UserInterface::UserInterface(void) {
     resourcesCounter = new TextItem(Vector2(20, 40), 0, "0 Resources Allocated", 20);
     entitiesCounter = new TextItem(Vector2(20, 70), 0, "0 Entities", 20);
     mousePosDisplay = new TextItem(Vector2(20, 100), 0, "MousePos: (0, 0)", 20);
-    interfaceShader = new Shader("shaders/vertUI.glsl", "shaders/fragUI.glsl");
+    interfaceShader = new Shader("InterfaceShader", "shaders/vertUI.glsl", "shaders/fragUI.glsl");
     fadeOverlay = new ImageItem(Vector2(0, 0), 0, windowSize, new Texture(Colour(0x00000000), "FadeTex"));
 }
 

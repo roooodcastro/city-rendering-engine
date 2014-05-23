@@ -58,6 +58,8 @@ Renderer::Renderer(void) {
         err_code = glGetError();
     }
 
+    currentShader = nullptr;
+
     // We initialize the primitive meshes that will be used by the interface
     Model::initializePrimitiveMeshes();
 }
@@ -65,8 +67,15 @@ Renderer::Renderer(void) {
 Renderer::~Renderer(void) {
 }
 
-void Renderer::render(float millisElapsed) {
-
+void Renderer::render(Scene *scene, float millisElapsed) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Draw current scene
+    if (scene != nullptr)
+        scene->render(this, millisElapsed);
+    // Swap buffers
+    SDL_GL_SwapWindow(window);
 }
 
 GLuint Renderer::createShaderProgram() {
@@ -92,4 +101,21 @@ bool Renderer::linkProgram(GLuint program) {
 
 void Renderer::bindAttributeLocation(GLuint program, GLuint location, std::string attrName) {
     glBindAttribLocation(program, location, attrName.c_str());
+}
+
+bool Renderer::useShader(Shader *shader) {
+    if (currentShader == nullptr || currentShader->getShaderProgram() != shader->getShaderProgram()) {
+        glUseProgram(shader->getShaderProgram());
+        this->currentShader = shader;
+        return (glIsProgram(shader->getShaderProgram()) == GL_TRUE);
+    }
+    return currentShader != nullptr;
+}
+
+bool Renderer::updateShaderMatrix(std::string matrixName, Matrix4 *matrix) {
+    GLuint location = glGetUniformLocation(currentShader->getShaderProgram(), matrixName.c_str());
+    if (location != -1) {
+        glUniformMatrix4fv(location, 1, false, (float*) matrix);
+        return true;
+    } else return false;
 }

@@ -15,8 +15,10 @@
 #include "Naquadah.h"
 #include "math/Matrix4.h"
 #include "rendering/Light.h"
+#include "rendering/Renderer.h"
 
 class UserInterface;
+class Renderer;
 class Entity;
 
 class Scene {
@@ -59,8 +61,8 @@ public:
     /* Updates the Scene logic. */
     virtual void update(float millisElapsed);
 
-    /* Renders all the Scene objects and the interface*/
-    virtual void render(float millisElapsed);
+    /* Renders all the Scene objects and the interface. Renderer is the active renderer on the engine. */
+    virtual void render(Renderer *renderer, float millisElapsed);
 
     /* ==========================================
      * =============== Other stuff ==============

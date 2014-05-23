@@ -17,6 +17,11 @@
 #pragma once
 
 #include "../Naquadah.h"
+#include "../math/Matrix4.h"
+#include "Shader.h"
+#include "../Scene.h"
+
+class Scene;
 
 class Renderer {
 public:
@@ -27,9 +32,10 @@ public:
     /*
      * Function that will be called to render the next frame into the back buffer, and flip the buffer afterwards.
      * The millisElapsed param represents the time since the last call to render. It does not represent the time since
-     * the last update or physics update call.
+     * the last update or physics update call. The scene parameter is the scene to be rendered. If the scene is null,
+     * nothing will be rendered.
      */
-    void render(float millisElapsed);
+    void render(Scene *scene, float millisElapsed);
 
     /* Returns true if the game is in fullscreen mode, false otherwise */
     bool isFullscreen() { return fullscreen; }
@@ -77,6 +83,19 @@ public:
      */
     void bindAttributeLocation(GLuint program, GLuint location, std::string attrName);
 
+    /*
+     * Tells OpenGL to use shader as the current Shader Program. If shader is the same as the one bein currently used,
+     * nothing will happen. This function returns true if the shader is now being used, or if it's already being used,
+     * and false if the shader couldn't be used.
+     */
+    bool useShader(Shader *shader);
+
+    /*
+     * Updates a matrix with the name matrixName on the current Shader Program to the value of matrix. This will tell
+     * OpenGL to upload the matrix to the shader being currently used.
+     */
+    bool updateShaderMatrix(std::string matrixName, Matrix4 *matrix);
+
 protected:
 
     /* The size of the window. Defaults to (1280, 720). */
@@ -84,6 +103,9 @@ protected:
 
     /* True if the game is in fullscreen mode. Defaults to false. */
     bool fullscreen;
+
+    /* The current Shader being used be OpenGL. Defaults to null. */
+    Shader *currentShader;
 
     /* The Window in which OpenGL will render to. */
     SDL_Window *window;
