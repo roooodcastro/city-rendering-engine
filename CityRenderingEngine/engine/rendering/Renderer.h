@@ -32,8 +32,7 @@ public:
     /*
      * Function that will be called to render the next frame into the back buffer, and flip the buffer afterwards.
      * The millisElapsed param represents the time since the last call to render. It does not represent the time since
-     * the last update or physics update call. The scene parameter is the scene to be rendered. If the scene is null,
-     * nothing will be rendered.
+     * the last update or physics update call.
      */
     void render(Scene *scene, float millisElapsed);
 
@@ -56,32 +55,15 @@ public:
         }
     }
 
+    static void logSDLError(std::ostream &os, const std::string &msg) {
+        os << msg << " error: " << SDL_GetError() << std::endl;
+    }
+
     /*
      * =========================
      * Shader related functions
      * =========================
      */
-
-    /* Creates a new Shader Program, and return its ID. */
-    GLuint createShaderProgram();
-
-    /*
-     * Creates and compiles a new shader, attaching it to program. The shaderType defines the type of the shader that
-     * will be created, and shaderCode is the actual shader text. Returns true if the shader was created and compiled
-     * successfully, or false if OpenGL raised an error in any of these stages, and the shader couldn't be compiled.
-     */
-    bool compileShader(GLuint program, GLenum shaderType, const char *shaderCode);
-
-    /*
-     * Links the shader program. Returns true if the program was successfully linked, or false otherwise.
-     */
-    bool linkProgram(GLuint program);
-
-    /*
-     * Binds an attribute name to a location that is basically a GLuint that OpenGL shaders can use to map which
-     * variable in the shader it's supposed to send data to.
-     */
-    void bindAttributeLocation(GLuint program, GLuint location, std::string attrName);
 
     /*
      * Tells OpenGL to use shader as the current Shader Program. If shader is the same as the one bein currently used,
@@ -95,6 +77,8 @@ public:
      * OpenGL to upload the matrix to the shader being currently used.
      */
     bool updateShaderMatrix(std::string matrixName, Matrix4 *matrix);
+
+    Shader *getCurrentShader() { return currentShader; }
 
 protected:
 

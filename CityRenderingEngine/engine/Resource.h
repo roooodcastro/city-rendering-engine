@@ -14,22 +14,24 @@
 
 #pragma once
 
+#include <string>
+
 class Resource {
 public:
 
     Resource(void) {
         loaded = false;
-        name = nullptr;
+        name = "";
     }
 
     Resource(const Resource &copy) {
-        this->name = copy.name;
+        this->name = std::string(copy.name);
         this->loaded = copy.loaded;
     }
 
-    Resource(const char *name) {
+    Resource(std::string name) {
         loaded = false;
-        this->name = name;
+        this->name = std::string(name);
     }
 
     virtual ~Resource(void) {};
@@ -41,12 +43,12 @@ public:
     virtual void unload() = 0;
 
     bool isLoaded() { return loaded; }
-    const char *getName() { return name; }
+    std::string getName() { return std::string(name); }
 
 protected:
 
     /* The unique name of the Resource. This name can be used to quickly identity resources. */
-    const char *name;
+    std::string name;
 
     /*
      * This should reflect the resource's data state. It's used by the ResourceManager, but should also be managed by

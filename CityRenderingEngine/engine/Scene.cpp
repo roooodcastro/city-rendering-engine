@@ -2,8 +2,10 @@
 
 Scene::Scene() {
     entities = new std::map<std::string, Entity*>();
-    projectionMatrix = new Matrix4();
-    cameraMatrix = new Matrix4();
+    //setProjectionMatrix(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
+    projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
+    //setCameraMatrix(Matrix4::Translation(Vector3(0, 0, -10.0f)));
+    cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     lightSources = new std::vector<Light*>();
     cameraPos = new Vector3(0, 0, 0);
     cameraRotation = new Vector3(0, 0, 0);
@@ -192,7 +194,6 @@ bool Scene::removeEntity(std::string name) {
 }
 
 void Scene::update(float millisElapsed) {
-    std::cout << millisElapsed << std::endl;
     lockMutex();
     if (userInterface != nullptr)
         userInterface->update(millisElapsed);
@@ -213,15 +214,17 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
     for (auto it = entities->begin(); it != entities->end(); ++it) {
         // We first get the right shader to use with this entity
         Entity *entity = (*it).second;
-        if (entity->getShader() != nullptr && renderer->useShader(entity->getShader())) {
-
+        if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
+            if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
+                renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+                entity->draw(millisElapsed);
+            } else if (renderer->useShader(entity->getShader())) {
+                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+                renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+                entity->draw(millisElapsed);
+            }
         }
-        // Then we update the shader matrices
-        renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-        renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-        renderer->updateShaderMatrix("projMatrix", projectionMatrix);
-        //applyShaderLight(program);
-        entity->draw(millisElapsed);
     }
 
     // Draw Interface

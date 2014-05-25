@@ -4,7 +4,7 @@ GameTimer *GameTimer::logicTimer = nullptr;
 GameTimer *GameTimer::renderingTimer = nullptr;
 GameTimer *GameTimer::physicsTimer = nullptr;
 
-GameTimer::GameTimer(int targetTps, std::function<void(float)> callback) {
+GameTimer::GameTimer(int targetTps, void (*callbackFunction)(float)) {
     running = false;
     tickCount = 0;
     this->targetTps = targetTps;
@@ -15,7 +15,7 @@ GameTimer::GameTimer(int targetTps, std::function<void(float)> callback) {
         tickIntervalList[i] = 0;
     }
     thread = nullptr;
-    this->callback = callback;
+    this->callback = callbackFunction;
 }
 
 GameTimer::GameTimer(const GameTimer &copy) {
@@ -62,7 +62,10 @@ void GameTimer::startTimer() {
     startTime = (double) start.QuadPart;
     lastTick = startTime;
     running = true;
-    thread = SDL_CreateThread(&GameTimer::run, "", this);
+    if (threading)
+        thread = SDL_CreateThread(&GameTimer::run, "", this);
+    else
+        run(this);
 }
 
 void GameTimer::stopTimer() {
@@ -80,6 +83,7 @@ void GameTimer::tick() {
     tickIntervalList[tickCount % targetTps] = (float) millisElapsed;
     tpsAverage = (float) (1 / ((tickIntervalSum / targetTps) / 1000.0f));
     tickCount++;
+    lastTickDeltaT = millisElapsed;
 }
 
 double GameTimer::getTime(double start, double frequency) {
@@ -107,7 +111,7 @@ int GameTimer::run(void *parameter) {
             instance->tick();
             // If there's a callback function, call it passing millisElapsed as parameter
             if (instance->callback) {
-                instance->callback((float) millisElapsed);
+                instance->callback(millisElapsed);
             }
         }
     }

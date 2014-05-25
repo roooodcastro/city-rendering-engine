@@ -2,11 +2,12 @@
 
 std::vector<std::string> FileIO::readTextFile(std::string fileName) {
     std::vector<std::string> lines = std::vector<std::string>();
-    std::ifstream file(fileName);
+    std::ifstream file;
+    file.open(fileName);
     if (file.is_open()) {
-        char lineBuffer[1024];
+        std::string lineBuffer;
         while(!file.eof()) {
-            file.getline(lineBuffer, 1024);
+            getline(file, lineBuffer);
             lines.emplace_back(lineBuffer);
         }
     }

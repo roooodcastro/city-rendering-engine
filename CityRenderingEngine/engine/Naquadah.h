@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <GL/glew.h>
-#include <functional>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
@@ -46,6 +45,9 @@ public:
     static const int NAQUADAH_INIT_CORE = 0x00000000;
     static const int NAQUADAH_INIT_GRAPHICS = 0x00000001;
     static const int NAQUADAH_INIT_PHYSICS = 0x00000002;
+
+    /* Event ID of the custom SDL Event for the rendering callback. */
+    static const int USER_EVENT_RENDER = 3;
 
     Naquadah(void);
     ~Naquadah(void);
@@ -109,6 +111,9 @@ public:
      * also destroy the previous scene, if there's any.
      */
     void setNextScene(Scene *nextScene) { this->nextScene = nextScene; }
+
+    /* Returns the current scene of the engine. This may be null. */
+    Scene *getCurrentScene() { return currentScene; }
 
     /*
      * Returns the size of the game window. If the instance hasn't been created yet, or if the Renderer is not present,

@@ -11,6 +11,13 @@
  * last tick. If the callback function is not present, the GameTimer will only measure time, returning its readings
  * when requested.
  *
+ * When a GameTimer is started, a new thread is started to run the timer, and the callback function, if present. The
+ * timer will run asynchronously on a separate thread from the main program, killing the thread once it has stopped.
+ * If this threading capability is not desired, there is a variable called threading that can be set to false, before
+ * calling startTimer, that will disable this. The timer will then run on the same thread as the startTimer call was
+ * made, and will only exit once it stops. If the timer is started with threading set to false and no callback function
+ * is assigned, it won't do anything until one of its functions is called from outside.
+
  * Naquadah works with 3 GameTimers, one for each main loops that it has: game logic, graphics rendering and physics
  * simulation. This class holds each of these 3 timers as static variables, to be used by any part of the engine at any
  * time. For example, the deltaT of the last physics update could be accessed from the game logic loop.
@@ -37,7 +44,7 @@ public:
      * targetTps times per second. If the execution of this function exceeds the interval between ticks, the number of
      * ticks per seconds (TPS) will drop, and the GameTimer will try to keep it as close as possible to the targetTps.
      */
-    GameTimer(int targetTps, std::function<void(float)> callback);
+    GameTimer(int targetTps, void (*callbackFunction)(float));
     GameTimer(const GameTimer &copy);
     ~GameTimer(void);
 
@@ -88,38 +95,55 @@ public:
     /* Returns the amount of time, in milliseconds, passed since the last tick. */
     float getDeltaT();
 
+    /* Returns the amount of time, in milliseconds passed between the start and end of the last tick. */
+    float getLastDeltaT() { return (float) lastTickDeltaT; }
+
     /* Returns the average TPS over the last second. */
     float getTicksPerSecond() { return tpsAverage; }
 
     /* Returns the SDL_Thread used to run this timer. Should be used with care. */
     SDL_Thread *getThread() { return thread; }
 
+    /* Turns the threading calability on or off. */
+    void setThreading(bool threading) {
+        this->threading = threading;
+    }
+    
+    /* Returns true if this timer have threading capabilities, or false otherwise. */
+    bool haveThreading() { return threading; }
+
 protected:
 
-    /* The total number of ticks since the beggining of the timer */
+    /* The total number of ticks since the beggining of the timer. */
     int tickCount;
 
-    /* Timestamp of the start of the simulation */
+    /* Timestamp of the start of the simulation. */
     double startTime;
 
-    /* Internal system variable to determine CPU clock */
+    /* Internal system variable to determine CPU clock. */
     double frequency;
 
-    /* Time between the beggining of last tick to the start of simulation */
+    /* Time between the beggining of last tick to the start of simulation. */
     double lastTick;
+
+    /* Duration of the last tick, in milliseconds. */
+    double lastTickDeltaT;
 
     /* Variables to help calculate a smooth ticks per second number, averaging it for one second. */
     float *tickIntervalList; // A list containing the running time of the last 60 ticks.
     float tickIntervalSum; // The sum of the last 60 ticks intervals.
     float tpsAverage; // The TPS averaged over the last second.
 
-    /* The function that will be called when this timer ticks */
-    std::function<void(float)> callback;
+    /* The function that will be called when this timer ticks. */
+    void (*callback)(float);
 
-    /* Whether this timer is running or not */
+    /* Whether this timer is running or not. */
     bool running;
 
-    /* The thread that will be running on this timer */
+    /* Set this to false if this timer shouldn't run on a new thread. Defaults to true. */
+    bool threading;
+
+    /* The thread that will be running on this timer. */
     SDL_Thread *thread;
 
     /* The number of ticks that are expected to be processed each second. Defaults to 60. */

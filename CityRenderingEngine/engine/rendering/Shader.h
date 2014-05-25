@@ -16,6 +16,7 @@
 
 #include <string>
 #include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include "../input/FileIO.h"
 #include "../Resource.h"
@@ -59,6 +60,53 @@ public:
 
     /* Returns the OpenGL ID of this Shader Program. */
     GLuint getShaderProgram() { return program; }
+
+    /*
+     * Creates and compiles a new shader, attaching it to program. The shaderType defines the type of the shader that
+     * will be created, and shaderCode is the actual shader text. Returns true if the shader was created and compiled
+     * successfully, or false if OpenGL raised an error in any of these stages, and the shader couldn't be compiled.
+     */
+    bool compileShader(GLuint program, GLenum shaderType, const char *shaderCode);
+
+    /*
+     * Links the shader program. Returns true if the program was successfully linked, or false otherwise.
+     */
+    bool linkProgram(GLuint program);
+
+    /*
+     * Binds an attribute name to a location that is basically a GLuint that OpenGL shaders can use to map which
+     * variable in the shader it's supposed to send data to.
+     */
+    void bindAttributeLocation(GLuint program, GLuint location, std::string attrName);
+
+    /*
+     * Returns a string with the name of the type of the shader. If it's a vertex shader, it'll return "VERTEX_SHADER",
+     * and so on. If it's not any type of supported shader, it'll return "INVALID_SHADER_TYPE"
+     */
+    std::string getShaderTypeName(GLenum shaderType) {
+        switch(shaderType) {
+        case GL_VERTEX_SHADER:
+            return "VERTEX_SHADER";
+            break;
+            case GL_FRAGMENT_SHADER:
+                return "FRAGMENT_SHADER";
+            break;
+            case GL_GEOMETRY_SHADER:
+                return "GEOMETRY_SHADER";
+            break;
+            case GL_TESS_CONTROL_SHADER:
+                return "TESSELATION_CONTROL_SHADER";
+            break;
+            case GL_TESS_EVALUATION_SHADER:
+                return "TESSELATION_EVALUATION_SHADER";
+            break;
+            default:
+                return "INVALID_SHADER_TYPE";
+        }
+    }
+
+    bool operator==(Shader &other);
+    bool operator!=(Shader &other);
 
 protected:
 

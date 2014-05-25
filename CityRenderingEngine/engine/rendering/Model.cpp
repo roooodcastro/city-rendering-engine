@@ -91,7 +91,7 @@ void Model::draw() {
             }
         }
         glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
-        //GameApp::logOpenGLError("MODEL_DRAW");
+        Renderer::logOpenGLError("MODEL_DRAW");
         glBindVertexArray(0);
     }
 }

@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     Shader *shader = new Shader("Shader", "resources/shaders/simpleVert.glsl", "resources/shaders/simpleFrag.glsl");
     ResourcesManager::addResource(shader);
     Model *model = Model::getOrCreate("Teapot", "resources/meshes/teapot.obj");
-    Entity *teapot = new Entity(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(1, 1, 1));
+    Entity *teapot = new Entity(Vector3(0, 0, -50), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(1, 1, 1));
     teapot->setShader(shader);
     teapot->setModel(model);
     scene->addEntity(teapot, "Teapot");
