@@ -150,6 +150,7 @@
     <ClCompile Include="engine\input\Mouse.cpp" />
     <ClCompile Include="engine\rendering\Light.cpp" />
     <ClCompile Include="engine\rendering\Renderer.cpp" />
+    <ClCompile Include="engine\rendering\ShaderParameter.cpp" />
     <ClCompile Include="engine\Scene.cpp" />
     <ClCompile Include="engine\math\Matrix3.cpp" />
     <ClCompile Include="engine\math\Matrix4.cpp" />
@@ -172,6 +173,10 @@
     <ClCompile Include="engine\ui\PanelItem.cpp" />
     <ClCompile Include="engine\ui\TextItem.cpp" />
     <ClCompile Include="engine\ui\UserInterface.cpp" />
+    <ClCompile Include="generator\City.cpp" />
+    <ClCompile Include="generator\CityBlock.cpp" />
+    <ClCompile Include="generator\Intersection.cpp" />
+    <ClCompile Include="generator\Road.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +188,7 @@
     <ClInclude Include="engine\input\Mouse.h" />
     <ClInclude Include="engine\rendering\Light.h" />
     <ClInclude Include="engine\rendering\Renderer.h" />
+    <ClInclude Include="engine\rendering\ShaderParameter.h" />
     <ClInclude Include="engine\Scene.h" />
     <ClInclude Include="engine\math\Common.h" />
     <ClInclude Include="engine\math\Matrix3.h" />
@@ -211,6 +217,10 @@
     <ClInclude Include="engine\ui\PanelItem.h" />
     <ClInclude Include="engine\ui\TextItem.h" />
     <ClInclude Include="engine\ui\UserInterface.h" />
+    <ClInclude Include="generator\City.h" />
+    <ClInclude Include="generator\CityBlock.h" />
+    <ClInclude Include="generator\Intersection.h" />
+    <ClInclude Include="generator\Road.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include "../math/Common.h"
+#include "../math/Vector3.h"
 
 class Colour {
 public:
@@ -44,6 +45,8 @@ public:
     uint32_t getColour();
     /* Returns the colour in hexadecimal format BGRA. */
     uint32_t getColourRev();
+    /* Returns the colour in Vector3, format RGB. The colour will be in float values, ranging from 0.0 to 1.0. */
+    Vector3 getColourVec3();
 
     Colour &operator=(const Colour &other);
 };

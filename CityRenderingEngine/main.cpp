@@ -28,14 +28,18 @@ int main(int argc, char* argv[]) {
     Scene *scene = new Scene();
 
 
-    Shader *shader = new Shader("Shader", "resources/shaders/simpleVert.glsl", "resources/shaders/simpleFrag.glsl");
+    Shader *shader = new Shader("Shader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    float *time = new float(0.0f);
+    ShaderParameter *shaderParameter = new ShaderParameter("time", PARAMETER_FLOAT, (void*) time);
+    shader->addShaderParameter(shaderParameter);
     ResourcesManager::addResource(shader);
     Model *model = Model::getOrCreate("Teapot", "resources/meshes/teapot.obj");
-    Entity *teapot = new Entity(Vector3(0, 0, -50), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(1, 1, 1));
+    Entity *teapot = new Entity(Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(1, 1, 1));
     teapot->setShader(shader);
     teapot->setModel(model);
     scene->addEntity(teapot, "Teapot");
-
+    scene->setLightSource(new Light(Colour(1.0f, 1.0f, 0.8f, 1.0f), Vector3(0, 50, 0), Vector3(0.2f, -0.5f, 0), 0.95f, 0, LIGHT_DIRECTIONAL));
+    scene->setCameraPosition(Vector3(0, 0, -50));
 
     Naquadah::getInstance()->setNextScene(scene);
 

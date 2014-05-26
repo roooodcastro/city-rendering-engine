@@ -7,25 +7,16 @@ Shader::Shader(std::string shaderName, std::string vertexFilename, std::string f
     this->geometryFilename = "";
     this->tessCtrlFilename = "";
     this->tessEvalFilename = "";
+    this->shaderParameters = new std::vector<ShaderParameter*>();
 }
 
-Shader::~Shader(void) {}
+Shader::~Shader(void) {
+    shaderParameters->clear();
+    delete shaderParameters;
+    shaderParameters = nullptr;
+}
 
 void Shader::load() {
-
-    std::string vertexString = std::string(FileIO::mergeLines(FileIO::readTextFile(vertexFilename), '\n'));
-    std::string fragmentString = std::string(FileIO::mergeLines(FileIO::readTextFile(fragmentFilename), '\n'));
-    std::string geometryString = std::string(FileIO::mergeLines(FileIO::readTextFile(geometryFilename), '\n'));
-    std::string tessCtrlString = std::string(FileIO::mergeLines(FileIO::readTextFile(tessCtrlFilename), '\n'));
-    std::string tessEvalString = std::string(FileIO::mergeLines(FileIO::readTextFile(tessEvalFilename), '\n'));
-    const char *vertexCode = vertexString.c_str();
-    const char *fragmentCode = fragmentString.c_str();
-    const char *geometryCode = geometryString.c_str();
-    const char *tessCtrlCode = tessCtrlString.c_str();
-    const char *tessEvalCode = tessEvalString.c_str();
-
-
-
     Renderer *renderer = Naquadah::getRenderer();
     if (renderer != nullptr) {
         std::string vertexCode = FileIO::mergeLines(FileIO::readTextFile(vertexFilename));
@@ -35,7 +26,6 @@ void Shader::load() {
         std::string tessEvalCode = FileIO::mergeLines(FileIO::readTextFile(tessEvalFilename));
 
         this->program = glCreateProgram();
-
         compileShader(program, GL_VERTEX_SHADER, vertexCode.c_str());
         compileShader(program, GL_FRAGMENT_SHADER, fragmentCode.c_str());
         if (geometryCode.size() > 0)
@@ -44,7 +34,6 @@ void Shader::load() {
             compileShader(program, GL_TESS_CONTROL_SHADER, tessCtrlCode.c_str());
             compileShader(program, GL_TESS_EVALUATION_SHADER, tessEvalCode.c_str());
         }
-
         setDefaultAttributes();
         if (linkProgram(program))
             loaded = true;
@@ -54,18 +43,16 @@ void Shader::load() {
 
 void Shader::unload() {
     glDeleteProgram(program);
+    loaded = false;
 }
 
 /*
-This function should set up which generic attribute attaches to which
-input variable of the vertex shader. I always make my vertex shaders
-use the same basic names (i.e "position" for positions...) so that it
-becomes trivial to attach vertex data to shaders, without having to
-mess around with layout qualifiers in the shaders themselves etc.
-
-This is up to you, though, you wouldn't be docked any marks for doing
-the vertex shader / VBO connection a different way!
-*/
+ * This function should set up which generic attribute attaches to which
+ * input variable of the vertex shader. I always make my vertex shaders
+ * use the same basic names (i.e "position" for positions...) so that it
+ * becomes trivial to attach vertex data to shaders, without having to
+ * mess around with layout qualifiers in the shaders themselves etc.
+ */
 void Shader::setDefaultAttributes()	{
     Renderer *renderer = Naquadah::getRenderer();
     if (renderer != nullptr) {
@@ -119,6 +106,75 @@ bool Shader::linkProgram(GLuint program) {
 
 void Shader::bindAttributeLocation(GLuint program, GLuint location, std::string attrName) {
     glBindAttribLocation(program, location, attrName.c_str());
+}
+
+void Shader::updateShaderParameters(bool forceUpdate) {
+    for (int i = 0; i < shaderParameters->size(); i++) {
+        ShaderParameter *parameter = shaderParameters->at(i);
+        if (parameter->hasValueChanged() || forceUpdate) {
+            GLuint location = glGetUniformLocation(program, parameter->parameterName.c_str());
+            if (location != -1) {
+                switch (parameter->parameterType) {
+                case PARAMETER_INT:
+                    glUniform1iv(location, parameter->valueSize, (int*) parameter->getValue());
+                    break;
+                case PARAMETER_FLOAT:
+                    glUniform1fv(location, parameter->valueSize, (float*) parameter->getValue());
+                    break;
+                case PARAMETER_DOUBLE:
+                    glUniform1dv(location, parameter->valueSize, (double*) parameter->getValue());
+                    break;
+                case PARAMETER_VECTOR_2:
+                    glUniform2fv(location, parameter->valueSize, (float*) parameter->getValue());
+                    break;
+                case PARAMETER_VECTOR_3:
+                    glUniform3fv(location, parameter->valueSize, (float*) parameter->getValue());
+                    break;
+                case PARAMETER_VECTOR_4:
+                    glUniform4fv(location, parameter->valueSize, (float*) parameter->getValue());
+                    break;
+                case PARAMETER_MATRIX_3:
+                    glUniformMatrix3fv(location, parameter->valueSize, false, (float*) parameter->getValue());
+                    break;
+                case PARAMETER_MATRIX_4:
+                    glUniformMatrix4fv(location, parameter->valueSize, false, (float*) parameter->getValue());
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void Shader::addShaderParameter(ShaderParameter *shaderParameter) {
+    bool exists = false;
+    for (int i = 0; i << shaderParameters->size(); i++) {
+        if (shaderParameters->at(i)->parameterName == shaderParameter->parameterName) {
+            exists = true;
+        }
+    }
+    if (!exists) {
+        shaderParameters->emplace_back(shaderParameter);
+    }
+}
+    
+void Shader::removeShaderParameter(std::string parameterName) {
+    for (int i = 0; i << shaderParameters->size(); i++) {
+        if (shaderParameters->at(i)->parameterName == parameterName) {
+            ShaderParameter *shaderParameter = shaderParameters->at(i);
+            shaderParameters->erase(shaderParameters->begin() + i);
+            delete shaderParameter;
+            return;
+        }
+    }
+}
+
+ShaderParameter *Shader::getShaderParameter(std::string parameterName) {
+    for (int i = 0; i << shaderParameters->size(); i++) {
+        if (shaderParameters->at(i)->parameterName == parameterName) {
+            return shaderParameters->at(i);
+        }
+    }
+    return nullptr;
 }
 
 bool Shader::operator==(Shader &other) {

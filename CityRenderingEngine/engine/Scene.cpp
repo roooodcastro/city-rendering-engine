@@ -6,7 +6,8 @@ Scene::Scene() {
     projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
     //setCameraMatrix(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
-    lightSources = new std::vector<Light*>();
+    //lightSources = new std::vector<Light*>();
+    lightSource = nullptr;
     cameraPos = new Vector3(0, 0, 0);
     cameraRotation = new Vector3(0, 0, 0);
     dragging = false;
@@ -20,7 +21,8 @@ Scene::Scene(const Scene &copy) {
     this->cameraRotation = new Vector3(*(copy.cameraRotation));
     this->cameraMatrix = new Matrix4(*(copy.cameraMatrix));
     this->entities = new std::map<std::string, Entity*>(*(copy.entities));
-    this->lightSources = new std::vector<Light*>(*(copy.lightSources));
+    //this->lightSources = new std::vector<Light*>(*(copy.lightSources));
+    this->lightSource = new Light(*(copy.lightSource));
     this->projectionMatrix = new Matrix4(*(copy.projectionMatrix));
     this->userInterface = new UserInterface(*(copy.userInterface));
     this->mutex = copy.mutex;
@@ -31,7 +33,8 @@ Scene::Scene(UserInterface *userInterface) {
     projectionMatrix = new Matrix4();
     cameraMatrix = new Matrix4();
     this->userInterface = userInterface;
-    lightSources = new std::vector<Light*>();
+    //lightSources = new std::vector<Light*>();
+    lightSource = nullptr;
     cameraPos = new Vector3(0, 0, 0);
     cameraRotation = new Vector3(0, 0, 0);
     dragging = false;
@@ -45,7 +48,7 @@ Scene::~Scene(void) {
     }
     entities->clear();
     delete entities;
-    delete lightSources;
+    delete lightSource;
     delete cameraPos;
     delete cameraRotation;
     SDL_DestroyMutex(mutex);
@@ -217,13 +220,16 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
         if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
             if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
                 renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-                entity->draw(millisElapsed);
-            } else if (renderer->useShader(entity->getShader())) {
-                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
-                renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-                entity->draw(millisElapsed);
             }
+            renderer->useShader(entity->getShader());
+            renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+            renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+            renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+            if (lightSource != nullptr) {
+                lightSource->updateShaderParameters(entity->getShader());
+            }
+            entity->getShader()->updateShaderParameters(true);
+            entity->draw(millisElapsed);
         }
     }
 
@@ -235,47 +241,48 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
         //userInterface->draw(millisElapsed);
     }
 }
-
-void Scene::addLightSource(Light &lightSource) {
-    // If we don't have space to store the item, make some!
-    // I set this if to >= to always have an empty space in the array, just in case
-    if ((lightSources->size() + 1) >= lightSources->capacity()) {
-        lightSources->reserve(lightSources->capacity() + 10);
-    }
-    lightSources->emplace_back(&lightSource);
-}
-
-void Scene::removeLightSource(Light &lightSource) {
-    lightSources->erase(std::remove(lightSources->begin(), lightSources->end(), &lightSource), lightSources->end());
-}
+//
+//void Scene::addLightSource(Light &lightSource) {
+//    lightSources->emplace_back(&lightSource);
+//}
+//
+//void Scene::removeLightSource(Light &lightSource) {
+//    lightSources->erase(std::remove(lightSources->begin(), lightSources->end(), &lightSource), lightSources->end());
+//}
 
 void Scene::applyShaderLight(GLuint program) {
-    unsigned lightCount = (unsigned) lightSources->size();
-    if (lightCount > 0) {
-        // We first build the arrays to be passed to the shader
-        Vector3 *positions = new Vector3[lightCount];
-        Vector3 *colours = new Vector3[lightCount];
-        float *radii = new float[lightCount];
+    //unsigned lightCount = (unsigned) lightSources->size();
+    //if (lightCount > 0) {
+    //    // We first build the arrays to be passed to the shader
+    //    Vector3 *positions = new Vector3[lightCount];
+    //    Vector3 *colours = new Vector3[lightCount];
+    //    float *radii = new float[lightCount];
+    //    float *intensities = new float[lightCount];
+    //    int *types = new int[lightCount];
 
-        for (unsigned i = 0; i < lightCount; i++) {
-            positions[i] = (*lightSources)[i]->position;
-            colours[i] = (*lightSources)[i]->colour;
-            radii[i] = (*lightSources)[i]->radius;
-        }
+    //    for (unsigned i = 0; i < lightCount; i++) {
+    //        positions[i] = (*lightSources)[i]->position;
+    //        colours[i] = (*lightSources)[i]->colour.getColourVec3();
+    //        radii[i] = (*lightSources)[i]->radius;
+    //        intensities[i] = (*lightSources)[i]->intensity;
+    //        types[i] = (int) (*lightSources)[i]->type;
+    //    }
 
-        GLuint n1 = glGetUniformLocation(program, "lightColour[]");
-        glUniform3fv(n1, (int) lightSources->size(), (float*) colours);
-        GLuint n2 = glGetUniformLocation(program, "lightPos[]");
-        glUniform3fv(glGetUniformLocation(program, "lightPos[]"), (int) lightSources->size(), (float*) positions);
-        glUniform1fv(glGetUniformLocation(program, "lightRadius[]"), (int) lightSources->size(), (float*) radii);
-        glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, (float*) cameraPos);
+    //    GLuint n1 = glGetUniformLocation(program, "lightColour[]");
+    //    glUniform3fv(n1, (int) lightSources->size(), (float*) colours);
+    //    GLuint n2 = glGetUniformLocation(program, "lightPos[]");
+    //    glUniform3fv(glGetUniformLocation(program, "lightPos[]"), (int) lightSources->size(), (float*) positions);
+    //    glUniform1fv(glGetUniformLocation(program, "lightRadius[]"), (int) lightSources->size(), (float*) radii);
+    //    glUniform3fv(glGetUniformLocation(program, "cameraPos"), 1, (float*) cameraPos);
 
-        delete[] positions;
-        delete[] colours;
-        delete[] radii;
-    }
-    glUniform1i(glGetUniformLocation(program, "lightCount"), (int) lightCount);
-    //GameApp::logOpenGLError("APPLY_SHADER_LIGHT");
+    //    delete[] positions;
+    //    delete[] colours;
+    //    delete[] radii;
+    //    delete[] intensities;
+    //    delete[] types;
+    //}
+    //glUniform1i(glGetUniformLocation(program, "lightCount"), (int) lightCount);
+    ////GameApp::logOpenGLError("APPLY_SHADER_LIGHT");
 }
 
 void Scene::lockMutex() {

@@ -57,7 +57,7 @@ Renderer::Renderer(void) {
     if (glewInit() != GLEW_OK) {
         std::cout << "OGLRenderer::OGLRenderer(): Cannot initialise GLEW!" << std::endl;
     }
-    logOpenGLError("CONTEX_INIT");
+    logOpenGLError("CONTEXT_INIT");
 
     currentShader = nullptr;
 
@@ -72,6 +72,8 @@ void Renderer::render(Scene *scene, float millisElapsed) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     logOpenGLError("PREPARE_FRAME");
     // Draw current scene
     if (scene != nullptr)

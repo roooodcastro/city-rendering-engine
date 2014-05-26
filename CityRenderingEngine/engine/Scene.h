@@ -20,6 +20,7 @@
 class UserInterface;
 class Renderer;
 class Entity;
+class Light;
 
 class Scene {
 public:
@@ -81,9 +82,11 @@ public:
     Matrix4 getProjectionMatrix() { return *projectionMatrix; }
     void setInterface(UserInterface *userInterface) { this->userInterface = userInterface; }
     UserInterface *getUserInterface() { return userInterface; }
-    void addLightSource(Light &lightSource);
-    void removeLightSource(Light &lightSource);
-    std::vector<Light*> *getLightSources() { return lightSources; }
+    void setLightSource(Light *lightSource) { this->lightSource = lightSource; }
+    Light *getLightSource() { return lightSource; }
+    //void addLightSource(Light &lightSource);
+    //void removeLightSource(Light &lightSource);
+    //std::vector<Light*> *getLightSources() { return lightSources; }
     void setCameraPosition(Vector3 &position) {*(this->cameraPos) = position; }
     Vector3 *getCameraPosition() { return cameraPos; }
     void setCameraRotation(Vector3 &rotation) {*(this->cameraRotation) = rotation; }
@@ -119,7 +122,10 @@ protected:
     }
 
     std::map<std::string, Entity*> *entities; // A list with all the entities contained in this level
-    std::vector<Light*> *lightSources; // A list of all light sources contained in this level
+    //std::vector<Light*> *lightSources; // A list of all light sources contained in this level
+
+    /* The LightSource for this Scene. Defaults to null. */
+    Light *lightSource;
 
     /* The player interface, may be a menu, or a HUD. */
     UserInterface *userInterface;

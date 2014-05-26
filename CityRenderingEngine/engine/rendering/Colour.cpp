@@ -82,3 +82,7 @@ unsigned int Colour::getColourRev() {
     colour += (blue << 24);
     return colour;
 }
+
+Vector3 Colour::getColourVec3() {
+    return Vector3(red / 255.0f, green / 255.0f, blue / 255.0f);
+}

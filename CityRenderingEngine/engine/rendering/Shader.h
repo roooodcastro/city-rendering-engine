@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <fstream>
 #include "../input/FileIO.h"
+#include "ShaderParameter.h"
 #include "../Resource.h"
 #include "Renderer.h"
 #include "Model.h"
@@ -80,6 +81,29 @@ public:
     void bindAttributeLocation(GLuint program, GLuint location, std::string attrName);
 
     /*
+     * Update the value of all Shader Parameters of this shader that had their values changed since the last call to
+     * this method. The parameter forceUpdate, when set to true, ensures that ALL Shader Parameters are updated, even
+     * if they hadn't their values changed. This makes sure the values are updated after a change of Shaders in the
+     * Renderer, as when a new program is used, all of its values have to be updates again.
+     */
+    void updateShaderParameters(bool forceUpdate);
+
+    /*
+     * Adds a ShaderParameter to the list. This ShaderParameter will be destroyed when the Shader is unloaded. If a
+     * ShaderParameter with the same name is already in the list, it won't get added.
+     */
+    void addShaderParameter(ShaderParameter *shaderParameter);
+
+    /* Removes a ShaderParameter from the list, destroying it. */
+    void removeShaderParameter(std::string parameterName);
+
+    /*
+     * Returns a ShaderParameter, searching using the GLSL variable name. This method returns null if no variable with
+     * the provided name exists in this Shader.
+     */
+    ShaderParameter *getShaderParameter(std::string parameterName);
+
+    /*
      * Returns a string with the name of the type of the shader. If it's a vertex shader, it'll return "VERTEX_SHADER",
      * and so on. If it's not any type of supported shader, it'll return "INVALID_SHADER_TYPE"
      */
@@ -120,8 +144,12 @@ protected:
     std::string tessCtrlFilename;
     std::string tessEvalFilename;
 
-    /**/
-    // std::vector<ShaderAttribute*> *shaderAttributes;
+    /*
+     * The vector os the parameters for this Shader. The world transforms aren't inluded in this list, as they are
+     * uploaded to all shaders. This list should contain values such as light source information and other variables
+     * specific to some shaders.
+     */
+    std::vector<ShaderParameter*> *shaderParameters;
 
     /* Sets some attributes necessary to tell OpenGL the names that we're going to use for some GLSL variables. */
     void setDefaultAttributes();

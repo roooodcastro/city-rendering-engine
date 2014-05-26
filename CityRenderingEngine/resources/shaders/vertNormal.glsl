@@ -5,14 +5,15 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 uniform float time;
 
+
 in vec3 position;
 in vec4 colour;
-in vec2 texCoord;
+in vec2 uv_map;
 in vec3 normal;
 
 out Vertex {
 	vec3 worldPos;
-	vec2 texCoord;
+	vec2 uv_map;
 	vec4 colour;
 	vec3 normal;
 } OUT;
@@ -22,7 +23,7 @@ void main(void) {
 
 	gl_Position = (projMatrix * viewMatrix) * worldPos;
 
-	OUT.texCoord = texCoord;
+	OUT.uv_map = uv_map;
 	OUT.worldPos = worldPos.xyz;
 	OUT.colour = colour;
 

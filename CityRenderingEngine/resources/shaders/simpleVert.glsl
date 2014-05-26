@@ -7,11 +7,11 @@ uniform float time;
 
 in vec3 position;
 in vec4 colour;
-in vec2 texCoord;
+in vec2 uv_map;
 
 out Vertex {
 	smooth vec4 colour;
-	smooth vec2 texCoord;
+	smooth vec2 uv_map;
 } OUT;
 
 void main(void) {
@@ -19,6 +19,6 @@ void main(void) {
 
 	gl_Position = mvp * vec4(position, 1.0);
 
-	OUT.colour = colour;
-	OUT.texCoord = texCoord;
+	OUT.colour = vec4(1,1,1,1);
+	OUT.uv_map = uv_map;
 }

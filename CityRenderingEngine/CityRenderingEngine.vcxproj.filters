@@ -61,6 +61,12 @@
     <Filter Include="Source Files\engine\rendering">
       <UniqueIdentifier>{332fff1f-5406-4d4e-8994-3a9f6dad1471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\generator\zones">
+      <UniqueIdentifier>{acf19a75-6f8b-4089-bafe-fcb3d47f77f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generator\zones">
+      <UniqueIdentifier>{f7af2985-89eb-4c8a-a4ea-315e0ee606a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -155,6 +161,21 @@
     </ClCompile>
     <ClCompile Include="engine\input\Mouse.cpp">
       <Filter>Source Files\engine\input</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\rendering\ShaderParameter.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\City.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\CityBlock.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\Intersection.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\Road.cpp">
+      <Filter>Source Files\generator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +286,21 @@
     </ClInclude>
     <ClInclude Include="engine\input\Mouse.h">
       <Filter>Header Files\engine\input</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\ShaderParameter.h">
+      <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\City.h">
+      <Filter>Header Files\generator\zones</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\CityBlock.h">
+      <Filter>Header Files\generator\zones</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\Intersection.h">
+      <Filter>Header Files\generator\zones</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\Road.h">
+      <Filter>Header Files\generator\zones</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
