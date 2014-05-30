@@ -4,6 +4,25 @@ Matrix4::Matrix4(void) {
     toIdentity();
 }
 
+Matrix4::Matrix4(Matrix3 &m) {
+    values[0] = m.values[0];
+    values[1] = m.values[1];
+    values[2] = m.values[2];
+    values[3] = 0.0f;
+    values[4] = m.values[3];
+    values[5] = m.values[4];
+    values[6] = m.values[5];
+    values[7] = 0.0f;
+    values[8] = m.values[6];
+    values[9] = m.values[7];
+    values[10] = m.values[8];
+    values[11] = 0.0f;
+    values[12] = 0.0f;
+    values[13] = 0.0f;
+    values[14] = 0.0f;
+    values[15] = 1.0f;
+}
+
 Matrix4::Matrix4(const Matrix4 &copy) {
     memcpy(this->values, copy.values, 16 * sizeof(float));
 }
@@ -104,6 +123,46 @@ Matrix4 Matrix4::buildViewMatrix(const Vector3 &from, const Vector3 &lookingAt, 
     m.values[10] = -f.z;
 
     return m * r;
+}
+
+Matrix4 Matrix4::Rotation(Vector3 degrees) {
+    Matrix3 mX, mY, mZ, out;
+    out.toIdentity();
+    // Rotate X
+    if (degrees.x != 0) {
+        float cosX = cos((float) toRadians(degrees.x));
+        float sinX = sin((float) toRadians(degrees.x));
+        mX.values[0] = 1.0f;
+        mX.values[4] = cosX;
+        mX.values[5] = sinX;
+        mX.values[7] = -sinX;
+        mX.values[8] = cosX;
+        out = out * mX;
+    }
+    // Rotate Y
+    if (degrees.y != 0) {
+        float cosY = cos((float) toRadians(degrees.y));
+        float sinY = sin((float) toRadians(degrees.y));
+        mY.values[0] = cosY;
+        mY.values[2] = -sinY;
+        mY.values[4] = 1.0f;
+        mY.values[6] = sinY;
+        mY.values[8] = cosY;
+        out = out * mY;
+    }
+
+    // Rotate Z
+    if (degrees.z != 0) {
+        float cosZ = cos((float) toRadians(degrees.z));
+        float sinZ = sin((float) toRadians(degrees.z));
+        mZ.values[0] = cosZ;
+        mZ.values[1] = sinZ;
+        mZ.values[3] = -sinZ;
+        mZ.values[4] = cosZ;
+        mZ.values[8] = 1.0f;
+        out = out * mZ;
+    }
+    return Matrix4(out);
 }
 
 Matrix4 Matrix4::Rotation(float degrees, const Vector3 &inaxis)	{

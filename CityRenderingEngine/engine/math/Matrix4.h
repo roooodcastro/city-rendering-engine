@@ -17,13 +17,16 @@
 #include "common.h"
 #include "Vector3.h"
 #include "Vector4.h"
+#include "Matrix3.h"
 
 class Vector3;
+class Matrix3;
 
 class Matrix4 {
 public:
 
     Matrix4(void);
+    Matrix4(Matrix3 &m);
     Matrix4(const Matrix4 &copy);
     Matrix4(float elements[16]);
     ~Matrix4(void);
@@ -77,17 +80,20 @@ public:
         return out;
     }
 
-    /* Gets the OpenGL position vector (floats 12, 13 and 14) */
+    /* Gets the OpenGL position vector (floats 12, 13 and 14). */
     Vector3 getPositionVector() const;
 
-    /* Sets the OpenGL position vector (floats 12, 13 and 14) */
+    /* Sets the OpenGL position vector (floats 12, 13 and 14). */
     void setPositionVector(const Vector3 in);
 
-    /* Gets the OpenGL scale vector (floats 1, 5 and 10) */
+    /* Gets the OpenGL scale vector (floats 1, 5 and 10). */
     Vector3 getScalingVector() const;
 
-    /* Sets the OpenGL scale vector (floats 1, 5 and 10) */
+    /* Sets the OpenGL scale vector (floats 1, 5 and 10). */
     void setScalingVector(const Vector3 &in);
+
+    /* Creates a rotation matrix that rotates all axis by the degree of each element of the vector degrees. */
+    static Matrix4 Rotation(Vector3 degrees);
 
     /* Creates a rotation matrix that rotates by 'degrees' around the 'axis'. Analogous to glRotatef. */
     static Matrix4 Rotation(float degrees, const Vector3 &axis);
@@ -125,10 +131,12 @@ public:
         Matrix4 out;
         //Students! You should be able to think up a really easy way of speeding this up...
         for (unsigned int r = 0; r < 4; ++r) {
+            int r4 = r * 4;
             for (unsigned int c = 0; c < 4; ++c) {
-                out.values[c + (r * 4)] = 0.0f;
+                int cr4 = c + r4;
+                out.values[cr4] = 0.0f;
                 for (unsigned int i = 0; i < 4; ++i) {
-                    out.values[c + (r * 4)] += this->values[c + (i * 4)] * a.values[(r * 4) + i];
+                    out.values[cr4] += this->values[c + (i * 4)] * a.values[(r4) + i];
                 }
             }
         }
@@ -156,6 +164,28 @@ public:
             v.x * values[2] + v.y * values[6] + v.z * values[10] + v.w * values[14],
             v.x * values[3] + v.y * values[7] + v.z * values[11] + v.w * values[15]
         );
+    };
+
+    inline bool operator==(const Matrix4 &other) const {
+        bool diff = false;
+        for (int i = 0; i < 16; i++) {
+            if (values[i] != other.values[i]) {
+                diff = true;
+                break;
+            }
+        }
+        return !diff;
+    };
+    
+    inline bool operator!=(const Matrix4 &other) const {
+        bool diff = false;
+        for (int i = 0; i < 16; i++) {
+            if (values[i] != other.values[i]) {
+                diff = true;
+                break;
+            }
+        }
+        return diff;
     };
 
     /* Handy string output for the matrix. Can get a bit messy, but better than nothing! */

@@ -173,6 +173,7 @@
     <ClCompile Include="engine\ui\PanelItem.cpp" />
     <ClCompile Include="engine\ui\TextItem.cpp" />
     <ClCompile Include="engine\ui\UserInterface.cpp" />
+    <ClCompile Include="generator\Building.cpp" />
     <ClCompile Include="generator\City.cpp" />
     <ClCompile Include="generator\CityBlock.cpp" />
     <ClCompile Include="generator\Intersection.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="engine\ui\PanelItem.h" />
     <ClInclude Include="engine\ui\TextItem.h" />
     <ClInclude Include="engine\ui\UserInterface.h" />
+    <ClInclude Include="generator\Building.h" />
     <ClInclude Include="generator\City.h" />
     <ClInclude Include="generator\CityBlock.h" />
     <ClInclude Include="generator\Intersection.h" />

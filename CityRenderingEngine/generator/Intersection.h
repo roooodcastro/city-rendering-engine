@@ -9,15 +9,23 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 #include "Road.h"
+#include "../engine/Entity.h"
+#include "../engine/Naquadah.h"
+#include "../engine/math/Vector3.h"
 
 class Road;
 
-class Intersection {
+class Intersection : public Entity {
 public:
 
     Intersection(void);
-    ~Intersection(void);
+    Intersection(Vector3 position);
+    virtual ~Intersection(void);
+
+    /* Connects this intersction to another, creating a connection and a road between them. */
+    void connectTo(Intersection *other);
 
 protected:
 

@@ -86,3 +86,7 @@ unsigned int Colour::getColourRev() {
 Vector3 Colour::getColourVec3() {
     return Vector3(red / 255.0f, green / 255.0f, blue / 255.0f);
 }
+
+Vector4 Colour::getColourVec4() {
+    return Vector4(red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f);
+}

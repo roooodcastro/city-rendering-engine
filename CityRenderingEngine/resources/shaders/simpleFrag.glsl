@@ -1,15 +1,14 @@
 # version 150 core
 
 uniform sampler2D texture0;
-uniform float time;
 
 in Vertex {
 	smooth vec4 colour;
-	smooth vec2 uv_map;
+	smooth vec2 texCoord;
 } IN;
 
-out vec4 gl_FragColor;
+out vec4 fragColour;
 
 void main(void) {
-    gl_FragColor = vec4(time,1,0,1);
+    fragColour = vec4(1.0, 1.0, 1.0, 1.0);
 }

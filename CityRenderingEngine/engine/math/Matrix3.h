@@ -16,6 +16,8 @@
 #include "Matrix4.h"
 #include "Vector3.h"
 
+class Matrix4;
+
 class Matrix3 {
 public:
 
@@ -81,6 +83,23 @@ public:
         values[0] = in.x;
         values[4] = in.y;
         values[8] = in.z;
+    }
+
+    /* Multiplies 'this' matrix by matrix 'a'. Performs the multiplication in 'OpenGL' order (ie, backwards) */
+    inline Matrix3 operator*(const Matrix3 &a) const {
+        Matrix3 out;
+        //Students! You should be able to think up a really easy way of speeding this up...
+        for (unsigned int r = 0; r < 3; r++) {
+            int r3 = r * 3;
+            for (unsigned int c = 0; c < 3; c++) {
+                int cr3 = c + r3;
+                out.values[cr3] = 0.0f;
+                for (unsigned int i = 0; i < 3; i++) {
+                    out.values[cr3] += this->values[c + (i * 3)] * a.values[(r3) + i];
+                }
+            }
+        }
+        return out;
     }
 
     inline Vector3 operator*(const Vector3 &v) const {

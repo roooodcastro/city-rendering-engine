@@ -3,8 +3,8 @@
  * Date: 22/05/2014
  *
  * Description: The Entity class is the container for all game objects that aren't part of the interface, and that are
- * part of the game itself. An entity needs to have a 3D Model, a Shader, and its transform matrix. It can also have
- * a PhysicalBody, if it needs to respond to physics and collision.
+ * part of the game itself. An entity needs to have a 3D Model, a Shader, and its transform matrix and vectors. It can
+ * also have a PhysicalBody, if it needs to respond to physics and collision.
  *
  * An entity may have one or more children entities, that are organized in a hierarchy, having all children relative to
  * their parent. This way, if the parent moves, rotates or change scale, its children will also do so, proportionally.
@@ -24,13 +24,18 @@
 class Naquadah;
 class Model;
 class Shader;
-//class PhysicalBody;
 
 class Entity {
 public:
+
+    /* The Transform vectors of the Entity. */
+    Vector3 position;
+    Vector3 rotation;
+    Vector3 scale;
+
     Entity(void);
     Entity(const Entity &copy);
-    Entity(Vector3 &position, Vector3 &velocity, Vector3 &rotation, Vector3 &scale);
+    Entity(Vector3 position, Vector3 rotation, Vector3 scale);
     virtual ~Entity(void);
 
     virtual void update(float millisElapsed);
@@ -77,11 +82,20 @@ public:
 
 protected:
 
+    /* The Transform variables, for the values of the last frame. */
+    Vector3 lastPosition;
+    Vector3 lastRotation;
+    Vector3 lastScale;
+
     /*
      * Here we get the entity's attributes and calculate the final model matrix. If the entity has children, it will
-     * update its child's matrices as well.
+     * update its child's matrices as well. The three parameter Vector3 are the offset of the Transform, and should be
+     * set to make children position, rotate and scale relative to their parents and grandparents. If the Entity don't
+     * have any parent, these vectors should be passed at their neutral values. The bool parameters indicate if their
+     * correspondent offset Vector3 has changed since the last frame. If they changed, the modelMatrix will have to be
+     * updated even if this Entity's Transform didn't change.
      */
-    void calculateModelMatrix();
+    void calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz, bool pDiff, bool rDiff, bool sDiff);
 
     /* The final transform matrix applied to this Entity. This is calculated and should not be modified directly. */
     Matrix4 *modelMatrix;

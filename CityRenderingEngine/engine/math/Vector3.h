@@ -96,7 +96,12 @@ public:
 
     /* Performs and returns the cross operator between two vectors. Both vectors remain unmodified. */
     static Vector3 cross(const Vector3 &a, const Vector3 &b) {
-        return Vector3((a.y*b.z) - (a.z*b.y), (a.z*b.x) - (a.x*b.z), (a.x*b.y) - (a.y*b.x));	
+        return Vector3((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));	
+    }
+
+    /* Calculates and returns a Vector3 that's in the center points between 2 other Vector3. */
+    static Vector3 average(Vector3 a, Vector3 b) {
+        return Vector3((a.x + b.x) / 2.0f, (a.y + b.y) / 2.0f, (a.z + b.z) / 2.0f);
     }
 
     /* Prints the vector to the output stream in the format "Vector3(x, y, z)". */

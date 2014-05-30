@@ -16,6 +16,7 @@ out Vertex {
 	vec2 uv_map;
 	vec4 colour;
 	vec3 normal;
+    vec3 cameraPos;
 } OUT;
 
 void main(void) {
@@ -27,7 +28,9 @@ void main(void) {
 	OUT.worldPos = worldPos.xyz;
 	OUT.colour = colour;
 
-	mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
+	//mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
 
-	OUT.normal = normalize(normalMatrix * normalize(normal));
+	//OUT.normal = normalize(normalMatrix * normal);
+    OUT.normal = normal;
+    OUT.cameraPos = -viewMatrix[3].xyz * mat3(viewMatrix);
 }

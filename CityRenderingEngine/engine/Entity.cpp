@@ -4,9 +4,13 @@ Entity::Entity(void) {
     this->childEntities = new std::vector<Entity*>();
     physicalBody = new PhysicalBody(this, 0, Vector3());
     modelMatrix = new Matrix4();
+    modelMatrix->toIdentity();
     shader = nullptr;
     model = nullptr;
     parent = nullptr;
+    position = Vector3();
+    rotation = Vector3();
+    scale = Vector3(1, 1, 1);
 }
 
 Entity::Entity(const Entity &copy) {
@@ -17,14 +21,18 @@ Entity::Entity(const Entity &copy) {
     this->model = new Model(*(copy.model));
     this->shader = copy.shader;
     this->physicalBody = new PhysicalBody(*(copy.physicalBody));
+    this->position = Vector3(copy.position);
+    this->rotation = Vector3(copy.rotation);
+    this->scale = Vector3(copy.scale);
 }
 
-Entity::Entity(Vector3 &position, Vector3 &velocity, Vector3 &rotation, Vector3 &scale) {
+Entity::Entity(Vector3 position, Vector3 rotation, Vector3 scale) {
     this->childEntities = new std::vector<Entity*>();
-    physicalBody = new PhysicalBody(this, 0, position);
-    physicalBody->setRotation(rotation);
-    physicalBody->setScale(scale);
+    this->position = Vector3(position);
+    this->rotation = Vector3(rotation);
+    this->scale = Vector3(scale);
     modelMatrix = new Matrix4();
+    modelMatrix->toIdentity();
     model = nullptr;
     shader = nullptr;
     parent = nullptr;
@@ -36,12 +44,12 @@ Entity::~Entity(void) {
         parent->removeChild(this);
     }
     delete modelMatrix;
-    modelMatrix = NULL;
+    modelMatrix = nullptr;
     delete childEntities;
     childEntities = nullptr;
     shader = nullptr;
     delete physicalBody;
-    physicalBody = NULL;
+    physicalBody = nullptr;
 }
 
 Entity &Entity::operator=(const Entity &other) {
@@ -61,6 +69,9 @@ Entity &Entity::operator=(const Entity &other) {
     }
     *(this->childEntities) = *(other.childEntities);
     *(this->physicalBody) = *(other.physicalBody);
+    this->position = Vector3(other.position);
+    this->rotation = Vector3(other.rotation);
+    this->scale = Vector3(other.scale);
     return *this;
 }
 
@@ -123,53 +134,36 @@ void Entity::onKeyUp(SDL_Keysym key) {
 }
 
 
-void Entity::calculateModelMatrix() {
-    Vector3 calcPos = Vector3(*(this->getPhysicalBody()->getPosition()));
-    Vector3 calcRot = Vector3(*(this->getPhysicalBody()->getRotation()));
-    Vector3 calcSiz = Vector3(*(this->getPhysicalBody()->getScale()));
-    /*
-     * If is a child, we add up the parent's attributes.
-     *
-     * TODO: This method won't work if we have an entity that is a child of a child.
-     * In this case, the "grandson" will have its attributes relative to the first child,
-     * but the first child's attributes will be considered global, instead of relative
-     * to the parent's.
-     * Example: e3 is child of e2. e2 is child of e1.
-     * e1 pos: 10, 0, 0
-     * e2 pos: -2, 0, 0
-     * e3 pos: 5, 0, 0
-     * e3 final position will erroneous be 3, 0, 0, because the function doesn't check
-     * if the parent has a parent, and so on.
-     * In the unlikely event that my game has such complex entity relationship,
-     * I may or may not try to fix this.
-     */
-    if (parent != NULL) {
-        //calcPos = calcPos + *(parent->getPhysicalBody()->getPosition());
-        //calcRot = calcRot + *(parent->getPhysicalBody()->getRotation());
-        //calcSiz = calcSiz * *(parent->getPhysicalBody()->getScale());
+void Entity::calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz, bool pDiff, bool rDiff, bool sDiff) {
+    pDiff = pDiff || position != lastPosition;
+    if (pDiff) {
+        // Position changed here or in the parent, update it in the matrix.
+        modelMatrix->setPositionVector(position + addPos);
+        lastPosition = Vector3(position);
     }
-
-    // Now that we calculated the final attributes, build the matrix
-    Matrix4 rotationMatrix = Matrix4::Rotation(calcRot.x, Vector3(1, 0, 0)) * Matrix4::Rotation(calcRot.y, Vector3(0, 1, 0)) * Matrix4::Rotation(calcRot.z, Vector3(0, 0, 1));
-    *modelMatrix = Matrix4::Translation(calcPos) * rotationMatrix * Matrix4::Scale(calcSiz);
-
-    // Finally, do the same for the children
+    rDiff = rDiff || rotation != lastRotation;
+    sDiff = sDiff || scale != lastScale;
+    if (rDiff || sDiff) {
+        // Rotation or Scale changed, the whole matrix needs to be recalculated.
+        Vector3 rot = (rotation + addRot);
+        Matrix4 rotationMatrix =
+            Matrix4::Rotation(rot.x, Vector3(1, 0, 0)) *
+            Matrix4::Rotation(rot.y, Vector3(0, 1, 0)) *
+            Matrix4::Rotation(rot.z, Vector3(0, 0, 1));
+        *modelMatrix = Matrix4::Translation(position + addPos) * rotationMatrix * Matrix4::Scale(scale * addSiz);
+        lastRotation = Vector3(rotation);
+        lastScale = Vector3(scale);
+    }
+    // Do the same for all the children
     for(std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
-        // Bad things will happen if two entities are parent and child of each other at the same time, please don't do that.
-        (*it)->calculateModelMatrix();
+        (*it)->calculateModelMatrix(position + addPos, rotation + addRot, scale + addSiz, pDiff, rDiff, sDiff);
     }
-
-    /*Matrix4 rotX = Matrix4::Rotation(this->physicalBody->getRotation()->x, Vector3(1, 0, 0));
-    Matrix4 rotY = Matrix4::Rotation(this->physicalBody->getRotation()->y, Vector3(0, 1, 0));
-    Matrix4 rotZ = Matrix4::Rotation(this->physicalBody->getRotation()->z, Vector3(0, 0, 1));
-    Matrix4 rotationMatrix = rotX * rotY * rotZ;
-    *modelMatrix = Matrix4::Translation(*(this->physicalBody->getPosition())) * rotationMatrix * Matrix4::Scale(*(this->physicalBody->getScale()));*/
 }
 
 void Entity::update(float millisElapsed) {
     // Only update the matrix if this entity isn't a child, because that function also update all children's matrices.
     if (parent == nullptr) {
-        calculateModelMatrix();
+        calculateModelMatrix(Vector3(), Vector3(), Vector3(1, 1, 1), false, false, false);
     }
     for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
         (*it)->update(millisElapsed);
@@ -177,9 +171,7 @@ void Entity::update(float millisElapsed) {
 }
 
 void Entity::draw(float millisElapsed) {
-    if (model != nullptr && shader != nullptr) {
-        // renderer->updateShaderMatrix(shader->getShaderProgram(), "modelMatrix", modelMatrix);
-        //glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) modelMatrix);
+    if (model != nullptr) {
         model->draw();
     }
     for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {

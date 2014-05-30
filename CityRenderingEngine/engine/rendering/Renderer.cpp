@@ -74,13 +74,13 @@ void Renderer::render(Scene *scene, float millisElapsed) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    logOpenGLError("PREPARE_FRAME");
+    glEnable(GL_CULL_FACE);
     // Draw current scene
     if (scene != nullptr)
         scene->render(this, millisElapsed);
     // Swap buffers
     SDL_GL_SwapWindow(window);
-    logOpenGLError("SWAP_WINDOW");
+    logOpenGLError("END_RENDER");
 }
 
 bool Renderer::useShader(Shader *shader) {

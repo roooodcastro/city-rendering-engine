@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include "../math/Common.h"
 #include "../math/Vector3.h"
+#include "../math/Vector4.h"
 
 class Colour {
 public:
@@ -47,6 +48,8 @@ public:
     uint32_t getColourRev();
     /* Returns the colour in Vector3, format RGB. The colour will be in float values, ranging from 0.0 to 1.0. */
     Vector3 getColourVec3();
+    /* Returns the colour in Vector4, format RGBA. The colour will be in float values, ranging from 0.0 to 1.0. */
+    Vector4 getColourVec4();
 
     Colour &operator=(const Colour &other);
 };

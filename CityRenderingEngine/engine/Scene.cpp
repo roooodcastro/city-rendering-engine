@@ -14,6 +14,7 @@ Scene::Scene() {
     draggingRight = false;
     mutex = SDL_CreateMutex();
     userInterface = nullptr;
+    cameraChanged = true;
 }
 
 Scene::Scene(const Scene &copy) {
@@ -26,6 +27,7 @@ Scene::Scene(const Scene &copy) {
     this->projectionMatrix = new Matrix4(*(copy.projectionMatrix));
     this->userInterface = new UserInterface(*(copy.userInterface));
     this->mutex = copy.mutex;
+    this->cameraChanged = copy.cameraChanged;
 }
 
 Scene::Scene(UserInterface *userInterface) {
@@ -39,6 +41,7 @@ Scene::Scene(UserInterface *userInterface) {
     cameraRotation = new Vector3(0, 0, 0);
     dragging = false;
     draggingRight = false;
+    cameraChanged = true;
     mutex = SDL_CreateMutex();
 }
 
@@ -197,42 +200,76 @@ bool Scene::removeEntity(std::string name) {
 }
 
 void Scene::update(float millisElapsed) {
+    //double start, end, sum = 0;
+
+    //start = GameTimer::renderingTimer->getTotalTime();
     lockMutex();
     if (userInterface != nullptr)
         userInterface->update(millisElapsed);
     unsigned numEntities = (unsigned) entities->size();
-    for (unsigned i = 0; i < numEntities; i++) {
-        if (i < entities->size()) {
-            auto it = entities->begin();
-            std::advance(it, i);
+    for (auto it = entities->begin(); it != entities->end(); ++it) {
             (*it).second->update(millisElapsed);
-        }
     }
+    //end = GameTimer::renderingTimer->getTotalTime();
+    //std::cout << (end - start) << std::endl;
+
+    // Calculate WASD movement
+    float speed = 10.0f;
+    float sinPhi = sinf(toRadians(cameraRotation->x));
+    float cosPhi = cosf(toRadians(cameraRotation->x));
+    float sinTheta = sinf(toRadians(cameraRotation->y));
+    float cosTheta = cosf(toRadians(cameraRotation->y));
+    Vector3 movement = Vector3();
+    if (Keyboard::isKeyPressed(SDLK_w)) {
+        movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
+    }
+    if (Keyboard::isKeyPressed(SDLK_s)) {
+        movement += -Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
+    }
+    if (Keyboard::isKeyPressed(SDLK_a)) {
+        movement += Vector3(cosTheta, 0, sinTheta);
+    }
+    if (Keyboard::isKeyPressed(SDLK_d)) {
+        movement += Vector3(-cosTheta, 0, -sinTheta);
+    }
+    *cameraPos += (movement * speed);
     calculateCameraMatrix();
     unlockMutex();
 }
 
 void Scene::render(Renderer *renderer, float millisElapsed) {
+    bool updatedCameraMatrix = false;
+    double sum = 0;
     // Draw Entities
     for (auto it = entities->begin(); it != entities->end(); ++it) {
+        double start = GameTimer::renderingTimer->getTotalTime();
         // We first get the right shader to use with this entity
         Entity *entity = (*it).second;
         if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
             if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
-                renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+                
+            } else {
+                renderer->useShader(entity->getShader());
+                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+                cameraChanged = false;
+                if (lightSource != nullptr) {
+                    lightSource->updateShaderParameters(entity->getShader());
+                }
+                entity->getShader()->updateShaderParameters(false);
             }
-            renderer->useShader(entity->getShader());
-            renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-            renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+            if (cameraChanged && !updatedCameraMatrix) {
+                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+                cameraChanged = false;
+                updatedCameraMatrix = true;
+            }
             renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-            if (lightSource != nullptr) {
-                lightSource->updateShaderParameters(entity->getShader());
-            }
-            entity->getShader()->updateShaderParameters(true);
             entity->draw(millisElapsed);
         }
+        double end = GameTimer::renderingTimer->getTotalTime();
+        sum += end - start;
     }
-
+    //std::cout << sum << std::endl;
     // Draw Interface
     if (userInterface != nullptr) {
         //renderer->useShader(userInterface->getInterfaceShader());

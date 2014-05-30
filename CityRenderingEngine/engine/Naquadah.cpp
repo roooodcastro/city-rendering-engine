@@ -31,6 +31,7 @@ void Naquadah::initialize(unsigned int initModules) {
     if (instance == nullptr) {
         instance = new Naquadah();
     }
+    ResourcesManager::initialize();
     bool initEverything = ((initModules >> 31) > 0);
     if ((initModules >> 1) > 0 || initEverything) {
         // Init Physics
@@ -46,11 +47,11 @@ void Naquadah::initialize(unsigned int initModules) {
     // Init keyboard and mouse managers
     Keyboard::getInstance();
     Mouse::getInstance();
-    ResourcesManager::initialize();
 }
 
 void Naquadah::runGame() {
     gameRunning = true;
+
     installTimers(); // Start game timers
     while(gameRunning) {
         handleUserEvents();
@@ -166,6 +167,7 @@ void Naquadah::updateLogic(float millisElapsed) {
     if (currentScene) {
         currentScene->update(millisElapsed);
     }
+    //std::cout << GameTimer::logicTimer->getTicksPerSecond() << " TPS, " << GameTimer::renderingTimer->getTicksPerSecond() << " FPS" << std::endl;
 }
 
 void Naquadah::updatePhysics(float millisElapsed) {

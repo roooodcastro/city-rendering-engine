@@ -13,6 +13,7 @@
 #include "ui/UserInterface.h"
 #include "Entity.h"
 #include "Naquadah.h"
+#include "math/Common.h"
 #include "math/Matrix4.h"
 #include "rendering/Light.h"
 #include "rendering/Renderer.h"
@@ -118,7 +119,11 @@ protected:
 
     virtual void calculateCameraMatrix() {
         Matrix4 rotationMatrix = Matrix4::Rotation(cameraRotation->x, Vector3(1, 0, 0)) * Matrix4::Rotation(cameraRotation->y, Vector3(0, 1, 0)) * Matrix4::Rotation(cameraRotation->z, Vector3(0, 0, 1));
-        *cameraMatrix = Matrix4::Translation(*cameraPos) * rotationMatrix;
+        Matrix4 newCamera = rotationMatrix * Matrix4::Translation(*cameraPos);
+        if ((*cameraMatrix) != newCamera) {
+            *cameraMatrix = newCamera;
+            cameraChanged = true;
+        }
     }
 
     std::map<std::string, Entity*> *entities; // A list with all the entities contained in this level
@@ -133,6 +138,7 @@ protected:
     Vector3 *cameraPos; // The position of the camera
     Vector3 *cameraRotation; // The direction the camera is facing
     Matrix4 *cameraMatrix; // The viewMatrix, or the camera
+    bool cameraChanged; // Indicates camera movement
     Matrix4 *projectionMatrix; // The projectionMatrix. This will be switched all the time to render interface and game
 
     SDL_mutex *mutex;

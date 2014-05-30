@@ -23,11 +23,13 @@
 #include "../math/Vector4.h"
 #include "../Naquadah.h"
 #include "Material.h"
+#include "Colour.h"
 #include "Shader.h"
 #include "../ResourcesManager.h"
 
 class Naquadah;
 class Material;
+class Texture;
 class Shader;
 
 /*
@@ -59,6 +61,9 @@ public:
     /* This method should destroy the resource, unloading and releasing it from memory */
     virtual void unload();
 
+    /* Sets texture to ALL materials of ALL faces of this Model. */
+    void setTexture(Texture *texture);
+
     /*
      * Functions to create some primitive models/meshes.
      * This is similar to the Graphics coursework functions,
@@ -76,6 +81,14 @@ public:
      * resource manager, and if it fails, creates and returns a new model.
      */
     static Model *getOrCreate(const char *name, const char *fileName);
+
+    /*
+     * Tries to retrieve a Model from ResourcesManager with the provided name. If there's no loaded Model with this
+     * name, it'll create, load and add a new Model to ResourcesManager using the provided vertices. This should only
+     * be used to create 2D models, as the texture coordinates will be dynamically calculated and may not be correct
+     * for more complex 3D shapes.
+     */
+    static Model *getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture);
 
     static const char *meshTriangleName;
     static const char *meshQuadName;

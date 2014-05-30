@@ -129,6 +129,12 @@ public:
         }
     }
 
+    /*
+     * This function tries to retrieve the requested Shader from the resource manager, and if it doen't yet exists,
+     * creates and returns a new Shader.
+     */
+    static Shader *getOrCreate(std::string name, std::string vertexFilename, std::string fragFilename);
+
     bool operator==(Shader &other);
     bool operator!=(Shader &other);
 

@@ -110,7 +110,12 @@ public:
      * Sets the next Scene for the game. The engine will switch the scenes in the neginning of the next frame. It will
      * also destroy the previous scene, if there's any.
      */
-    void setNextScene(Scene *nextScene) { this->nextScene = nextScene; }
+    void setNextScene(Scene *nextScene) {
+        if (currentScene == nullptr)
+            currentScene = nextScene;
+        else
+            this->nextScene = nextScene;
+    }
 
     /* Returns the current scene of the engine. This may be null. */
     Scene *getCurrentScene() { return currentScene; }

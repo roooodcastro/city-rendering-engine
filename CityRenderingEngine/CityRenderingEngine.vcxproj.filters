@@ -177,6 +177,9 @@
     <ClCompile Include="generator\Road.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="generator\Building.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Vector2.h">
@@ -291,16 +294,19 @@
       <Filter>Header Files\engine\rendering</Filter>
     </ClInclude>
     <ClInclude Include="generator\City.h">
-      <Filter>Header Files\generator\zones</Filter>
-    </ClInclude>
-    <ClInclude Include="generator\CityBlock.h">
-      <Filter>Header Files\generator\zones</Filter>
-    </ClInclude>
-    <ClInclude Include="generator\Intersection.h">
-      <Filter>Header Files\generator\zones</Filter>
+      <Filter>Header Files\generator</Filter>
     </ClInclude>
     <ClInclude Include="generator\Road.h">
-      <Filter>Header Files\generator\zones</Filter>
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\CityBlock.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\Intersection.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\Building.h">
+      <Filter>Header Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

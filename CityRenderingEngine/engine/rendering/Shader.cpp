@@ -177,6 +177,17 @@ ShaderParameter *Shader::getShaderParameter(std::string parameterName) {
     return nullptr;
 }
 
+
+Shader *Shader::getOrCreate(std::string name, std::string vertexFilename, std::string fragFilename) {
+    if (ResourcesManager::resourceExists(name)) {
+        return (Shader*) ResourcesManager::getResource(name);
+    } else {
+        Shader *newShader = new Shader(name, vertexFilename, fragFilename);
+        ResourcesManager::addResource(newShader);
+        return newShader;
+    }
+}
+
 bool Shader::operator==(Shader &other) {
     if (&other)
         return this->program == other.program;

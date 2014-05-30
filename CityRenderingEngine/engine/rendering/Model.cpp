@@ -80,7 +80,8 @@ void Model::draw() {
             vertexCount += 3;
             if (face->material->getTexture() && face->material->getTexture()->isTextureValid()) {
                 if (face->material->getTexture()->getTextureId() != currentTexId) {
-                    //face->material->getTexture()->bindTexture(program, TEXTURE0);
+                    GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
+                    face->material->getTexture()->bindTexture(program, TEXTURE0);
                     if (currentTexId >= 0) {
                         glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
                         vertexOffset = vertexCount;
@@ -150,40 +151,33 @@ Model* Model::generateQuad() {
     m->textureCoords[4] = Vector2(1.0f, 1.0f);
     m->textureCoords[5] = Vector2(0, 1.0f);
 
-    Face *face1 = new Face(1, 2, 3, 1, 2, 3, 0, 0, 0, new Material());
-    Face *face2 = new Face(4, 5, 6, 4, 5, 6, 0, 0, 0, new Material());
-    /* We purposely set invalid textures here, so when this model renders,
-     * it won't bind any texture. This specific mesh can't bind a texture
-     * on its own because these primitives will be used primarily to render
-     * interface items, such as texts and buttons that have other ways of
-     * binding its textures. */
-    //face1->material->setTexture(Texture());
-    //face2->material->setTexture(Texture());
+    Material *material = new Material();
+    Face *face1 = new Face(1, 2, 3, 1, 2, 3, 1, 2, 3, material);
+    Face *face2 = new Face(4, 5, 6, 4, 5, 6, 4, 5, 6, material);
     m->faces->emplace_back(face1);
     m->faces->emplace_back(face2);
 
+    m->generateNormals();
     m->bufferData();
     return m;
 }
 
 void Model::generateNormals() {
-    //if (type == GL_TRIANGLES) {
-    //	if (normals == NULL) {
-    //		normals = new Vector3[numVertices];
-    //	}
-    //	for (int i = 0; i < numVertices; i += 3) {
-    //		Vector3 &a = vertices[i];
-    //		Vector3 &b = vertices[i + 1];
-    //		Vector3 &c = vertices[i + 2];
+    if (normals == NULL) {
+    	normals = new Vector3[numVertices];
+    }
+    for (int i = 0; i < numVertices; i += 3) {
+    	Vector3 &a = vertices[i];
+    	Vector3 &b = vertices[i + 1];
+    	Vector3 &c = vertices[i + 2];
 
-    //		Vector3 normal = Vector3::cross(b - a, c - a);
-    //		normal.normalise();
+    	Vector3 normal = Vector3::cross(b - a, c - a);
+    	normal.normalise();
 
-    //		normals[i] = normal;
-    //		normals[i + 1] = normal;
-    //		normals[i + 2] = normal;
-    //	}
-    //}
+    	normals[i] = Vector3(normal);
+    	normals[i + 1] = Vector3(normal);
+    	normals[i + 2] = Vector3(normal);
+    }
 }
 
 void Model::bufferData() {
@@ -206,7 +200,7 @@ void Model::bufferData() {
         glVertexAttribPointer(index, 4, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(index);
 
-        if (textureCoords != NULL) {
+        if (textureCoords != nullptr) {
             index = 2; // Texture map
             glGenBuffers(1, &texVbo);
             glBindBuffer(GL_ARRAY_BUFFER, texVbo);
@@ -215,7 +209,7 @@ void Model::bufferData() {
             glEnableVertexAttribArray(index);
         }
 
-        if (normals != NULL) {
+        if (normals != nullptr) {
             index = 3; // Normal
             glGenBuffers(1, &norVbo);
             glBindBuffer(GL_ARRAY_BUFFER, norVbo);
@@ -233,7 +227,7 @@ void Model::bufferData() {
 void Model::load() {
     if (!loaded) {
         std::vector<std::string*> lines;
-        std::vector<Vector3*> vecVertices;
+        std::vector<Vector3> vecVertices;
         std::vector<Face*> vecFaces;
         std::vector<Vector3*> vecNormals;
         std::vector<Vector2*> vecTexCoords;
@@ -274,7 +268,7 @@ void Model::load() {
                     // It's a vertex
                     float x, y, z;
                     sscanf(line.c_str(), "v %f %f %f", &x, &y, &z);
-                    vecVertices.emplace_back(new Vector3(x, y, z));
+                    vecVertices.emplace_back(Vector3(x, y, z));
                 } else if (secondChar == 'n') {
                     // It's a normal
                     float x, y, z;
@@ -386,7 +380,7 @@ void Model::load() {
             int numVertices = 3;
         
             for (int j = 0; j < numVertices; j++) {
-                this->vertices[vertexOffset + j] = *(vecVertices[face->vertexIndexes[j] - 1]);
+                this->vertices[vertexOffset + j] = Vector3(vecVertices[face->vertexIndexes[j] - 1]);
                 Colour colour = face->material->getDiffuse();
                 this->colours[vertexOffset + j] = Vector4(colour.red, colour.green, colour.blue, face->material->getAlpha());
                 if (face->texCoords[j] == 0) {
@@ -410,8 +404,6 @@ void Model::load() {
             delete lines[i];
         for (unsigned i = 0; i < vecNormals.size(); i++)
             delete vecNormals[i];
-        for (unsigned i = 0; i < vecVertices.size(); i++)
-            delete vecVertices[i];
         for (unsigned i = 0; i < vecTexCoords.size(); i++)
             delete vecTexCoords[i];
         //for (unsigned i = 0; i < materials.size(); i++)
@@ -437,9 +429,9 @@ void Model::unload() {
 
 void Model::initializePrimitiveMeshes() {
     //Model *triangle = Model::generateTriangle();
-    //Model *quad = Model::generateQuad();
+    Model *quad = Model::generateQuad();
     //ResourcesManager::addResource(triangle);
-    //ResourcesManager::addResource(quad);
+    ResourcesManager::addResource(quad);
 }
 
 Model *Model::getTriangleMesh() {
@@ -457,5 +449,40 @@ Model *Model::getOrCreate(const char *name, const char *fileName) {
         Model *newModel = new Model(fileName, name);
         ResourcesManager::addResource(newModel);
         return newModel;
+    }
+}
+
+Model *Model::getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture) {
+    if (ResourcesManager::resourceExists(name)) {
+        return (Model*) ResourcesManager::getResource(name);
+    } else {
+        Model *m = new Model();
+
+        m->numVertices = (int) vertices.size();
+        m->vertices = new Vector3[m->numVertices];
+        m->colours = new Vector4[m->numVertices];
+        m->textureCoords = new Vector2[m->numVertices];
+        m->faces = new std::vector<Face*>();
+        m->name = name;
+        Material *material = new Material();
+
+        for (int i = 0; i < m->numVertices; i++) {
+            m->vertices[i] = Vector3(vertices.at(i));
+            m->colours[i] = colour.getColourVec4();
+            m->textureCoords[i] = Vector2(vertices.at(i).x, vertices.at(i).z).normalised();
+            Face *face = new Face(i + 1, i + 2, i + 3, i + 1, i + 2, i + 3, i + 1, i + 2, i + 3, material);
+            m->faces->emplace_back(face);
+        }
+        m->generateNormals();
+        m->bufferData();
+        m->loaded = true;
+        ResourcesManager::addResource(m);
+        return m;
+    }
+}
+
+void Model::setTexture(Texture *texture) {
+    for (unsigned i = 0; i < faces->size(); i++) {
+        faces->at(i)->material->setTexture(texture);
     }
 }
