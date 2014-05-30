@@ -11,6 +11,7 @@ Entity::Entity(void) {
     position = Vector3();
     rotation = Vector3();
     scale = Vector3(1, 1, 1);
+    numChildEntities = 0;
 }
 
 Entity::Entity(const Entity &copy) {
@@ -24,6 +25,7 @@ Entity::Entity(const Entity &copy) {
     this->position = Vector3(copy.position);
     this->rotation = Vector3(copy.rotation);
     this->scale = Vector3(copy.scale);
+    this->numChildEntities = copy.numChildEntities;
 }
 
 Entity::Entity(Vector3 position, Vector3 rotation, Vector3 scale) {
@@ -36,6 +38,7 @@ Entity::Entity(Vector3 position, Vector3 rotation, Vector3 scale) {
     model = nullptr;
     shader = nullptr;
     parent = nullptr;
+    numChildEntities = 0;
     
 }
 
@@ -72,6 +75,7 @@ Entity &Entity::operator=(const Entity &other) {
     this->position = Vector3(other.position);
     this->rotation = Vector3(other.rotation);
     this->scale = Vector3(other.scale);
+    this->numChildEntities = other.numChildEntities;
     return *this;
 }
 
@@ -155,8 +159,10 @@ void Entity::calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz
         lastScale = Vector3(scale);
     }
     // Do the same for all the children
-    for(std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
-        (*it)->calculateModelMatrix(position + addPos, rotation + addRot, scale + addSiz, pDiff, rDiff, sDiff);
+    if (numChildEntities > 0) {
+        for(auto it = childEntities->begin(); it != childEntities->end(); it++) {
+            (*it)->calculateModelMatrix(position + addPos, rotation + addRot, scale + addSiz, pDiff, rDiff, sDiff);
+        }
     }
 }
 
@@ -165,8 +171,10 @@ void Entity::update(float millisElapsed) {
     if (parent == nullptr) {
         calculateModelMatrix(Vector3(), Vector3(), Vector3(1, 1, 1), false, false, false);
     }
-    for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
-        (*it)->update(millisElapsed);
+    if (numChildEntities > 0) {
+        for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); it++) {
+            (*it)->update(millisElapsed);
+        }
     }
 }
 
@@ -174,8 +182,10 @@ void Entity::draw(float millisElapsed) {
     if (model != nullptr) {
         model->draw();
     }
-    for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); ++it) {
-        (*it)->draw(millisElapsed);
+    if (numChildEntities > 0) {
+        for (auto it = childEntities->begin(); it != childEntities->end(); ++it) {
+            (*it)->draw(millisElapsed);
+        }
     }
 
     // If debug mode enabled, draw the collision spheres to track their position and check if collisions are correct
@@ -210,6 +220,7 @@ void Entity::addChild(Entity *child) {
             childEntities->reserve(childEntities->capacity() + 5);
         }
         childEntities->emplace_back(child);
+        numChildEntities = childEntities->size();
         child->parent = this;
     }
 }
@@ -217,11 +228,12 @@ void Entity::addChild(Entity *child) {
 void Entity::removeChild(Entity *child) {
     if (child) {
         childEntities->erase(std::remove(childEntities->begin(), childEntities->end(), child), childEntities->end());
+        numChildEntities = childEntities->size();
         // If vector becomes too big, shrink it
         if (childEntities->size() + 10 < childEntities->capacity()) {
             childEntities->shrink_to_fit();
         }
-        child->parent = NULL;
+        child->parent = nullptr;
     }
 }
 

@@ -32,6 +32,7 @@ void Naquadah::initialize(unsigned int initModules) {
         instance = new Naquadah();
     }
     ResourcesManager::initialize();
+    Profiler::startProfiler();
     bool initEverything = ((initModules >> 31) > 0);
     if ((initModules >> 1) > 0 || initEverything) {
         // Init Physics
@@ -60,6 +61,7 @@ void Naquadah::runGame() {
     GameTimer::logicTimer->stopTimer();
     GameTimer::physicsTimer->stopTimer();
     GameTimer::renderingTimer->stopTimer();
+    //Profiler::stopProfiler();
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
@@ -167,6 +169,8 @@ void Naquadah::updateLogic(float millisElapsed) {
     if (currentScene) {
         currentScene->update(millisElapsed);
     }
+    Profiler::getTimer(2)->resetCycle();
+    //std::cout << Profiler::getTimer(2)->getAverageTime() << std::endl;
     //std::cout << GameTimer::logicTimer->getTicksPerSecond() << " TPS, " << GameTimer::renderingTimer->getTicksPerSecond() << " FPS" << std::endl;
 }
 
@@ -178,10 +182,14 @@ void Naquadah::updatePhysics(float millisElapsed) {
 }
 
 void Naquadah::render(float millisElapsed) {
+    Profiler::getTimer(1)->startMeasurement();
     // If we have the renderer, render the scene
     if (renderer != nullptr) {
         renderer->render(currentScene, millisElapsed);
     }
+    Profiler::getTimer(1)->finishMeasurement();
+    Profiler::getTimer(1)->resetCycle();
+    std::cout << Profiler::getTimer(1)->getAverageTime() << std::endl;
 }
 
 /* Callback function created to be called by the logic timer, and call the update logic function of Naquadah. */

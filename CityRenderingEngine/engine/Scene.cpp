@@ -200,18 +200,17 @@ bool Scene::removeEntity(std::string name) {
 }
 
 void Scene::update(float millisElapsed) {
-    //double start, end, sum = 0;
-
-    //start = GameTimer::renderingTimer->getTotalTime();
+    Profiler::getTimer(2)->startMeasurement();
     lockMutex();
     if (userInterface != nullptr)
         userInterface->update(millisElapsed);
     unsigned numEntities = (unsigned) entities->size();
-    for (auto it = entities->begin(); it != entities->end(); ++it) {
-            (*it).second->update(millisElapsed);
+    // Doing this makes it unsafe for entities to add and remove other entities from the Scene, but speeds things up.
+    auto it = entities->begin();
+    auto itEnd = entities->end();
+    for (; it != itEnd; it++) {
+        it->second->update(millisElapsed);
     }
-    //end = GameTimer::renderingTimer->getTotalTime();
-    //std::cout << (end - start) << std::endl;
 
     // Calculate WASD movement
     float speed = 10.0f;
@@ -235,16 +234,17 @@ void Scene::update(float millisElapsed) {
     *cameraPos += (movement * speed);
     calculateCameraMatrix();
     unlockMutex();
+    Profiler::getTimer(2)->finishMeasurement();
 }
 
 void Scene::render(Renderer *renderer, float millisElapsed) {
     bool updatedCameraMatrix = false;
-    double sum = 0;
     // Draw Entities
-    for (auto it = entities->begin(); it != entities->end(); ++it) {
-        double start = GameTimer::renderingTimer->getTotalTime();
+    auto it = entities->begin();
+    auto itEnd = entities->end();
+    for (; it != itEnd; it++) {
         // We first get the right shader to use with this entity
-        Entity *entity = (*it).second;
+        Entity *entity = it->second;
         if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
             if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
                 
@@ -253,6 +253,7 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
                 renderer->updateShaderMatrix("projMatrix", projectionMatrix);
                 renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
                 cameraChanged = false;
+                updatedCameraMatrix = true;
                 if (lightSource != nullptr) {
                     lightSource->updateShaderParameters(entity->getShader());
                 }
@@ -266,8 +267,6 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
             renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
             entity->draw(millisElapsed);
         }
-        double end = GameTimer::renderingTimer->getTotalTime();
-        sum += end - start;
     }
     //std::cout << sum << std::endl;
     // Draw Interface

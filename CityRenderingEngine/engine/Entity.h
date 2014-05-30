@@ -108,6 +108,9 @@ protected:
      */
     std::vector<Entity*> *childEntities;
 
+    /* The number of childEntities in this Entity. */
+    int numChildEntities;
+
     /*
      * If this entity is the child of another entity, it must know its parent, in order to calculate its world
      * attributes, such as position, velocity and rotation, relative to its parent's.

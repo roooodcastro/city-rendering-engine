@@ -180,6 +180,12 @@
     <ClCompile Include="generator\Building.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Profiler.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\ProfilingTimer.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Vector2.h">
@@ -307,6 +313,12 @@
     </ClInclude>
     <ClInclude Include="generator\Building.h">
       <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Profiler.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\ProfilingTimer.h">
+      <Filter>Header Files\engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -71,28 +71,13 @@ void Model::draw() {
     // Will only try to render if the model is loaded to the GPU
     if (loaded) {
         glBindVertexArray(vao);
-        //GLuint program = Naquadah::getInstance()->getDefaultShader()->getShaderProgram();
-        int vertexOffset = 0;
-        int vertexCount = 0;
-        int currentTexId = -1;
-        for (unsigned i = 0; i < faces->size(); i++) {
-            Face *face = (*faces)[i];
-            vertexCount += 3;
-            if (face->material->getTexture() && face->material->getTexture()->isTextureValid()) {
-                if (face->material->getTexture()->getTextureId() != currentTexId) {
-                    GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
-                    face->material->getTexture()->bindTexture(program, TEXTURE0);
-                    if (currentTexId >= 0) {
-                        glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
-                        vertexOffset = vertexCount;
-                        vertexCount = 0;
-                    }
-                    currentTexId = face->material->getTexture()->getTextureId();
-                }
-            }
+        Face *face = faces->at(0);
+        if (face->material->getTexture() && face->material->getTexture()->isTextureValid()) {
+            GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
+            face->material->getTexture()->bindTexture(program, TEXTURE0);
         }
-        glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
-        Renderer::logOpenGLError("MODEL_DRAW");
+        glDrawArrays(GL_TRIANGLES, 0, numVertices);
+        //Renderer::logOpenGLError("MODEL_DRAW");
         glBindVertexArray(0);
     }
 }

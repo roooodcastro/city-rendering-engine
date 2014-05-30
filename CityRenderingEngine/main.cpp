@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     scene->setCameraPosition(Vector3(1000, -600, 1000));
     scene->setCameraRotation(Vector3(15, 135, 0));
 
-    City *city = City::generateManhattanGrid(20, 20);
+    City *city = City::generateManhattanGrid(40, 40);
     std::vector<CityBlock*> *cityBlocks = city->getCityBlocks();
     for (unsigned i = 0; i < cityBlocks->size(); i++) {
         CityBlock *cityBlock = cityBlocks->at(i);
@@ -54,6 +54,11 @@ int main(int argc, char* argv[]) {
             scene->addEntity(buildings->at(j), "Building_" + iString + "_" + jString);
         }
     }
+
+    ProfilingTimer *entityMatrixTimer = new ProfilingTimer(1, 60);
+    ProfilingTimer *entityLoopTimer = new ProfilingTimer(2, 60);
+    Profiler::addProfilingTimer(entityMatrixTimer);
+    Profiler::addProfilingTimer(entityLoopTimer);
 
     Naquadah::getInstance()->runGame();
 

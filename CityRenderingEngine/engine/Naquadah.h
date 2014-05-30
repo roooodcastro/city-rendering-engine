@@ -28,6 +28,7 @@
 #include "input/ConfigurationManager.h"
 #include "rendering/Renderer.h"
 #include "physics/Simulation.h"
+#include "Profiler.h"
 #include "Scene.h"
 
 class Scene;
