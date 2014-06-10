@@ -150,7 +150,10 @@
     <ClCompile Include="engine\input\Mouse.cpp" />
     <ClCompile Include="engine\Profiler.cpp" />
     <ClCompile Include="engine\ProfilingTimer.cpp" />
+    <ClCompile Include="engine\rendering\Camera.cpp" />
+    <ClCompile Include="engine\rendering\Frustum.cpp" />
     <ClCompile Include="engine\rendering\Light.cpp" />
+    <ClCompile Include="engine\rendering\Plane.cpp" />
     <ClCompile Include="engine\rendering\Renderer.cpp" />
     <ClCompile Include="engine\rendering\ShaderParameter.cpp" />
     <ClCompile Include="engine\Scene.cpp" />
@@ -191,7 +194,10 @@
     <ClInclude Include="engine\input\Mouse.h" />
     <ClInclude Include="engine\Profiler.h" />
     <ClInclude Include="engine\ProfilingTimer.h" />
+    <ClInclude Include="engine\rendering\Camera.h" />
+    <ClInclude Include="engine\rendering\Frustum.h" />
     <ClInclude Include="engine\rendering\Light.h" />
+    <ClInclude Include="engine\rendering\Plane.h" />
     <ClInclude Include="engine\rendering\Renderer.h" />
     <ClInclude Include="engine\rendering\ShaderParameter.h" />
     <ClInclude Include="engine\Scene.h" />

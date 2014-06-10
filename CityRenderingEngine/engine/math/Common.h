@@ -62,3 +62,17 @@ static inline std::vector<std::string> split(const std::string &s, char delim) {
     split(s, delim, elems);
     return elems;
 }
+
+template<typename Iterator>
+void insertionSort(Iterator first, Iterator last) {
+    Iterator min = first;
+    for (Iterator i = first + 1; i < last; i++) {
+        if (*i < *min) min = i;
+    }
+    std::iter_swap(first, min);
+    while (++first < last) {
+        for (Iterator j = first; *j < *(j - 1); --j) {
+            std::iter_swap((j - 1), j);
+        }
+    }
+}

@@ -7,7 +7,7 @@ Intersection::Intersection(void) {
     this->position = Vector3();
     this->rotation = Vector3();
     this->scale = Vector3(10, 0, 10);
-
+    this->setRenderRadius(15);
     connections = new std::vector<Intersection*>();
     roads = new std::vector<Road*>();
 }
@@ -20,7 +20,7 @@ Intersection::Intersection(Vector3 position) {
     this->position = position;
     this->rotation = Vector3();
     this->scale = Vector3(10, 0, 10);
-
+    this->setRenderRadius(15);
     connections = new std::vector<Intersection*>();
     roads = new std::vector<Road*>();
 }

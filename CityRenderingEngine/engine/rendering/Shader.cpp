@@ -42,6 +42,9 @@ void Shader::load() {
 }
 
 void Shader::unload() {
+    // TODO: store the GLuint of the shaders to be able to delete them here
+    //glDetachShader(program, vertexShader);
+    //glDeleteShader(vertexShader);
     glDeleteProgram(program);
     loaded = false;
 }
@@ -56,10 +59,9 @@ void Shader::unload() {
 void Shader::setDefaultAttributes()	{
     Renderer *renderer = Naquadah::getRenderer();
     if (renderer != nullptr) {
-        bindAttributeLocation(program, LOC_VERTEX_BUFFER, "position");
-        bindAttributeLocation(program, LOC_COLOUR_BUFFER, "colour");
-        bindAttributeLocation(program, LOC_UV_MAP_BUFFER, "uv_map");
-        bindAttributeLocation(program, LOC_NORMAL_BUFFER, "normal");
+        bindAttributeLocation(program, VERTEX_BUFFER, "position");
+        bindAttributeLocation(program, UV_MAP_BUFFER, "uv_map");
+        bindAttributeLocation(program, NORMAL_BUFFER, "normal");
         //renderer->bindAttributeLocation(program, LOC_TANGENT_BUFFER, "tangent");
     }
 }

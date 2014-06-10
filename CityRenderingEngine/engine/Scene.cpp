@@ -2,58 +2,83 @@
 
 Scene::Scene() {
     entities = new std::map<std::string, Entity*>();
+    opaqueEntities = new std::vector<Entity*>();
+    opaqueEntities->reserve(25000);
+    transparentEntities = new std::vector<Entity*>();
+    transparentEntities->reserve(25000);
     //setProjectionMatrix(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
     projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
-    //setCameraMatrix(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
+    camera = new Camera();
     //lightSources = new std::vector<Light*>();
     lightSource = nullptr;
-    cameraPos = new Vector3(0, 0, 0);
-    cameraRotation = new Vector3(0, 0, 0);
     dragging = false;
     draggingRight = false;
     mutex = SDL_CreateMutex();
     userInterface = nullptr;
-    cameraChanged = true;
+    frustum = new Frustum(*projectionMatrix * *cameraMatrix);
 }
 
 Scene::Scene(const Scene &copy) {
-    this->cameraPos = new Vector3(*(copy.cameraPos));
-    this->cameraRotation = new Vector3(*(copy.cameraRotation));
     this->cameraMatrix = new Matrix4(*(copy.cameraMatrix));
     this->entities = new std::map<std::string, Entity*>(*(copy.entities));
+    this->opaqueEntities = new std::vector<Entity*>(*(copy.opaqueEntities));
+    this->transparentEntities = new std::vector<Entity*>(*(copy.transparentEntities));
+    this->camera = new Camera(*(copy.camera));
     //this->lightSources = new std::vector<Light*>(*(copy.lightSources));
     this->lightSource = new Light(*(copy.lightSource));
     this->projectionMatrix = new Matrix4(*(copy.projectionMatrix));
     this->userInterface = new UserInterface(*(copy.userInterface));
     this->mutex = copy.mutex;
-    this->cameraChanged = copy.cameraChanged;
+    this->frustum = new Frustum(*(copy.frustum));
 }
 
 Scene::Scene(UserInterface *userInterface) {
     entities = new std::map<std::string, Entity*>();
     projectionMatrix = new Matrix4();
     cameraMatrix = new Matrix4();
-    this->userInterface = userInterface;
+    userInterface = userInterface;
+    camera = new Camera();
     //lightSources = new std::vector<Light*>();
     lightSource = nullptr;
-    cameraPos = new Vector3(0, 0, 0);
-    cameraRotation = new Vector3(0, 0, 0);
     dragging = false;
     draggingRight = false;
-    cameraChanged = true;
     mutex = SDL_CreateMutex();
+    frustum = new Frustum(*projectionMatrix * *cameraMatrix);
 }
 
 Scene::~Scene(void) {
-    if (userInterface) {
+    if (userInterface != nullptr) {
         delete userInterface;
+        userInterface = nullptr;
     }
-    entities->clear();
-    delete entities;
-    delete lightSource;
-    delete cameraPos;
-    delete cameraRotation;
+    if (entities != nullptr) {
+        entities->clear();
+        delete entities;
+        entities = nullptr;
+    }
+    if (opaqueEntities != nullptr) {
+        opaqueEntities->clear();
+        delete opaqueEntities;
+        opaqueEntities = nullptr;
+    }
+    if (transparentEntities != nullptr) {
+        transparentEntities->clear();
+        delete transparentEntities;
+        transparentEntities = nullptr;
+    }
+    if (lightSource != nullptr) {
+        delete lightSource;
+        lightSource = nullptr;
+    }
+    if (camera != nullptr) {
+        delete camera;
+        camera = nullptr;
+    }
+    if (frustum != nullptr) {
+        delete frustum;
+        frustum = nullptr;
+    }
     SDL_DestroyMutex(mutex);
 }
 
@@ -68,11 +93,9 @@ void Scene::onMouseMoved(Vector2 &position, Vector2 &amount) {
     }*/
 
     if (dragging) {
-        this->cameraRotation->y += (amount.x / 4.0f);
-        this->cameraRotation->x += (amount.y / 4.0f);
+        this->camera->rotateCamera(Vector3(amount.y / 4.0f, amount.x / 4.0f, 0));
     } else if (draggingRight) {
-        this->cameraPos->x += (amount.x / 20.0f);
-        this->cameraPos->y -= (amount.y / 20.0f);
+        this->camera->moveCamera(Vector3(amount.x / 5.0f, amount.y / 5.0f, 0));
     }
 }
 
@@ -188,7 +211,25 @@ bool Scene::isEntityInScene(std::string name) {
 
 void Scene::addEntity(Entity *entity, std::string name) {
     if (entity && name != "") {
-        entities->insert(std::pair<std::string, Entity*>(name, entity));
+        if (entity->getParent() == nullptr) {
+            // Only add to this map if it's a root entity 
+            entities->insert(std::pair<std::string, Entity*>(name, entity));
+        }
+        // Add it to opaque or transparent lists and reorder them
+        // Note that the children entities will also be added to the lists
+        std::vector<Entity*> entityTree = entity->getAllChildren(entity);
+        auto itEnd = entityTree.end();
+        Profiler::getTimer(3)->startMeasurement();
+        for (auto it = entityTree.begin(); it != itEnd; it++) {
+            if ((*it)->getModel() != nullptr && (*it)->isTranslucent()) {
+                transparentEntities->push_back((*it));
+            } else {
+                opaqueEntities->push_back((*it));
+            }
+        }
+        std::sort_heap(transparentEntities->begin(), transparentEntities->end(), Entity::compareByCameraDistance);
+        std::sort_heap(opaqueEntities->begin(), opaqueEntities->end(), Entity::compareByCameraDistance);
+        Profiler::getTimer(3)->finishMeasurement();
     }
 }
 
@@ -204,20 +245,13 @@ void Scene::update(float millisElapsed) {
     lockMutex();
     if (userInterface != nullptr)
         userInterface->update(millisElapsed);
-    unsigned numEntities = (unsigned) entities->size();
-    // Doing this makes it unsafe for entities to add and remove other entities from the Scene, but speeds things up.
-    auto it = entities->begin();
-    auto itEnd = entities->end();
-    for (; it != itEnd; it++) {
-        it->second->update(millisElapsed);
-    }
 
-    // Calculate WASD movement
+    // Calculate WASD movement (only debug purposes, NOT permanent)
     float speed = 10.0f;
-    float sinPhi = sinf(toRadians(cameraRotation->x));
-    float cosPhi = cosf(toRadians(cameraRotation->x));
-    float sinTheta = sinf(toRadians(cameraRotation->y));
-    float cosTheta = cosf(toRadians(cameraRotation->y));
+    float sinPhi = sinf(toRadians(camera->getRotation().x));
+    float cosPhi = cosf(toRadians(camera->getRotation().x));
+    float sinTheta = sinf(toRadians(camera->getRotation().y));
+    float cosTheta = cosf(toRadians(camera->getRotation().y));
     Vector3 movement = Vector3();
     if (Keyboard::isKeyPressed(SDLK_w)) {
         movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
@@ -231,8 +265,27 @@ void Scene::update(float millisElapsed) {
     if (Keyboard::isKeyPressed(SDLK_d)) {
         movement += Vector3(-cosTheta, 0, -sinTheta);
     }
-    *cameraPos += (movement * speed);
-    calculateCameraMatrix();
+    if (movement.getLength() > 0.00001f) {
+        camera->moveCamera(movement * speed);
+    }
+
+    // Recalculate camera
+    if (camera && camera->hasChanged()) {
+        *cameraMatrix = camera->buildViewMatrix();
+        frustum->updateMatrix(*projectionMatrix * *cameraMatrix);
+    }
+
+    unsigned numEntities = (unsigned) entities->size();
+    // Doing this makes it unsafe for entities to add and remove other entities from the Scene, but speeds things up.
+    auto it = entities->begin();
+    auto itEnd = entities->end();
+    for (; it != itEnd; it++) {
+        it->second->update(millisElapsed);
+    }
+
+    // We only set this to false here because the Entities use it to recalculate their distanceToCamera
+    camera->setChanged(false);
+
     unlockMutex();
     Profiler::getTimer(2)->finishMeasurement();
 }
@@ -240,32 +293,32 @@ void Scene::update(float millisElapsed) {
 void Scene::render(Renderer *renderer, float millisElapsed) {
     bool updatedCameraMatrix = false;
     // Draw Entities
-    auto it = entities->begin();
-    auto itEnd = entities->end();
+    auto it = opaqueEntities->rbegin();
+    auto itEnd = opaqueEntities->rend();
     for (; it != itEnd; it++) {
         // We first get the right shader to use with this entity
-        Entity *entity = it->second;
-        if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
-            if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
+        Entity *entity = (*it);
+        if (frustum->isEntityInside(entity)) {
+            if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
+                if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
                 
-            } else {
-                renderer->useShader(entity->getShader());
-                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
-                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-                cameraChanged = false;
-                updatedCameraMatrix = true;
-                if (lightSource != nullptr) {
-                    lightSource->updateShaderParameters(entity->getShader());
+                } else {
+                    renderer->useShader(entity->getShader());
+                    renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+                    renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+                    updatedCameraMatrix = true;
+                    if (lightSource != nullptr) {
+                        lightSource->updateShaderParameters(entity->getShader());
+                    }
+                    entity->getShader()->updateShaderParameters(false);
                 }
-                entity->getShader()->updateShaderParameters(false);
+                if (!updatedCameraMatrix) {
+                    renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+                    updatedCameraMatrix = true;
+                }
+                renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+                entity->draw(millisElapsed);
             }
-            if (cameraChanged && !updatedCameraMatrix) {
-                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-                cameraChanged = false;
-                updatedCameraMatrix = true;
-            }
-            renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-            entity->draw(millisElapsed);
         }
     }
     //std::cout << sum << std::endl;

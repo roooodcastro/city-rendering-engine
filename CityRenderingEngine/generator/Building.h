@@ -23,9 +23,6 @@ public:
 
 protected:
 
-    /* The CtyBlock in whici this building is located. */
+    /* The CtyBlock in which this building is located. */
     CityBlock *cityBlock;
-
-    /* Position of the center of the building's base, relative to the center of its CityBlock. */
-    Vector3 blockPosition;
 };

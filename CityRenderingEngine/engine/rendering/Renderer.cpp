@@ -22,10 +22,6 @@ Renderer::Renderer(void) {
     // Init and configure OpenGL
     glShadeModel(GL_SMOOTH);
     glClearDepth(1.0f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // TODO: read driver data to check supported opengl versions
@@ -60,6 +56,13 @@ Renderer::Renderer(void) {
     logOpenGLError("CONTEXT_INIT");
 
     currentShader = nullptr;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // We initialize the primitive meshes that will be used by the interface
     Model::initializePrimitiveMeshes();

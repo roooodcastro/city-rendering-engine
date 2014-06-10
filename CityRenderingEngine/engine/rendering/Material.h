@@ -32,8 +32,7 @@ public:
 
     Material(void);
     Material(const Material &copy);
-    Material(const char* name, float alpha, float ns, float ni, Colour &diffuse, Colour &ambient, Colour &specular,
-        int illum, Texture *texture);
+    Material(std::string name, float shininess, Colour diffuse, Colour ambient, Colour specular, Texture *texture);
     ~Material(void);
 
     /*

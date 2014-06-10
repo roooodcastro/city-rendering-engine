@@ -20,7 +20,7 @@ City::~City(void) {
 
 Intersection *City::getIntersectionAt(Vector3 position) {
     for (int i = 0; i < intersections->size(); i++) {
-        if (intersections->at(i)->position == position) {
+        if (intersections->at(i)->getPosition() == position) {
             return intersections->at(i);
         }
     }
@@ -29,13 +29,13 @@ Intersection *City::getIntersectionAt(Vector3 position) {
 
 City *City::generateManhattanGrid(int width, int height) {
     City *manhattan = new City();
-    Vector2 gridOffset = Vector2(width * 110, height * 110);
+    Vector2 gridOffset = Vector2((float) (width * 110), (float) (height * 110));
     for (int i = 0; i <= width; i++) { // North-South roads (columns)
         for (int j = 0; j <= height; j++) { // East-West roads (rows)
             Vector3 position = Vector3((j * 220.0f) - gridOffset.x, 0, (i * 220.0f) - gridOffset.y);
             Intersection *intersection = new Intersection(Vector3(position));
             std::stringstream intersectionName;
-            intersectionName << "I" << intersection->position;
+            intersectionName << "I" << intersection->getPosition();
             Naquadah::getInstance()->getCurrentScene()->addEntity(intersection, intersectionName.str());
             manhattan->intersections->emplace_back(intersection);
             if (j > 0) {
@@ -57,6 +57,9 @@ City *City::generateManhattanGrid(int width, int height) {
                 cityBlock->addVertice(intersection);
                 cityBlock->generateBuildings();
                 manhattan->cityBlocks->emplace_back(cityBlock);
+                std::stringstream blockName;
+                blockName << "CB" << cityBlock->getPosition();
+                Naquadah::getInstance()->getCurrentScene()->addEntity(cityBlock, blockName.str());
             }
         }
     }

@@ -27,12 +27,6 @@
 class Shader : public Resource {
 public:
 
-    static const GLuint LOC_VERTEX_BUFFER = 0;
-    static const GLuint LOC_COLOUR_BUFFER = 1;
-    static const GLuint LOC_UV_MAP_BUFFER = 2;
-    static const GLuint LOC_NORMAL_BUFFER = 3;
-    //static const GLuint LOC_TANGENT_BUFFER = 4;
-
     /*
      * Creates a new Shader, with the specified filenames for the shader files. ShaderName is the name of the shader
      * resource that will be created. Note that the actual OpenGL shaders won't be created here, but only when the

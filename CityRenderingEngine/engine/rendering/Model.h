@@ -9,9 +9,9 @@
  * that has some nice tutorials on SDL and OpenGL, but it was 99% rewritten because of the massive lack of readability
  * of his code.
  *
- * It contains vectors with the vertex, texture mapping and normal data, and a vector of faces to index each vertex to
- * its correct face. A Face is a structure that holds the 3 indices for the vertex, texture and normal vectors. It also
- * specifies the material that the face is using. The Model must also contain a Shader that will be used to render it.
+ * It contains vectors with the vertexes, texture mapping, normal data and the indexes. The indexes tell OpenGL which
+ * vertexes make up a triangle, so we can have less vertex, uv_map and normal information uploaded to the GPU, taking
+ * less space in its memory, and having on;y a big array of floats, which is much less memory intensive.
  *
  */
 
@@ -32,26 +32,16 @@ class Material;
 class Texture;
 class Shader;
 
-/*
- * Face stores the attributes of a face, and is used to correctly order and render every vertex, uv map, material
- * and normal.
- */
-struct Face {
-    int vertexIndexes[3]; // Index of the vertices that make up this face, starting from 1
-    int texCoords[3]; // Indexes of the texture coordinates of this face, starting from 1
-    int normals[3]; // Indexes of the texture coordinates of this face, starting from 1
-    Material *material; // Material used in this face
-    Face(int v1, int v2, int v3, int t1, int t2, int t3, int n1, int n2, int n3, Material *material);
-    Face(const Face &copy);
-    ~Face(void);
+enum ModelBuffer {
+    VERTEX_BUFFER, UV_MAP_BUFFER, NORMAL_BUFFER, INDEX_BUFFER, MAX_BUFFER
 };
 
 class Model : public Resource {
 public:
     Model(void);
     Model(const Model &copy);
-    Model(const char *fileName, const char *name);
-    virtual ~Model(void);
+    Model(std::string fileName, std::string name);
+    virtual ~Model(void) {}
 
     virtual void draw();
 
@@ -61,8 +51,10 @@ public:
     /* This method should destroy the resource, unloading and releasing it from memory */
     virtual void unload();
 
-    /* Sets texture to ALL materials of ALL faces of this Model. */
+    /* Sets the texture to the Material of this Model. */
     void setTexture(Texture *texture);
+
+    void setMaterial(Material *material) { this->material = material; }
 
     /*
      * Functions to create some primitive models/meshes.
@@ -101,24 +93,30 @@ protected:
     static Model *generateTriangle();
     static Model *generateQuad();
 
-    GLuint vao;
-    GLuint posVbo;
-    GLuint colVbo;
-    GLuint texVbo;
-    GLuint norVbo;
+    /* OpenGL identifiers for the buffer objects of this Model. */
+    GLuint vao; // Vertex Array Object - VAO
+    GLuint bufferObjects[MAX_BUFFER]; // The Vertex Buffer Objects - VBOs
 
+    /* The total number of verteces, uv_maps and normals of this Model. */
     int numVertices;
-    const char *fileName;
 
-    Vector3 *vertices;
-    Vector4 *colours;
-    Vector2 *textureCoords;
+    /* The total number of indexes of this model. This is the true number of vertexes of the Model. */
+    int numIndexes;
+
+    /* The fileName for the .obj file. If this model wasn't loaded from an .obj file, this will be null.*/
+    std::string fileName;
+
+    /* The arrays containing the vertex, uv_map and normal informations. */
+    Vector3 *vertexes;
+    Vector2 *uv_maps;
     Vector3 *normals;
-    std::vector<Face*> *faces;
+
+    /* The array containing the indexes information, to map the vertexes, uv_maps and normals to OpenGL. */
+    unsigned int *indexes;
 
     /* The Shader to be used by this model. */
     Shader *shader;
 
-    /* Stores the materials used in this model. */
-    std::vector<Material*> *materials;
+    /* The Material used in this model. */
+    Material *material;
 };

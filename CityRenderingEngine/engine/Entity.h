@@ -3,11 +3,15 @@
  * Date: 22/05/2014
  *
  * Description: The Entity class is the container for all game objects that aren't part of the interface, and that are
- * part of the game itself. An entity needs to have a 3D Model, a Shader, and its transform matrix and vectors. It can
- * also have a PhysicalBody, if it needs to respond to physics and collision.
+ * part of the game itself. To be rendered. an entity need a 3D Model, a Shader, and its transform matrix and vectors.
+ * It can also have a PhysicalBody, if it needs to respond to physics and collision. Even though its main purpose is to
+ * be a game object and have a 3D representation onscreen, an Entity can also be used to serve as a node for a more
+ * complex hierarchy system, serving as base to group other entities together, putting them as children.
  *
  * An entity may have one or more children entities, that are organized in a hierarchy, having all children relative to
  * their parent. This way, if the parent moves, rotates or change scale, its children will also do so, proportionally.
+ * An entity should update the logic of itself and of its children, but it should only render itself, because the Scene
+ * will already call the render methods separatedly of all the entities.
  */
 
 #pragma once
@@ -27,11 +31,6 @@ class Shader;
 
 class Entity {
 public:
-
-    /* The Transform vectors of the Entity. */
-    Vector3 position;
-    Vector3 rotation;
-    Vector3 scale;
 
     Entity(void);
     Entity(const Entity &copy);
@@ -62,6 +61,26 @@ public:
     Model *getModel() { return model; }
     void setPhysicalBody(PhysicalBody &body);
     PhysicalBody *getPhysicalBody() { return physicalBody; }
+    inline Vector3 getPosition() const { return position; }
+    inline Vector3 getRotation() const { return rotation; }
+    inline Vector3 getScale() const { return scale; }
+    void setPosition(const Vector3 &position) { this->position = position; posChanged = true; }
+    void setRotation(const Vector3 &rotation) { this->rotation = rotation; rotChanged = true; }
+    void setScale(const Vector3 &scale) { this->scale = scale; scaleChanged = true; }
+    void setIsTranslucent(bool translucent) { this->translucent = translucent; }
+    bool isTranslucent() { return translucent; }
+    void setRenderRadius(float renderRadius) { this->renderRadius = renderRadius; }
+    float getRenderRadius() { return renderRadius; }
+
+    /* Calculates and returns the world position of this entity. */
+    Vector3 getWorldPosition() {
+        if (parent != nullptr) {
+            return this->position + parent->getWorldPosition();
+        } else {
+            return this->position;
+        }
+    }
+
 
     /*
      * This functions returns all the children, grandchildren, etc of an entity, recursively. Notice that the function
@@ -80,22 +99,38 @@ public:
 
     Entity &operator=(const Entity &other);
 
+    static bool compareByCameraDistance(Entity *a, Entity *b) {
+        if (a->translucent) {
+            return (a->distanceToCamera < b->distanceToCamera);
+        } else {
+            return (a->distanceToCamera > b->distanceToCamera);
+        }
+    }
+
 protected:
 
+    /* The Transform vectors of the Entity. */
+    Vector3 position;
+    Vector3 rotation;
+    Vector3 scale;
+
     /* The Transform variables, for the values of the last frame. */
-    Vector3 lastPosition;
-    Vector3 lastRotation;
-    Vector3 lastScale;
+    bool posChanged;
+    bool rotChanged;
+    bool scaleChanged;
+
+    /* This is the distance to the camera, if a straight line could be drawn directly between the camera and this. */
+    float distanceToCamera;
 
     /*
-     * Here we get the entity's attributes and calculate the final model matrix. If the entity has children, it will
-     * update its child's matrices as well. The three parameter Vector3 are the offset of the Transform, and should be
-     * set to make children position, rotate and scale relative to their parents and grandparents. If the Entity don't
-     * have any parent, these vectors should be passed at their neutral values. The bool parameters indicate if their
-     * correspondent offset Vector3 has changed since the last frame. If they changed, the modelMatrix will have to be
-     * updated even if this Entity's Transform didn't change.
+     * The radius from the center of the Entity that forms the sphere that surrounds the whole renderable Entity. This
+     * should be just as big as to allow every part of the model to be rendered, as it will be used to calculate if
+     * the Entity is whithin camera's sight.
      */
-    void calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz, bool pDiff, bool rDiff, bool sDiff);
+    float renderRadius;
+
+    /* Indicates if this Entity has a transparent or translucent model. Defaults to false. */
+    bool translucent;
 
     /* The final transform matrix applied to this Entity. This is calculated and should not be modified directly. */
     Matrix4 *modelMatrix;
@@ -125,4 +160,14 @@ protected:
 
     /* The physical body of this entity */
     PhysicalBody *physicalBody;
+    /*
+     * Here we get the entity's attributes and calculate the final model matrix. If the entity has children, it will
+
+     * update its child's matrices as well. The three parameter Vector3 are the offset of the Transform, and should be
+     * set to make children position, rotate and scale relative to their parents and grandparents. If the Entity don't
+     * have any parent, these vectors should be passed at their neutral values. The bool parameters indicate if their
+     * correspondent offset Vector3 has changed since the last frame. If they changed, the modelMatrix will have to be
+     * updated even if this Entity's Transform didn't change.
+     */
+    void calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz, bool pDiff, bool rDiff, bool sDiff);
 };

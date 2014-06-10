@@ -17,6 +17,11 @@
 class Colour {
 public:
     
+    /* Some fixed colours. */
+    const static Colour WHITE;
+    const static Colour BLACK;
+
+    /* The colour components. */
     uint8_t red;
     uint8_t green;
     uint8_t blue;
@@ -28,7 +33,7 @@ public:
     /* Parses a hexadecimal in the format RGBA to a Colour. */
     Colour(uint32_t colour);
     /* Parses individual colour values to a Colour. Values should range from 0 to 255. */
-    Colour(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
+    Colour(int red, int green, int blue, int alpha);
     /* Parses individual float colour values to a Colour. Values should range from 0.0f to 1.0f. */
     Colour(float red, float green, float blue, float alpha);
     ~Colour(void) {}

@@ -40,25 +40,31 @@ int main(int argc, char* argv[]) {
     //scene->addEntity(teapot, "Teapot");
 
     scene->setLightSource(new Light(Colour(1.0f, 1.0f, 0.9f, 1.0f), Vector3(0, 50, 0), Vector3(0.2f, -0.5f, 0.1f), 0.95f, 0, LIGHT_DIRECTIONAL));
-    scene->setCameraPosition(Vector3(1000, -600, 1000));
-    scene->setCameraRotation(Vector3(15, 135, 0));
+    scene->getCamera()->setPosition(Vector3(1000, -600, 1000));
+    scene->getCamera()->setRotation(Vector3(15, 135, 0));
 
-    City *city = City::generateManhattanGrid(40, 40);
-    std::vector<CityBlock*> *cityBlocks = city->getCityBlocks();
-    for (unsigned i = 0; i < cityBlocks->size(); i++) {
-        CityBlock *cityBlock = cityBlocks->at(i);
-        std::vector<Building*> *buildings = cityBlock->getBuildings();
-        for (unsigned j = 0; j < buildings->size(); j++) {
-            std::string iString = std::to_string((long long) i);
-            std::string jString = std::to_string((long long) j);
-            scene->addEntity(buildings->at(j), "Building_" + iString + "_" + jString);
-        }
-    }
-
-    ProfilingTimer *entityMatrixTimer = new ProfilingTimer(1, 60);
-    ProfilingTimer *entityLoopTimer = new ProfilingTimer(2, 60);
+    ProfilingTimer *entityMatrixTimer = new ProfilingTimer(1, 10);
+    ProfilingTimer *entityLoopTimer = new ProfilingTimer(2, 10);
+    ProfilingTimer *creationTimer = new ProfilingTimer(3, 1);
     Profiler::addProfilingTimer(entityMatrixTimer);
     Profiler::addProfilingTimer(entityLoopTimer);
+    Profiler::addProfilingTimer(creationTimer);
+    Profiler::startProfiler();
+
+    City *city = City::generateManhattanGrid(30, 30);
+
+    Profiler::getTimer(3)->resetCycle();
+    std::cout << Profiler::getTimer(3)->getAverageTime() << std::endl;
+    //std::vector<CityBlock*> *cityBlocks = city->getCityBlocks();
+    //for (unsigned i = 0; i < cityBlocks->size(); i++) {
+        //CityBlock *cityBlock = cityBlocks->at(i);
+        //std::vector<Building*> *buildings = cityBlock->getBuildings();
+        //for (unsigned j = 0; j < buildings->size(); j++) {
+            //std::string iString = std::to_string((long long) i);
+            //std::string jString = std::to_string((long long) j);
+            //scene->addEntity(buildings->at(j), "Building_" + iString + "_" + jString);
+        //}
+    //}
 
     Naquadah::getInstance()->runGame();
 

@@ -10,16 +10,19 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include "ui/UserInterface.h"
 #include "Entity.h"
 #include "Naquadah.h"
 #include "math/Common.h"
 #include "math/Matrix4.h"
 #include "rendering/Light.h"
+#include "ui/UserInterface.h"
+#include "rendering/Camera.h"
+#include "rendering/Frustum.h"
 #include "rendering/Renderer.h"
 
 class UserInterface;
 class Renderer;
+class Frustum;
 class Entity;
 class Light;
 
@@ -88,10 +91,8 @@ public:
     //void addLightSource(Light &lightSource);
     //void removeLightSource(Light &lightSource);
     //std::vector<Light*> *getLightSources() { return lightSources; }
-    void setCameraPosition(Vector3 &position) {*(this->cameraPos) = position; }
-    Vector3 *getCameraPosition() { return cameraPos; }
-    void setCameraRotation(Vector3 &rotation) {*(this->cameraRotation) = rotation; }
-    Vector3 *getCameraRotation() { return cameraRotation; }
+    void setCamera(Camera &camera) { *(this->camera) = camera; camera.setChanged(true); }
+    Camera *getCamera() const { return camera; }
 
     /* Checks if the entity with the provided name has been added to this level */
     bool isEntityInScene(std::string name);
@@ -117,17 +118,15 @@ public:
 
 protected:
 
-    virtual void calculateCameraMatrix() {
-        Matrix4 rotationMatrix = Matrix4::Rotation(cameraRotation->x, Vector3(1, 0, 0)) * Matrix4::Rotation(cameraRotation->y, Vector3(0, 1, 0)) * Matrix4::Rotation(cameraRotation->z, Vector3(0, 0, 1));
-        Matrix4 newCamera = rotationMatrix * Matrix4::Translation(*cameraPos);
-        if ((*cameraMatrix) != newCamera) {
-            *cameraMatrix = newCamera;
-            cameraChanged = true;
-        }
-    }
+    /* A list with all the root (parent) entities contained in this level. No child entity should be added here. */
+    std::map<std::string, Entity*> *entities;
+    /* A list with all the opaque entities, including children, ordered from the closest to the farthest. */
+    std::vector<Entity*> *opaqueEntities;
+    /* A list with all the transparent entities, including children, ordered from the farthest fo the closest. */
+    std::vector<Entity*> *transparentEntities;
 
-    std::map<std::string, Entity*> *entities; // A list with all the entities contained in this level
-    //std::vector<Light*> *lightSources; // A list of all light sources contained in this level
+    /* The Frustum used by this Scene to perform Frustum Culling. */
+    Frustum *frustum;
 
     /* The LightSource for this Scene. Defaults to null. */
     Light *lightSource;
@@ -135,10 +134,9 @@ protected:
     /* The player interface, may be a menu, or a HUD. */
     UserInterface *userInterface;
 
-    Vector3 *cameraPos; // The position of the camera
-    Vector3 *cameraRotation; // The direction the camera is facing
+    /* The current Camera being used by this Scene. */
+    Camera *camera;
     Matrix4 *cameraMatrix; // The viewMatrix, or the camera
-    bool cameraChanged; // Indicates camera movement
     Matrix4 *projectionMatrix; // The projectionMatrix. This will be switched all the time to render interface and game
 
     SDL_mutex *mutex;

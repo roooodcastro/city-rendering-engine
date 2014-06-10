@@ -1,11 +1,14 @@
 #include "Material.h"
 
 Material::Material(void) : Resource() {
-    diffuse = Colour();
-    ambient = Colour();
-    specular = Colour();
+    diffuse = Colour::WHITE;
+    ambient = Colour::WHITE;
+    specular = Colour::WHITE;
     texture = nullptr;
     alpha = 1.0f;
+    ns = 1.0f;
+    ni = 0;
+    illum = 0;
 }
 
 Material::Material(const Material &copy) : Resource(copy) {
@@ -19,16 +22,16 @@ Material::Material(const Material &copy) : Resource(copy) {
     this->illum = copy.illum;
 }
 
-Material::Material(const char* name, float alpha, float ns, float ni, Colour &diffuse, Colour &ambient,
-    Colour &specular, int illum, Texture *texture) : Resource(name) {
+Material::Material(std::string name, float shininess, Colour diffuse, Colour ambient, Colour specular,
+    Texture *texture) : Resource(name) {
     this->diffuse = diffuse;
     this->ambient = ambient;
     this->specular = specular;
     this->texture = texture;
-    this->alpha = alpha;
-    this->ns = ns;
-    this->ni = ni;
-    this->illum = illum;
+    this->alpha = diffuse.alpha;
+    this->ns = shininess;
+    this->ni = 0;
+    this->illum = 0;
 }
 
 Material::~Material(void) {

@@ -12,6 +12,12 @@ Entity::Entity(void) {
     rotation = Vector3();
     scale = Vector3(1, 1, 1);
     numChildEntities = 0;
+    posChanged = true;
+    rotChanged = true;
+    scaleChanged = true;
+    distanceToCamera = 0;
+    renderRadius = 1.0f;
+    translucent = false;
 }
 
 Entity::Entity(const Entity &copy) {
@@ -26,6 +32,12 @@ Entity::Entity(const Entity &copy) {
     this->rotation = Vector3(copy.rotation);
     this->scale = Vector3(copy.scale);
     this->numChildEntities = copy.numChildEntities;
+    this->posChanged = copy.posChanged;
+    this->rotChanged = copy.rotChanged;
+    this->scaleChanged = copy.scaleChanged;
+    this->distanceToCamera = copy.distanceToCamera;
+    this->renderRadius = copy.renderRadius;
+    this->translucent = copy.translucent;
 }
 
 Entity::Entity(Vector3 position, Vector3 rotation, Vector3 scale) {
@@ -39,7 +51,12 @@ Entity::Entity(Vector3 position, Vector3 rotation, Vector3 scale) {
     shader = nullptr;
     parent = nullptr;
     numChildEntities = 0;
-    
+    posChanged = true;
+    rotChanged = true;
+    scaleChanged = true;
+    distanceToCamera = 0;
+    renderRadius = 1.0f;
+    translucent = false;
 }
 
 Entity::~Entity(void) {
@@ -76,6 +93,12 @@ Entity &Entity::operator=(const Entity &other) {
     this->rotation = Vector3(other.rotation);
     this->scale = Vector3(other.scale);
     this->numChildEntities = other.numChildEntities;
+    this->posChanged = other.posChanged;
+    this->rotChanged = other.rotChanged;
+    this->scaleChanged = other.scaleChanged;
+    this->distanceToCamera = other.distanceToCamera;
+    this->renderRadius = other.renderRadius;
+    this->translucent = other.translucent;
     return *this;
 }
 
@@ -139,15 +162,13 @@ void Entity::onKeyUp(SDL_Keysym key) {
 
 
 void Entity::calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz, bool pDiff, bool rDiff, bool sDiff) {
-    pDiff = pDiff || position != lastPosition;
-    if (pDiff) {
+    if (posChanged) {
         // Position changed here or in the parent, update it in the matrix.
         modelMatrix->setPositionVector(position + addPos);
-        lastPosition = Vector3(position);
+        pDiff = true;
+        posChanged = false;
     }
-    rDiff = rDiff || rotation != lastRotation;
-    sDiff = sDiff || scale != lastScale;
-    if (rDiff || sDiff) {
+    if (rotChanged || scaleChanged) {
         // Rotation or Scale changed, the whole matrix needs to be recalculated.
         Vector3 rot = (rotation + addRot);
         Matrix4 rotationMatrix =
@@ -155,13 +176,15 @@ void Entity::calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz
             Matrix4::Rotation(rot.y, Vector3(0, 1, 0)) *
             Matrix4::Rotation(rot.z, Vector3(0, 0, 1));
         *modelMatrix = Matrix4::Translation(position + addPos) * rotationMatrix * Matrix4::Scale(scale * addSiz);
-        lastRotation = Vector3(rotation);
-        lastScale = Vector3(scale);
+        rDiff = true;
+        sDiff = true;
+        rotChanged = false;
+        scaleChanged = false;
     }
     // Do the same for all the children
     if (numChildEntities > 0) {
         for(auto it = childEntities->begin(); it != childEntities->end(); it++) {
-            (*it)->calculateModelMatrix(position + addPos, rotation + addRot, scale + addSiz, pDiff, rDiff, sDiff);
+            (*it)->calculateModelMatrix(position + addPos, rotation + addRot, scale * addSiz, pDiff, rDiff, sDiff);
         }
     }
 }
@@ -170,6 +193,12 @@ void Entity::update(float millisElapsed) {
     // Only update the matrix if this entity isn't a child, because that function also update all children's matrices.
     if (parent == nullptr) {
         calculateModelMatrix(Vector3(), Vector3(), Vector3(1, 1, 1), false, false, false);
+    }
+    // Update the distanceToCamera if that's changed
+    if (Naquadah::getInstance()->getCurrentScene()->getCamera()->hasChanged()) {
+        Camera *camera = Naquadah::getInstance()->getCurrentScene()->getCamera();
+        Vector3 dir = position - camera->getPosition();
+        distanceToCamera = Vector3::dot(dir, dir);
     }
     if (numChildEntities > 0) {
         for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); it++) {
@@ -182,7 +211,7 @@ void Entity::draw(float millisElapsed) {
     if (model != nullptr) {
         model->draw();
     }
-    if (numChildEntities > 0) {
+    if (numChildEntities > 0 && false) {
         for (auto it = childEntities->begin(); it != childEntities->end(); ++it) {
             (*it)->draw(millisElapsed);
         }

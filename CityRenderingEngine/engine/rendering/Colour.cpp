@@ -1,5 +1,8 @@
 #include "Colour.h"
 
+const Colour Colour::WHITE = Colour(255, 255, 255, 255);
+const Colour Colour::BLACK = Colour(0, 0, 0, 255);
+
 Colour::Colour(const Colour &copy) {
     this->red = copy.red;
     this->green = copy.green;
@@ -15,7 +18,7 @@ Colour::Colour(uint32_t colour) {
     this->setColour(colour);
 }
 
-Colour::Colour(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
+Colour::Colour(int red, int green, int blue, int alpha) {
     this->red = clamp(red, 0, 255);
     this->green = clamp(green, 0, 255);
     this->blue = clamp(blue, 0, 255);
