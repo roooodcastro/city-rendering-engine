@@ -96,9 +96,12 @@ bool Renderer::useShader(Shader *shader) {
 }
 
 bool Renderer::updateShaderMatrix(std::string matrixName, Matrix4 *matrix) {
-    GLuint location = glGetUniformLocation(currentShader->getShaderProgram(), matrixName.c_str());
-    if (location != -1) {
-        glUniformMatrix4fv(location, 1, false, (float*) matrix);
-        return true;
-    } else return false;
+    if (currentShader != nullptr) {
+        GLuint location = glGetUniformLocation(currentShader->getShaderProgram(), matrixName.c_str());
+        if (location != -1) {
+            glUniformMatrix4fv(location, 1, false, (float*) matrix);
+            return true;
+        }
+    }
+    return false;
 }

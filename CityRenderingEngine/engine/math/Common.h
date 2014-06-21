@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "Vector2.h"
 
 //It's pi(ish)...
 static const float PI = 3.14159265358979323846f;	
@@ -75,4 +76,19 @@ void insertionSort(Iterator first, Iterator last) {
             std::iter_swap((j - 1), j);
         }
     }
+}
+
+static float distancePointToLineSeg(Vector2 lineA, Vector2 lineB, Vector2 point) {
+    // Return minimum distance between line segment lineAlineB and point
+    Vector2 line = lineB - lineA;
+    const float l2 = line.x * line.x + line.y * line.y; // i.e. |w-v|^2 - avoid a sqrt
+    if (l2 == 0.0f) return (lineA - point).getLength(); // v == w case
+    // Consider the line extending the segment, parameterized as v + t (w - v).
+    // We find projection of point p onto the line. 
+    // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+    const float t = Vector2::dot(point - lineA, lineB - lineA) / l2;
+    if (t < 0.0f) return (lineA - point).getLength(); // Beyond the 'v' end of the segment
+    else if (t > 1.0f) return (lineB - point).getLength();  // Beyond the 'w' end of the segment
+    const Vector2 projection = lineA + (line * t);  // Projection falls on the segment
+    return (projection - point).getLength();
 }

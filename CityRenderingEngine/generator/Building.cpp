@@ -1,14 +1,16 @@
 #include "Building.h"
 
 Building::Building(void) : Entity() {
-    model = Model::getOrCreate("cube", "resources/meshes/cube.obj");
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    model = Model::getOrCreate("cube", "resources/meshes/cube.obj", false);
+    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+        "resources/shaders/fragLight.glsl", false);
     this->cityBlock = nullptr;
 }
 
 Building::Building(CityBlock *cityBlock, Vector3 blockPosition) : Entity() {
-    model = Model::getOrCreate("cube", "resources/meshes/cube.obj");
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    model = Model::getOrCreate("cube", "resources/meshes/cube.obj", false);
+    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+        "resources/shaders/fragLight.glsl", false);
     this->cityBlock = cityBlock;
     float height = generateRandom(20, 100);
     float width = 50.0f; // Width relative to the pavement

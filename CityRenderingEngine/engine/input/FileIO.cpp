@@ -24,3 +24,12 @@ std::string FileIO::mergeLines(std::vector<std::string> lines, char delimiter) {
     }
     return "";
 }
+
+bool FileIO::fileExists(const std::string &filePath) {
+    if (FILE *file = fopen(filePath.c_str(), "r")) {
+        fclose(file);
+        return true;
+    } else {
+        return false;
+    }   
+}

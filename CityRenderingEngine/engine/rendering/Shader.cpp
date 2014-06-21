@@ -180,12 +180,12 @@ ShaderParameter *Shader::getShaderParameter(std::string parameterName) {
 }
 
 
-Shader *Shader::getOrCreate(std::string name, std::string vertexFilename, std::string fragFilename) {
+Shader *Shader::getOrCreate(std::string name, std::string vertexFilename, std::string fragFilename, bool preLoad) {
     if (ResourcesManager::resourceExists(name)) {
         return (Shader*) ResourcesManager::getResource(name);
     } else {
         Shader *newShader = new Shader(name, vertexFilename, fragFilename);
-        ResourcesManager::addResource(newShader);
+        ResourcesManager::addResource(newShader, preLoad);
         return newShader;
     }
 }

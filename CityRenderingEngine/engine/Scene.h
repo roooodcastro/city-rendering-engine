@@ -32,7 +32,7 @@ public:
     Scene(void);
     Scene(const Scene &copy);
     Scene(UserInterface *userInterface);
-    ~Scene(void);
+    virtual ~Scene(void);
 
     Scene &operator=(const Scene *other);
 
@@ -75,7 +75,7 @@ public:
      */
 
     // Adds a new entity to this level
-    void addEntity(Entity *entity, std::string name);
+    virtual void addEntity(Entity *entity, std::string name);
     // Removes a entity from this level
     bool removeEntity(std::string name);
 
@@ -106,6 +106,13 @@ public:
     }
 
     std::map<std::string, Entity*> *getEntities() { return entities; }
+
+    /*
+     * Uses the Shader specified. If the Shader is already being used, it won't do anything. If the Shader is switched,
+     * the projection and view matrices will be updates in the new Shader, which may cause lag. Careful ordering should
+     * be used in order to minimize Shader changes.
+     */
+    void useShader(Shader *shader);
 
     void applyShaderLight(GLuint program);
 

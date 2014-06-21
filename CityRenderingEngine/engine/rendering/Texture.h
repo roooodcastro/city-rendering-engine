@@ -24,41 +24,36 @@ public:
 	Texture &operator=(const Texture &other);
 
 	/*
-	 * Reads an image file from disk and buffers it to the OpenGL context.
-	 * Returns the OpenGL reference value and writes the width and height
-	 * of the texture to the two last parameters
+	 * Reads an image file from disk and buffers it to the OpenGL context. Returns the OpenGL reference value and
+     * writes the width and height of the texture to the two last parameters.
 	 */
 	virtual void load();
 
-	/*
-	 * Unloads texture data from OpenGL
-	 */
+	/* Unloads texture data from OpenGL. */
 	virtual void unload();
 
 	/*
-	 * These functions will look in the resource manager to see if the texture already
-	 * exists, returning them if so, or creating them if they're not present in the manager.
+	 * These functions will look in the resource manager to see if the texture already exists, returning them if so,
+     * or creating them if they're not present in the manager. The preLoad flag determines if the Texture should be
+     * buffered to the GPU now, instead of being able to do this later.
 	 */
-	static Texture *getOrCreate(const char *name, const char *fileName);
-	static Texture *getOrCreate(const char *name, Colour &colour);
+	static Texture *getOrCreate(const char *name, const char *fileName, bool preLoad);
+	static Texture *getOrCreate(const char *name, Colour &colour, bool preLoad);
 
 	/*
-	 * Creates a text texture, which is basically a text rendered into an image.
-	 * This is the only type of texture that should not be added to the Resource Manager,
-	 * because texts usually change a lot and adding and removing them from the manager
-	 * every frame or so is not desirable.
+	 * Creates a text texture, which is basically a text rendered into an image. This is the only type of texture that
+     * should not be added to the Resource Manager, because texts usually change a lot and adding and removing them
+     * from the manager every frame or so is not desirable.
 	 */
 	static Texture *createFromText(std::string textureText, Colour &textColour, TTF_Font &font);
 
 	/*
-	 * Binds an already loaded texture to the specified texture unit.
-	 * Call this function right before rendering a model that uses a texture
+	 * Binds an already loaded texture to the specified texture unit. Call this function right before rendering a model
+     * that uses a texture.
 	 */
 	static void bindTexture(Texture *texture, GLuint shaderProgram, TextureSlot slot);
 
-	/*
-	 * Binds this texture into the specified texture unit
-	 */
+	/* Binds this texture into the specified texture unit. */
 	void bindTexture(GLuint shaderProgram, TextureSlot slot);
 
 	GLuint getTextureId() { return textureId; }

@@ -1,17 +1,17 @@
 #include "Road.h"
 
 Road::Road(void) : Entity() {
-    model = Model::getOrCreate("Road", "resources/meshes/plane.obj");
-    model->setTexture(Texture::getOrCreate("RoadStraight1", "resources/textures/road_straight_1.png"));
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    model = Model::getOrCreate("Road", "resources/meshes/plane.obj", false);
+    model->setTexture(Texture::getOrCreate("RoadStraight1", "resources/textures/road_straight_1.png", false));
+    //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
     pointA = nullptr;
     pointB = nullptr;
 }
 
 Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
-    model = Model::getOrCreate("Road", "resources/meshes/plane.obj");
-    model->setTexture(Texture::getOrCreate("RoadStraight1", "resources/textures/road_straight_1.png"));
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    model = Model::getOrCreate("Road", "resources/meshes/plane.obj", false);
+    model->setTexture(Texture::getOrCreate("RoadStraight1", "resources/textures/road_straight_1.png", false));
+    //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
     this->pointA = pointA;
     this->pointB = pointB;
 

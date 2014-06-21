@@ -26,7 +26,7 @@ public:
         this->y = y;
     }
 
-    Vector2(Vector2 &copy) {
+    Vector2(const Vector2 &copy) {
         this->x = copy.x;
         this->y = copy.y;
     }
@@ -69,9 +69,14 @@ public:
         return Vector2(-x, -y);
     }
 
+    /* Performs and returns the dot operator between two vectors. Both vectors remain unmodified. */
+    static float dot(const Vector2 &a, const Vector2 &b) {
+        return (a.x * b.x) + (a.y * b.y);
+    }
+
     /* Prints the vector to the output stream in the format "Vector2(x, y)". */
     inline friend std::ostream& operator<<(std::ostream& o, const Vector2& v){
-        o << "Vector2(" << v.x << ", " << v.y << ")" << std::endl;
+        o << "Vector2(" << v.x << ", " << v.y << ")";
         return o;
     }
 
@@ -88,6 +93,10 @@ public:
     inline Vector2 operator+(const Vector2 &a) const {
         return Vector2(x + a.x, y + a.y);
     }
+    
+    inline Vector2 operator+(const float a) const {
+        return Vector2(x + a, y + a);
+    }
 
     inline Vector2 operator+=(const Vector2 &a) {
         this->x += a.x;
@@ -101,6 +110,10 @@ public:
 
     inline Vector2 operator-(const Vector2 &a) const {
         return Vector2(x - a.x, y - a.y);
+    }
+    
+    inline Vector2 operator-(const float a) const {
+        return Vector2(x - a, y - a);
     }
 
     inline Vector2 operator-=(const Vector2 &a) {

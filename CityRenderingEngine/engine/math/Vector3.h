@@ -106,7 +106,7 @@ public:
 
     /* Prints the vector to the output stream in the format "Vector3(x, y, z)". */
     inline friend std::ostream& operator<<(std::ostream& o, const Vector3& v) {
-        o << "Vector3(" << v.x << ", " << v.y << ", " << v.z <<")" << std::endl;
+        o << "Vector3(" << v.x << ", " << v.y << ", " << v.z <<")";
         return o;
     }
 

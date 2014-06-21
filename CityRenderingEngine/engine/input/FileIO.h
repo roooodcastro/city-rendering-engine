@@ -31,6 +31,9 @@ public:
      */
     static std::string mergeLines(std::vector<std::string> lines, char delimiter = '\n');
 
+    /* Returns true if a file already exists, or false otherwise. */
+    static bool fileExists(const std::string &filePath);
+
 private:
 
     FileIO(void) {}

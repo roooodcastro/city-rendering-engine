@@ -32,5 +32,5 @@ void main(void) {
 
 	//OUT.normal = normalize(normalMatrix * normal);
     OUT.normal = normal;
-    OUT.cameraPos = -viewMatrix[3].xyz * mat3(viewMatrix);
+    OUT.cameraPos = viewMatrix[3].xyz * mat3(viewMatrix);
 }

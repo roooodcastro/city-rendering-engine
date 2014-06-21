@@ -16,10 +16,10 @@ void ResourcesManager::terminate() {
     resources = nullptr;
 }
 
-bool ResourcesManager::addResource(Resource *resource) {
+bool ResourcesManager::addResource(Resource *resource, bool load) {
     if (resource != nullptr && !resourceExists(resource->getName())) {
         resources->insert(std::pair<std::string, Resource*>(resource->getName(), resource));
-        resource->load();
+        if (load) resource->load();
         return true;
     }
     return false;

@@ -73,7 +73,7 @@ public:
     float getRenderRadius() { return renderRadius; }
 
     /* Calculates and returns the world position of this entity. */
-    Vector3 getWorldPosition() {
+    virtual Vector3 getWorldPosition() {
         if (parent != nullptr) {
             return this->position + parent->getWorldPosition();
         } else {

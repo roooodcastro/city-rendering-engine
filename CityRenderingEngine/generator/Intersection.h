@@ -25,7 +25,7 @@ public:
     virtual ~Intersection(void);
 
     /* Connects this intersction to another, creating a connection and a road between them. */
-    void connectTo(Intersection *other);
+    Road *connectTo(Intersection *other);
 
 protected:
 

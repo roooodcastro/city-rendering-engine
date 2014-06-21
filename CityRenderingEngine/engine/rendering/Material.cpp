@@ -82,7 +82,7 @@ std::vector<Material*> Material::loadMaterialsFromFile(const char *filename) {
                 sscanf(line.c_str(),"%*s %s", &nameC);
                 if (currentMaterial != nullptr) {
                     currentMaterial->loaded = true;
-                    ResourcesManager::addResource(currentMaterial);
+                    ResourcesManager::addResource(currentMaterial, true);
                     materials.emplace_back(currentMaterial);
                 }
                 currentMaterial = new Material();
@@ -134,7 +134,7 @@ std::vector<Material*> Material::loadMaterialsFromFile(const char *filename) {
                     char texFilename[150];
                     sscanf(line.c_str(), "map_Kd %s", &texFilename);
                     std::string texName = "Texture" + std::string(currentMaterial->name);
-                    currentMaterial->texture = Texture::getOrCreate(texName.c_str(), texFilename);
+                    currentMaterial->texture = Texture::getOrCreate(texName.c_str(), texFilename, false);
                 }
                 break;
             }

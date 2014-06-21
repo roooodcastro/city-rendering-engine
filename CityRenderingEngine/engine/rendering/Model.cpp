@@ -8,6 +8,8 @@ Model::Model(void) : Resource() {
     uv_maps = nullptr;
     normals = nullptr;
     indexes = nullptr;
+    material = nullptr;
+    shader = nullptr;
     fileName = "";
     numVertices = 0;
     numIndexes = 0;
@@ -21,6 +23,8 @@ Model::Model(std::string fileName, std::string name) : Resource(name) {
     uv_maps = nullptr;
     normals = nullptr;
     indexes = nullptr;
+    material = nullptr;
+    shader = nullptr;
     this->fileName = fileName;
     numVertices = 0;
     numIndexes = 0;
@@ -36,19 +40,29 @@ Model::Model(const Model &copy) : Resource(copy) {
     indexes = copy.indexes;
     numVertices = copy.numVertices;
     numIndexes = copy.numIndexes;
+    material = new Material(*(copy.material));
+    shader = new Shader(*(copy.shader));
     fileName = copy.fileName;
     for (int i = 0; i < MAX_BUFFER; i++) {
         this->bufferObjects[i] = copy.bufferObjects[i];
     }
 }
 
+Model::~Model(void) {
+    material = nullptr;
+    shader = nullptr;
+}
+
 void Model::draw() {
-    // Will only try to render if the model is loaded to the GPU
-    if (loaded) {
+    if (!loaded) load(); // If it's not yet loaded, try to load it
+    if (loaded) { // Check it again in case there's a proble loading the Model
         glBindVertexArray(vao);
-        if (material != nullptr && material->getTexture() && material->getTexture()->isTextureValid()) {
-            GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
-            material->getTexture()->bindTexture(program, TEXTURE0);
+        if (material != nullptr && material->getTexture()) {
+            if (!material->getTexture()->isLoaded()) material->getTexture()->load();
+            if (material->getTexture()->isTextureValid()) {
+                GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
+                material->getTexture()->bindTexture(program, TEXTURE0);
+            }
         }
         if (bufferObjects[INDEX_BUFFER]) {
             glDrawElements(GL_TRIANGLES, numIndexes, GL_UNSIGNED_INT, 0);
@@ -372,7 +386,7 @@ void Model::initializePrimitiveMeshes() {
     //Model *triangle = Model::generateTriangle();
     Model *quad = Model::generateQuad();
     //ResourcesManager::addResource(triangle);
-    ResourcesManager::addResource(quad);
+    ResourcesManager::addResource(quad, true);
 }
 
 Model *Model::getTriangleMesh() {
@@ -383,17 +397,18 @@ Model *Model::getQuadMesh() {
     return (Model*) ResourcesManager::getResource(Model::meshQuadName);
 }
 
-Model *Model::getOrCreate(const char *name, const char *fileName) {
+Model *Model::getOrCreate(const char *name, const char *fileName, bool preLoad) {
     if (ResourcesManager::resourceExists(name)) {
         return (Model*) ResourcesManager::getResource(name);
     } else {
         Model *newModel = new Model(fileName, name);
-        ResourcesManager::addResource(newModel);
+        ResourcesManager::addResource(newModel, preLoad);
         return newModel;
     }
 }
 
-Model *Model::getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture) {
+Model *Model::getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture,
+    bool preLoad) {
     if (ResourcesManager::resourceExists(name)) {
         return (Model*) ResourcesManager::getResource(name);
     } else {
@@ -411,7 +426,7 @@ Model *Model::getOrCreate(std::string name, std::vector<Vector3> vertices, Colou
         }
         m->generateNormals();
         m->bufferData();
-        ResourcesManager::addResource(m);
+        ResourcesManager::addResource(m, preLoad);
         return m;
     }
 }

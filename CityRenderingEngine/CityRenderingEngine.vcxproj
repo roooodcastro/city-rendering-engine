@@ -179,8 +179,13 @@
     <ClCompile Include="engine\ui\TextItem.cpp" />
     <ClCompile Include="engine\ui\UserInterface.cpp" />
     <ClCompile Include="generator\Building.cpp" />
+    <ClCompile Include="generator\Chunk.cpp" />
+    <ClCompile Include="generator\ChunkGenerator.cpp" />
     <ClCompile Include="generator\City.cpp" />
     <ClCompile Include="generator\CityBlock.cpp" />
+    <ClCompile Include="generator\CityScene.cpp" />
+    <ClCompile Include="generator\GridLayout.cpp" />
+    <ClCompile Include="generator\gridlayouts\ManhattanGridLayout.cpp" />
     <ClCompile Include="generator\Intersection.cpp" />
     <ClCompile Include="generator\Road.cpp" />
     <ClCompile Include="main.cpp" />
@@ -229,8 +234,13 @@
     <ClInclude Include="engine\ui\TextItem.h" />
     <ClInclude Include="engine\ui\UserInterface.h" />
     <ClInclude Include="generator\Building.h" />
+    <ClInclude Include="generator\Chunk.h" />
+    <ClInclude Include="generator\ChunkGenerator.h" />
     <ClInclude Include="generator\City.h" />
     <ClInclude Include="generator\CityBlock.h" />
+    <ClInclude Include="generator\CityScene.h" />
+    <ClInclude Include="generator\GridLayout.h" />
+    <ClInclude Include="generator\gridlayouts\ManhattanGridLayout.h" />
     <ClInclude Include="generator\Intersection.h" />
     <ClInclude Include="generator\Road.h" />
   </ItemGroup>

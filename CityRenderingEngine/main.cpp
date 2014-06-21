@@ -17,7 +17,10 @@
 #include "engine/Naquadah.h"
 
 #include "engine/ResourcesManager.h"
+#include "generator/CityScene.h"
 #include "generator/City.h"
+
+#include "generator/ChunkGenerator.h"
 
 int main(int argc, char* argv[]) {
 
@@ -26,7 +29,7 @@ int main(int argc, char* argv[]) {
     Naquadah::initialize(Naquadah::NAQUADAH_INIT_EVERYTHING);
 
     // Create the first Scene and start the game
-    Scene *scene = new Scene();
+    CityScene *scene = new CityScene(new City());
     Naquadah::getInstance()->setNextScene(scene);
 
     //Shader *shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
@@ -40,8 +43,10 @@ int main(int argc, char* argv[]) {
     //scene->addEntity(teapot, "Teapot");
 
     scene->setLightSource(new Light(Colour(1.0f, 1.0f, 0.9f, 1.0f), Vector3(0, 50, 0), Vector3(0.2f, -0.5f, 0.1f), 0.95f, 0, LIGHT_DIRECTIONAL));
-    scene->getCamera()->setPosition(Vector3(1000, -600, 1000));
-    scene->getCamera()->setRotation(Vector3(15, 135, 0));
+    //scene->getCamera()->setPosition(Vector3(1000, -600, 1000));
+    scene->getCamera()->setPosition(Vector3(0, 600, 0));
+    //scene->getCamera()->setRotation(Vector3(15, 135, 0));
+    //scene->getCamera()->setRotation(Vector3(180, 0, 0));
 
     ProfilingTimer *entityMatrixTimer = new ProfilingTimer(1, 10);
     ProfilingTimer *entityLoopTimer = new ProfilingTimer(2, 10);
@@ -51,10 +56,12 @@ int main(int argc, char* argv[]) {
     Profiler::addProfilingTimer(creationTimer);
     Profiler::startProfiler();
 
-    City *city = City::generateManhattanGrid(30, 30);
+    //Chunk *chunk = ChunkGenerator::generateChunk(Vector2(0, 0));
 
-    Profiler::getTimer(3)->resetCycle();
-    std::cout << Profiler::getTimer(3)->getAverageTime() << std::endl;
+    //City *city = City::generateManhattanGrid(30, 30);
+
+    //Profiler::getTimer(3)->resetCycle();
+    //std::cout << Profiler::getTimer(3)->getAverageTime() << std::endl;
     //std::vector<CityBlock*> *cityBlocks = city->getCityBlocks();
     //for (unsigned i = 0; i < cityBlocks->size(); i++) {
         //CityBlock *cityBlock = cityBlocks->at(i);

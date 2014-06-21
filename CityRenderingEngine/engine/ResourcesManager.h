@@ -18,11 +18,12 @@ public:
 
     /*
      * Loads a resource to memory and add it to the loaded resources list. The resource shouldn't be preloaded before
-     * adding it to the manager.The resource should already have an unique name assigned to it, otherwise it won't be
+     * adding it to the manager. The resource should already have an unique name assigned to it, otherwise it won't be
      * added to the manager, and false will be returned. This function will also return false if the resource is null,
-     * or if the manager hasn't been initialized.
+     * or if the manager hasn't been initialized. The flag load determines if the Resource should also be loaded.
+     * Setting this to true will load the Resource now, setting it to false will alow this loading to be done later.
      */
-    static bool addResource(Resource *resource);
+    static bool addResource(Resource *resource, bool load);
 
     /*
      * Removes a resource from the list. This also calls the resource's unload function. It will return false if the

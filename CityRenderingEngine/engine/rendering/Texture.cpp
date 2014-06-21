@@ -201,44 +201,44 @@ Texture *Texture::createFromText(std::string textureText, Colour &textColour, TT
 	return texture;
 }
 
-Texture *Texture::getOrCreate(const char *name, const char *fileName) {
+Texture *Texture::getOrCreate(const char *name, const char *fileName, bool preLoad) {
 	if (ResourcesManager::resourceExists(name)) {
 		return (Texture*) ResourcesManager::getResource(name);
 	} else {
 		Texture *newTexture = new Texture(fileName, name);
-		ResourcesManager::addResource(newTexture);
+		ResourcesManager::addResource(newTexture, preLoad);
 		return newTexture;
 	}
 }
 
-Texture *Texture::getOrCreate(const char *name, Colour &colour) {
+Texture *Texture::getOrCreate(const char *name, Colour &colour, bool preLoad) {
 	if (ResourcesManager::resourceExists(name)) {
 		return (Texture*) ResourcesManager::getResource(name);
 	} else {
 		Texture *newTexture = new Texture(colour, name);
-		ResourcesManager::addResource(newTexture);
+		ResourcesManager::addResource(newTexture, preLoad);
 		return newTexture;
 	}
 }
 
 Texture *Texture::getColourWhite() {
-	return getOrCreate(Texture::texColNameWhite, Colour(0xFFFFFFFF));
+	return getOrCreate(Texture::texColNameWhite, Colour(0xFFFFFFFF), true);
 }
 
 Texture *Texture::getColourBlack() {
-	return getOrCreate(Texture::texColNameBlack, Colour(0xFF000000));
+	return getOrCreate(Texture::texColNameBlack, Colour(0xFF000000), true);
 }
 
 Texture *Texture::getColourRed() {
-	return getOrCreate(Texture::texColNameRed, Colour(0xFFFF0000));
+	return getOrCreate(Texture::texColNameRed, Colour(0xFFFF0000), true);
 }
 
 Texture *Texture::getColourGreen() {
-	return getOrCreate(Texture::texColNameGreen, Colour(0xFF00FF00));
+	return getOrCreate(Texture::texColNameGreen, Colour(0xFF00FF00), true);
 }
 
 Texture *Texture::getColourBlue() {
-	return getOrCreate(Texture::texColNameBlue, Colour(0xFF0000FF));
+	return getOrCreate(Texture::texColNameBlue, Colour(0xFF0000FF), true);
 }
 
 void Texture::setColour(Colour &colour) {

@@ -22,11 +22,11 @@ InterfaceItem(ITEM_BUTTON, position, rotation, size) {
 
 ButtonItem::ButtonItem(Vector2 &position, float rotation, Vector2 &size, const char *resourceName, const char *normal, const char *hovered, const char *pressed, const char *selected) :
 	InterfaceItem(ITEM_BUTTON, position, rotation, size) {
-		this->normalTex = Texture::getOrCreate((std::string(resourceName) + "_normal").c_str(), normal);
+		this->normalTex = Texture::getOrCreate((std::string(resourceName) + "_normal").c_str(), normal, true);
 		this->texture = this->normalTex;
-		this->hoveredTex = Texture::getOrCreate((std::string(resourceName) + "_hovered").c_str(), hovered);
-		this->pressedTex = Texture::getOrCreate((std::string(resourceName) + "_pressed").c_str(), pressed);
-		this->selectedTex = Texture::getOrCreate((std::string(resourceName) + "_selected").c_str(), selected);
+		this->hoveredTex = Texture::getOrCreate((std::string(resourceName) + "_hovered").c_str(), hovered, true);
+		this->pressedTex = Texture::getOrCreate((std::string(resourceName) + "_pressed").c_str(), pressed, true);
+		this->selectedTex = Texture::getOrCreate((std::string(resourceName) + "_selected").c_str(), selected, true);
 		this->selected = false;
 }
 

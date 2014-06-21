@@ -41,7 +41,7 @@ public:
     Model(void);
     Model(const Model &copy);
     Model(std::string fileName, std::string name);
-    virtual ~Model(void) {}
+    virtual ~Model(void);
 
     virtual void draw();
 
@@ -69,18 +69,21 @@ public:
     static Model *getQuadMesh();
 
     /*
-     * This function tries to retrieve the requested model from the
-     * resource manager, and if it fails, creates and returns a new model.
+     * This function tries to retrieve the requested model from the resource manager, and if it fails, creates and
+     * returns a new model. The bool preLoad determines if the Model should be also loaded in this call, if set to
+     * false it will still need to be loaded before it can be used.
      */
-    static Model *getOrCreate(const char *name, const char *fileName);
+    static Model *getOrCreate(const char *name, const char *fileName, bool preLoad);
 
     /*
      * Tries to retrieve a Model from ResourcesManager with the provided name. If there's no loaded Model with this
      * name, it'll create, load and add a new Model to ResourcesManager using the provided vertices. This should only
      * be used to create 2D models, as the texture coordinates will be dynamically calculated and may not be correct
-     * for more complex 3D shapes.
+     * for more complex 3D shapes. The bool preLoad determines if the Model should be also loaded in this call, if set
+     * to false it will still need to be loaded before it can be used.
      */
-    static Model *getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture);
+    static Model *getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture,
+        bool preLoad);
 
     static const char *meshTriangleName;
     static const char *meshQuadName;

@@ -209,6 +209,8 @@ void Entity::update(float millisElapsed) {
 
 void Entity::draw(float millisElapsed) {
     if (model != nullptr) {
+        Naquadah::getInstance()->getCurrentScene()->useShader(shader);
+        Naquadah::getRenderer()->updateShaderMatrix("modelMatrix", modelMatrix);
         model->draw();
     }
     if (numChildEntities > 0 && false) {
@@ -221,7 +223,7 @@ void Entity::draw(float millisElapsed) {
     bool debug = false;
     if (debug) {
         //GLuint program = GameApp::getInstance()->getDefaultShader()->getShaderProgram();
-        Model *sphere = (Model*) Model::getOrCreate("SPHERE_MESH", "resources/models/sphere.mdl");
+        Model *sphere = (Model*) Model::getOrCreate("SPHERE_MESH", "resources/models/sphere.mdl", true);
         if (sphere != NULL) {
             //std::vector<CollisionBody*> *colBodies = physicalBody->getCollisionBodies();
             //for (unsigned i = 0; i < min(colBodies->size(), 2); i++) {
@@ -238,7 +240,6 @@ void Entity::draw(float millisElapsed) {
             //}
         }
     }
-
 }
 
 void Entity::addChild(Entity *child) {

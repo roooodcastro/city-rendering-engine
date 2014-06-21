@@ -67,6 +67,12 @@
     <Filter Include="Source Files\generator\zones">
       <UniqueIdentifier>{f7af2985-89eb-4c8a-a4ea-315e0ee606a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\generator\gridlayouts">
+      <UniqueIdentifier>{d8bd5351-d302-420a-ad5f-64daf4ddc26c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generator\gridlayouts">
+      <UniqueIdentifier>{b6096982-fcb7-41e4-a0b5-4089826e77a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -194,6 +200,21 @@
     </ClCompile>
     <ClCompile Include="engine\rendering\Plane.cpp">
       <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\Chunk.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\ChunkGenerator.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\GridLayout.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\gridlayouts\ManhattanGridLayout.cpp">
+      <Filter>Source Files\generator\gridlayouts</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\CityScene.cpp">
+      <Filter>Source Files\generator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -337,6 +358,21 @@
     </ClInclude>
     <ClInclude Include="engine\rendering\Plane.h">
       <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\Chunk.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\ChunkGenerator.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\GridLayout.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\gridlayouts\ManhattanGridLayout.h">
+      <Filter>Header Files\generator\gridlayouts</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\CityScene.h">
+      <Filter>Header Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

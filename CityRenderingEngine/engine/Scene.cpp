@@ -7,7 +7,7 @@ Scene::Scene() {
     transparentEntities = new std::vector<Entity*>();
     transparentEntities->reserve(25000);
     //setProjectionMatrix(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
-    projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
+    projectionMatrix = new Matrix4(Matrix4::Perspective(-1.0f, 100.0f, 1280.0f/720.0f, 45.0f));
     cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     camera = new Camera();
     //lightSources = new std::vector<Light*>();
@@ -219,7 +219,6 @@ void Scene::addEntity(Entity *entity, std::string name) {
         // Note that the children entities will also be added to the lists
         std::vector<Entity*> entityTree = entity->getAllChildren(entity);
         auto itEnd = entityTree.end();
-        Profiler::getTimer(3)->startMeasurement();
         for (auto it = entityTree.begin(); it != itEnd; it++) {
             if ((*it)->getModel() != nullptr && (*it)->isTranslucent()) {
                 transparentEntities->push_back((*it));
@@ -229,7 +228,6 @@ void Scene::addEntity(Entity *entity, std::string name) {
         }
         std::sort_heap(transparentEntities->begin(), transparentEntities->end(), Entity::compareByCameraDistance);
         std::sort_heap(opaqueEntities->begin(), opaqueEntities->end(), Entity::compareByCameraDistance);
-        Profiler::getTimer(3)->finishMeasurement();
     }
 }
 
@@ -248,22 +246,22 @@ void Scene::update(float millisElapsed) {
 
     // Calculate WASD movement (only debug purposes, NOT permanent)
     float speed = 10.0f;
-    float sinPhi = sinf(toRadians(camera->getRotation().x));
-    float cosPhi = cosf(toRadians(camera->getRotation().x));
-    float sinTheta = sinf(toRadians(camera->getRotation().y));
-    float cosTheta = cosf(toRadians(camera->getRotation().y));
+    float sinPhi = sinf((float) toRadians(camera->getRotation().x));
+    float cosPhi = cosf((float) toRadians(camera->getRotation().x));
+    float sinTheta = sinf((float) toRadians(camera->getRotation().y));
+    float cosTheta = cosf((float) toRadians(camera->getRotation().y));
     Vector3 movement = Vector3();
     if (Keyboard::isKeyPressed(SDLK_w)) {
-        movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
+        movement -= Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
     }
     if (Keyboard::isKeyPressed(SDLK_s)) {
-        movement += -Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
+        movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
     }
     if (Keyboard::isKeyPressed(SDLK_a)) {
-        movement += Vector3(cosTheta, 0, sinTheta);
+        movement += Vector3(-cosTheta, 0, -sinTheta);
     }
     if (Keyboard::isKeyPressed(SDLK_d)) {
-        movement += Vector3(-cosTheta, 0, -sinTheta);
+        movement += Vector3(cosTheta, 0, sinTheta);
     }
     if (movement.getLength() > 0.00001f) {
         camera->moveCamera(movement * speed);
@@ -292,35 +290,50 @@ void Scene::update(float millisElapsed) {
 
 void Scene::render(Renderer *renderer, float millisElapsed) {
     bool updatedCameraMatrix = false;
+    if (renderer->getCurrentShader() != nullptr && renderer->getCurrentShader()->isLoaded()) {
+        renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+    }
     // Draw Entities
-    auto it = opaqueEntities->rbegin();
-    auto itEnd = opaqueEntities->rend();
+
+    auto it = entities->begin();
+    auto itEnd = entities->end();
     for (; it != itEnd; it++) {
         // We first get the right shader to use with this entity
-        Entity *entity = (*it);
+        Entity *entity = it->second;
         if (frustum->isEntityInside(entity)) {
-            if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
-                if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
-                
-                } else {
-                    renderer->useShader(entity->getShader());
-                    renderer->updateShaderMatrix("projMatrix", projectionMatrix);
-                    renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-                    updatedCameraMatrix = true;
-                    if (lightSource != nullptr) {
-                        lightSource->updateShaderParameters(entity->getShader());
-                    }
-                    entity->getShader()->updateShaderParameters(false);
-                }
-                if (!updatedCameraMatrix) {
-                    renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-                    updatedCameraMatrix = true;
-                }
-                renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-                entity->draw(millisElapsed);
-            }
+            entity->draw(millisElapsed);
         }
     }
+
+
+    //auto it = opaqueEntities->rbegin();
+    //auto itEnd = opaqueEntities->rend();
+    //for (; it != itEnd; it++) {
+    //    // We first get the right shader to use with this entity
+    //    Entity *entity = (*it);
+    //    if (frustum->isEntityInside(entity)) {
+    //        if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
+    //            if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
+    //            
+    //            } else {
+    //                renderer->useShader(entity->getShader());
+    //                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+    //                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+    //                updatedCameraMatrix = true;
+    //                if (lightSource != nullptr) {
+    //                    lightSource->updateShaderParameters(entity->getShader());
+    //                }
+    //                entity->getShader()->updateShaderParameters(false);
+    //            }
+    //            if (!updatedCameraMatrix) {
+    //                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+    //                updatedCameraMatrix = true;
+    //            }
+    //            renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
+    //            entity->draw(millisElapsed);
+    //        }
+    //    }
+    //}
     //std::cout << sum << std::endl;
     // Draw Interface
     if (userInterface != nullptr) {
@@ -380,4 +393,22 @@ void Scene::lockMutex() {
 
 void Scene::unlockMutex() {
     SDL_mutexV(mutex);
+}
+
+void Scene::useShader(Shader *shader) {
+    if (shader != nullptr) {
+        if (!shader->isLoaded()) shader->load(); // If it's not loaded yet, load it.
+        if (shader->isLoaded()) { // Check this again just on case there's a problem loading the Shader
+            Renderer *renderer = Naquadah::getRenderer();
+            if (*shader != *(renderer->getCurrentShader())) {
+                renderer->useShader(shader);
+                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
+                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
+                if (lightSource != nullptr) {
+                    lightSource->updateShaderParameters(shader);
+                }
+                shader->updateShaderParameters(false);
+            }
+        }
+    }
 }

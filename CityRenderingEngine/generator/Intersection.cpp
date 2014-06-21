@@ -1,8 +1,9 @@
 #include "Intersection.h"
 
 Intersection::Intersection(void) {
-    model = Model::getOrCreate("Intersection", "resources/meshes/plane.obj");
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    model = Model::getOrCreate("Intersection", "resources/meshes/plane.obj", false);
+    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+        "resources/shaders/fragLight.glsl", false);
     // Calculate the plane's model rotation, position and scale
     this->position = Vector3();
     this->rotation = Vector3();
@@ -13,9 +14,10 @@ Intersection::Intersection(void) {
 }
 
 Intersection::Intersection(Vector3 position) {
-    model = Model::getOrCreate("Intersection", "resources/meshes/plane.obj");
-    model->setTexture(Texture::getOrCreate("RoadIntersection", "resources/textures/road_intersection.png"));
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    model = Model::getOrCreate("Intersection", "resources/meshes/plane.obj", false);
+    model->setTexture(Texture::getOrCreate("RoadIntersection", "resources/textures/road_intersection.png", false));
+    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+        "resources/shaders/fragLight.glsl", false);
     // Calculate the plane's model rotation, position and scale
     this->position = position;
     this->rotation = Vector3();
@@ -34,13 +36,14 @@ Intersection::~Intersection(void) {
     roads = nullptr;
 }
 
-void Intersection::connectTo(Intersection *other) {
-    this->connections->emplace_back(other);
-    other->connections->emplace_back(this);
+Road *Intersection::connectTo(Intersection *other) {
+    for (auto it = connections->begin(); it != connections->end(); it++) {
+        if ((*it) == other) return nullptr; // Avoid duplicate connections
+    }
+    this->connections->push_back(other);
+    other->connections->push_back(this);
     Road *road = new Road(this, other);
-    std::stringstream roadName;
-    roadName << this->position << other->position;
-    Naquadah::getInstance()->getCurrentScene()->addEntity(road, roadName.str());
-    this->roads->emplace_back(road);
-    other->roads->emplace_back(road);
+    this->roads->push_back(road);
+    other->roads->push_back(road);
+    return road;
 }
