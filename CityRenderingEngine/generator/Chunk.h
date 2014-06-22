@@ -21,14 +21,14 @@
 
 #pragma once
 
-#include <vector>
+#include "City.h"
+#include "Road.h"
 #include "CityBlock.h"
 #include "Intersection.h"
 #include "../engine/Entity.h"
 #include "../engine/Resource.h"
-#include "../engine/math/Vector2.h"
 
-class Intersection;
+class City;
 
 class Chunk : public Entity, Resource {
 public:
@@ -39,7 +39,7 @@ public:
     static const int SUBCHUNK_SIZE = 10;
 
     Chunk(void);
-    Chunk(const Vector2 &position);
+    Chunk(const Vector2 &position, City *city);
     virtual ~Chunk(void);
 
     virtual void update(float millisElapsed);
@@ -57,9 +57,6 @@ public:
     std::vector<Intersection*> *getIntersections() const { return intersections; }
     std::vector<CityBlock*> *getCityBlocks() const { return cityBlocks; }
     std::vector<Road*> *getRoads() const { return roads; }
-
-    /* Returns the position of this Chunk as a Vector2, for Chunk calculations. */
-    Vector2 getChunkPos() { return Vector2(position.x, position.z); }
 
     /* Adds a new Intersection to this Chunk. */
     void addIntersection(Intersection *intersection);
@@ -89,9 +86,16 @@ public:
     /* Generates and returns the filename for this chunk. */
     std::string getFileName();
 
-    Vector3 getWorldPosition() {
+    /*
+     * Returns the position of the centre of this Chunk as a Vector2. This is the same as getPosition(), without the
+     * "y" element of the Vector3.
+     */
+    Vector2 getCentrePos() { return Vector2(position.x, position.z); }
+
+    /* Returns the chunkPosition, the position at the bottom left corner of the Chunk, as a Vector2. */
+    Vector2 getChunkPos() {
         float offset = Chunk::CHUNK_SIZE / 2.0f;
-        return this->position + Vector3(offset, 0, offset);
+        return this->getCentrePos() - Vector2(offset, offset);
     }
 
     /* Checks if the Chunk exists as a file. Returns true if ti exists, and false if it needs to be generated. */
@@ -101,7 +105,7 @@ public:
      * Loads the Chunk at position from the disk. If the Chunk doesn't exist, doesn't load anything and returns null.
      * If the Chunk is successfully loaded, it's added to the ResourcesManager and it's returned.
      */
-    static Chunk *loadChunk(const Vector2 &position);
+    static Chunk *loadChunk(const Vector2 &position, City *city);
 
     static std::string getFileName(const Vector2 &position) {
         std::stringstream fileName;
@@ -125,4 +129,7 @@ protected:
 
     /* The CityBlocks that are inside this chunk. */
     std::vector<CityBlock*> *cityBlocks;
+
+    /* The City in which this Chunk is loaded. */
+    City *city;
 };

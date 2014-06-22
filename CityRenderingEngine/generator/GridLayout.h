@@ -9,11 +9,10 @@
 
 #pragma once
 
-#include <vector>
-#include "Chunk.h"
-#include "Intersection.h"
-#include "Road.h"
-#include "../engine/math/Vector2.h"
+#include "City.h"
+
+class Chunk;
+class Intersection;
 
 class GridLayout {
 public:

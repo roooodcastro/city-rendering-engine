@@ -52,15 +52,33 @@ int loadChunkWorkerThread(void *data) {
     Chunk *chunk = nullptr;
     if (Chunk::chunkExists(chunkPos)) {
         // Load it from the disk
-        chunk = Chunk::loadChunk(chunkPos);
+        chunk = Chunk::loadChunk(chunkPos, params->city);
     } else {
         // Generate it
         chunk = ChunkGenerator::generateChunk(params->city, chunkPos);
     }
     // Add it to the Scene
     params->city->addChunk(chunk);
+    params->city->flagChunkAsLoaded(chunk);
     delete params;
     return 0;
+}
+
+void City::unloadChunk(Chunk *chunk) {
+    lockMutex();
+    if (chunk != nullptr) {
+        if (Naquadah::getInstance()->getCurrentScene()->isEntityInScene(chunk->getEntityName())) {
+            // If the Chunk is still in the Scene, remove it from the Scene and wait until the next frame to delete it.
+            Naquadah::getInstance()->getCurrentScene()->removeEntity(chunk->getEntityName());
+        } else {
+            // This gives the update() method of the Chunk time to finish, and makes sure it won't be called again.
+            chunks->erase(std::remove(chunks->begin(), chunks->end(), chunk), chunks->end());
+            chunk->unload();
+            delete chunk;
+            chunk = nullptr;
+        }
+    }
+    unlockMutex();
 }
 
 void City::loadChunk(const Vector2 &chunkPos) {
@@ -71,14 +89,15 @@ void City::loadChunk(const Vector2 &chunkPos) {
     // Check if the Chunks that were loading before have finished loading
     auto chunkToBeRemoved = chunksLoading.end();
     bool duplicate = false;
-    for (auto it = chunksLoading.begin(); it != chunksLoading.end(); it++) {
+    for (int i = 0; i < chunksLoading.size(); i++) {
         // We also check if we're trying to load a Chunks that's already being loaded
-        if (isChunkLoaded(*it)) {
-            chunkToBeRemoved = std::find(chunksLoading.begin(), chunksLoading.end(), *it);
+        Vector2 pos = chunksLoading.at(i);
+        if (isChunkLoaded(pos)) {
+            chunkToBeRemoved = std::find(chunksLoading.begin(), chunksLoading.end(), pos);
         }
-        if (*it == chunkPos) duplicate = true;
+        if (pos == chunkPos) duplicate = true;
     }
-    if (chunkToBeRemoved != chunksLoading.end()) {
+    if (chunkToBeRemoved < chunksLoading.end()) {
         chunksLoading.erase(chunkToBeRemoved);
     }
     if (chunksLoading.size() < MAX_PARALEL_LOADING_CHUNKS && !duplicate) {
@@ -94,8 +113,7 @@ bool City::isChunkLoaded(const Vector2 &chunkPos) {
     lockMutex();
     for (auto it = chunks->begin(); it != chunks->end(); it++) {
         if (*it) {
-            Vector3 pos3 = (*it)->getPosition();
-            Vector2 pos = Vector2(pos3.x, pos3.z);
+            Vector2 pos = (*it)->getChunkPos();
             if (pos == chunkPos) {
                 unlockMutex();
                 return true;
@@ -129,7 +147,7 @@ std::vector<Chunk*> City::getNeighbourChunks(Chunk *chunk, bool loadFromDisk) {
     Vector2 maxPos = chunk->getChunkPos() + 1000.0f;
     for (int i = (int) minPos.x; i < (int) maxPos.x; i += 1000) {
         for (int j = (int) minPos.y; j < (int) maxPos.y; j += 1000) {
-            Chunk *neighbour = getChunkAt(Vector2(i, j), loadFromDisk);
+            Chunk *neighbour = getChunkAt(Vector2((float) i, (float) j), loadFromDisk);
             if (neighbour != nullptr && neighbour != chunk) {
                 neighbours.push_back(neighbour);
             }
@@ -183,6 +201,10 @@ void City::addChunk(Chunk *chunk) {
     chunks->push_back(chunk);
     Naquadah::getInstance()->getCurrentScene()->addEntity(chunk, chunk->getEntityName());
     unlockMutex();
+}
+
+void City::flagChunkAsLoaded(Chunk *chunk) {
+    chunksLoading.erase(std::find(chunksLoading.begin(), chunksLoading.end(), chunk->getChunkPos()));
 }
 
 void City::lockMutex() {

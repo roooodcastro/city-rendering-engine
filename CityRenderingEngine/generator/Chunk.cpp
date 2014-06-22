@@ -5,14 +5,16 @@ Chunk::Chunk(void) : Entity(), Resource() {
     this->roads = new std::vector<Road*>();
     this->cityBlocks = new std::vector<CityBlock*>();
     this->setRenderRadius(Chunk::CHUNK_SIZE * 1.42f);
+    this->city = nullptr;
 }
 
-Chunk::Chunk(const Vector2 &position) : Entity(), Resource() {
-    this->position = Vector3(position.x, 0, position.y);
+Chunk::Chunk(const Vector2 &position, City *city) : Entity(), Resource() {
+    this->position = Vector3(position.x + 500.0f, 0, position.y + 500.0f);
     this->intersections = new std::vector<Intersection*>();
     this->roads = new std::vector<Road*>();
     this->cityBlocks = new std::vector<CityBlock*>();
     this->setRenderRadius(Chunk::CHUNK_SIZE * 1.42f);
+    this->city = city;
 }
 
 Chunk::~Chunk(void) {
@@ -31,6 +33,7 @@ Chunk::~Chunk(void) {
         delete cityBlocks;
         cityBlocks = nullptr;
     }
+    city = nullptr;
 }
 
 void Chunk::update(float millisElapsed) {
@@ -91,12 +94,14 @@ void Chunk::draw(float millisElapsed) {
 
 void Chunk::addIntersection(Intersection *intersection) {
     intersections->push_back(intersection);
+    intersection->addChunkSharing();
     //addChild(intersection);
 }
 
 void Chunk::removeIntersection(Intersection *intersection) {
     auto itEnd = intersections->end();
     intersections->erase(std::remove(intersections->begin(), itEnd, intersection), itEnd);
+    intersection->removeChunkSharing();
     //removeChild(intersection);
 }
 
@@ -156,7 +161,21 @@ void Chunk::load() {
 }
 
 void Chunk::unload() {
-
+    for (auto it = roads->begin(); it != roads->end(); it++) {
+        if ((*it)->getPointA()->getNumChunksSharing() == 1 && (*it)->getPointB()->getNumChunksSharing() == 1) {
+            delete *it;
+        }
+    }
+    roads->clear();
+    for (auto it = intersections->begin(); it != intersections->end(); it++) {
+        if ((*it)->getNumChunksSharing() == 1) {
+            delete *it;
+        } else {
+            (*it)->removeChunkSharing();
+        }
+    }
+    intersections->clear();
+    // TODO: Find and fix a small memoryleak on the chunk loading/unloading, about 4kb each 20 or so chunks
 }
 
 void Chunk::saveToFile() {
@@ -171,7 +190,7 @@ bool Chunk::chunkExists(const Vector2 &position) {
     return FileIO::fileExists(Chunk::getFileName(position));
 }
 
-Chunk *Chunk::loadChunk(const Vector2 &position) {
-    Chunk *chunk = nullptr;
+Chunk *Chunk::loadChunk(const Vector2 &position, City *city) {
+    Chunk *chunk = new Chunk(position, city);
     return chunk;
 }

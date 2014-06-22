@@ -117,8 +117,10 @@ public:
     void applyShaderLight(GLuint program);
 
     /* Locks and unlocks the mutex, to prevent errors while accessing and editting the entities map */
-    void lockMutex();
-    void unlockMutex();
+    void lockUpdateMutex();
+    void unlockUpdateMutex();
+    void lockRenderMutex();
+    void unlockRenderMutex();
 
     bool dragging;
     bool draggingRight;
@@ -146,5 +148,6 @@ protected:
     Matrix4 *cameraMatrix; // The viewMatrix, or the camera
     Matrix4 *projectionMatrix; // The projectionMatrix. This will be switched all the time to render interface and game
 
-    SDL_mutex *mutex;
+    SDL_mutex *updateMutex;
+    SDL_mutex *renderMutex;
 };

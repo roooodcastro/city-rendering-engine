@@ -1,7 +1,7 @@
 #include "ChunkGenerator.h"
+#include "gridlayouts/ManhattanGridLayout.h"
 
 Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
-    std::cout << "Started generating Chunk " << position << std::endl;
     // First we check if position is valid (if both X and Y are multiple of 1000)
     if ((int) position.x % 1000 != 0 || (int) position.y % 1000 != 0) {
         return nullptr;
@@ -19,7 +19,7 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
     //TODO: Put this condition on the different grid layout generators. Each may have different limits
     int minDistanceIntersections = 50; // Minimum distance between intersections
 
-    Chunk *chunk = new Chunk(position);
+    Chunk *chunk = new Chunk(position, city);
     std::vector<Chunk*> neighbourChunks = city->getNeighbourChunks(chunk, true);
     ManhattanGridLayout gridLayout = ManhattanGridLayout(Vector2(), Vector2());
     int numSubChunks = Chunk::CHUNK_SIZE / Chunk::SUBCHUNK_SIZE;

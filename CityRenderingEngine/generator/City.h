@@ -8,12 +8,18 @@
 
 #pragma once
 
+#include <SDL.h>
 #include <vector>
 #include "Chunk.h"
-#include "Intersection.h"
-#include "CityBlock.h"
 #include "ChunkGenerator.h"
 #include "../engine/math/Vector2.h"
+#include "../engine/math/Vector3.h"
+
+class Road;
+class Chunk;
+class CityBlock;
+class Intersection;
+class ChunkGenerator;
 
 class City {
 public:
@@ -33,11 +39,20 @@ public:
     /* Returns the vector containing the CityBlocks. */
     std::vector<CityBlock*> *getCityBlocks() { return cityBlocks; }
 
+    /* Returns the vector containing the Chunks. */
+    std::vector<Chunk*> *getChunks() { return chunks; }
+
     /*
      * Adds a Chunk to the City. The Chunk should be fully loaded before it's added. The Chunk will also be added to
      * the current Scene.
      */
     void addChunk(Chunk *chunk);
+
+    /*
+     * Unloads and removes the chunk from memory. This will remove the Chunk from the list of loaded Chunks of the
+     * city, and also unload it from memory, requiring it to be loaded again.
+     */
+    void unloadChunk(Chunk *chunk);
 
     /*
      * Requests that the Chunk at position chunkPos be loaded OR generated. This will delegate the task to a worker
@@ -51,6 +66,9 @@ public:
      * generated.
      */
     bool isChunkLoaded(const Vector2 &chunkPos);
+
+    /* Tells the City that the chunk has finished loading. This tells the City that the next Chunk may be loaded. */
+    void flagChunkAsLoaded(Chunk *chunk);
 
     /*
      * Returns the Chunk at chunkPos. If the Chunk is not already loaded, it'll load from disk if the flag is set. If

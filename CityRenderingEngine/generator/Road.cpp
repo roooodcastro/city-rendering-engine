@@ -27,10 +27,6 @@ Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
 }
 
 Road::~Road(void) {
-    if (pointA != nullptr)
-        delete pointA;
     pointA = nullptr;
-    if (pointB != nullptr)
-        delete pointB;
     pointB = nullptr;
 }

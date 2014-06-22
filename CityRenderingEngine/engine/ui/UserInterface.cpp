@@ -154,7 +154,7 @@ void UserInterface::update(float millisElapsed) {
     //}
     // Fade Effect
     if (fadeControl > 0) {
-        fadeStep += millisElapsed;
+        fadeStep += (int) millisElapsed;
         uint8_t alpha = 0;
         if (fadeControl == 1) {
             alpha = (uint8_t) (256 - ((fadeStep * 1.0f) / fadeDuration) * 256.0f);

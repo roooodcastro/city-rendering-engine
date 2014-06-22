@@ -17,10 +17,9 @@
 #include "City.h"
 #include "../engine/input/FileIO.h"
 #include "../engine/math/Vector2.h"
-#include "gridlayouts/ManhattanGridLayout.h"
 
-class Intersection;
 class City;
+class Chunk;
 
 class ChunkGenerator {
 public:

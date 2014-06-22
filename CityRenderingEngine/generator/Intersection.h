@@ -27,8 +27,20 @@ public:
     /* Connects this intersction to another, creating a connection and a road between them. */
     Road *connectTo(Intersection *other);
 
+    /* Returns the number of Chunks that are currently using this Intersection. */
+    int getNumChunksSharing() { return (int) numChunksSharing; }
+
+    /* Tells the Intersection that another Chunks is now using it. */
+    void addChunkSharing() { numChunksSharing++; }
+
+    /* Tells the Intersection that a Chunk that was previously using it is not using it anymore. */
+    void removeChunkSharing() { numChunksSharing--; }
+
 protected:
 
     std::vector<Intersection*> *connections;
     std::vector<Road*> *roads;
+
+    /* Indicates the number of Chunks that currently have this Intersection within. Defaults to zero. */
+    char numChunksSharing;
 };

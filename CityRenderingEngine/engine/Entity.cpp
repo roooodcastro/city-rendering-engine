@@ -250,7 +250,7 @@ void Entity::addChild(Entity *child) {
             childEntities->reserve(childEntities->capacity() + 5);
         }
         childEntities->emplace_back(child);
-        numChildEntities = childEntities->size();
+        numChildEntities = (int) childEntities->size();
         child->parent = this;
     }
 }
@@ -258,7 +258,7 @@ void Entity::addChild(Entity *child) {
 void Entity::removeChild(Entity *child) {
     if (child) {
         childEntities->erase(std::remove(childEntities->begin(), childEntities->end(), child), childEntities->end());
-        numChildEntities = childEntities->size();
+        numChildEntities = (int) childEntities->size();
         // If vector becomes too big, shrink it
         if (childEntities->size() + 10 < childEntities->capacity()) {
             childEntities->shrink_to_fit();
@@ -276,8 +276,8 @@ void Entity::makeOrphan() {
 std::vector<Entity*> Entity::getAllChildren(Entity *entity) {
     std::vector<Entity*> children = std::vector<Entity*>();
     children.emplace_back(entity);
-    unsigned size = entity->childEntities->size();
-    for (unsigned i = 0; i < size; i++) {
+    int size = (int) entity->childEntities->size();
+    for (int i = 0; i < size; i++) {
         if ((unsigned) entity->childEntities != 0xcdcdcd01 && (unsigned) entity->childEntities != 0xfeeefeee) {
             std::vector<Entity*> grandChildren = Entity::getAllChildren((*(entity->childEntities))[i]);
             children.insert(children.end(), grandChildren.begin(), grandChildren.end());

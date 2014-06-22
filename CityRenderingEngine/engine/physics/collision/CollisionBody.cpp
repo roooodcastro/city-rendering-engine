@@ -141,4 +141,5 @@ Vector3 CollisionBody::getMaxPosition() {
 	} else if (type == PLANE) {
 		return *getAbsolutePosition();
 	}
+    return Vector3();
 }

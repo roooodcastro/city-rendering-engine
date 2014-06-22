@@ -9,6 +9,7 @@ Intersection::Intersection(void) {
     this->rotation = Vector3();
     this->scale = Vector3(10, 0, 10);
     this->setRenderRadius(15);
+    this->numChunksSharing = 0;
     connections = new std::vector<Intersection*>();
     roads = new std::vector<Road*>();
 }
@@ -23,17 +24,22 @@ Intersection::Intersection(Vector3 position) {
     this->rotation = Vector3();
     this->scale = Vector3(10, 0, 10);
     this->setRenderRadius(15);
+    this->numChunksSharing = 0;
     connections = new std::vector<Intersection*>();
     roads = new std::vector<Road*>();
 }
 
 Intersection::~Intersection(void) {
-    connections->clear();
-    delete connections;
-    connections = nullptr;
-    roads->clear();
-    delete roads;
-    roads = nullptr;
+    if (connections != nullptr) {
+        connections->clear();
+        delete connections;
+        connections = nullptr;
+    }
+    if (roads != nullptr) {
+        roads->clear();
+        delete roads;
+        roads = nullptr;
+    }
 }
 
 Road *Intersection::connectTo(Intersection *other) {

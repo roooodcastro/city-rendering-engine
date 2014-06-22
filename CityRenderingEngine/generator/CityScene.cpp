@@ -21,40 +21,62 @@ CityScene::~CityScene(void) {
 
 void CityScene::update(float millisElapsed) {
     Scene::update(millisElapsed);
-    lockMutex();
+    lockUpdateMutex();
 
     // Distance that new chunks should be loaded
     float chunkViewDistance = 3000.0f;
 
     // Use current camera position to calculate which Chunks must be loaded or unloaded.
     Vector3 cameraPos = camera->getPosition();
-    Vector3 correctedCameraPos = Vector3(cameraPos);
+    Vector2 correctedCameraPos = Vector2(cameraPos.x, cameraPos.z);
     correctedCameraPos.x = (float) ((int) (cameraPos.x / (float) Chunk::CHUNK_SIZE) * Chunk::CHUNK_SIZE);
-    correctedCameraPos.z = (float) ((int) (cameraPos.z / (float) Chunk::CHUNK_SIZE) * Chunk::CHUNK_SIZE);
+    correctedCameraPos.y = (float) ((int) (cameraPos.z / (float) Chunk::CHUNK_SIZE) * Chunk::CHUNK_SIZE);
     correctedCameraPos.x += Chunk::CHUNK_SIZE / 2.0f; // Make it to the centre of the Chunk, so we can calculate based
-    correctedCameraPos.z += Chunk::CHUNK_SIZE / 2.0f; // on the centre of the chunk instead of from one of the corners.
-    std::cout << cameraPos << " - " << correctedCameraPos << std::endl;
-    Vector2 chunkMin = Vector2(correctedCameraPos.x - chunkViewDistance, correctedCameraPos.z - chunkViewDistance);
-    Vector2 chunkMax = Vector2(correctedCameraPos.x + chunkViewDistance, correctedCameraPos.z + chunkViewDistance);
+    correctedCameraPos.y += Chunk::CHUNK_SIZE / 2.0f; // on the centre of the chunk instead of from one of the corners.
+    Vector2 chunkMin = Vector2(correctedCameraPos.x - chunkViewDistance, correctedCameraPos.y - chunkViewDistance);
+    Vector2 chunkMax = Vector2(correctedCameraPos.x + chunkViewDistance, correctedCameraPos.y + chunkViewDistance);
 
+    // Load Chunks that are inside the ChunkViewArea
+    Vector2 cameraPos2f = Vector2(cameraPos.x, cameraPos.z);
     for (int x = (int) chunkMin.x; x < (int) chunkMax.x; x += 1000) {
         for (int y = (int) chunkMin.y; y < (int) chunkMax.y; y += 1000) {
-            Vector2 cameraPos2f = Vector2(cameraPos.x, cameraPos.z);
             Vector2 chunkCentre = Vector2((float) x, (float) y);
             Vector2 chunkPos = Vector2((float) x - 500.0f, (float) y - 500.0f); // Take it back from the centre of the Chunk
             float distance = (cameraPos2f - chunkCentre).getLength();
             if ((distance - Chunk::CHUNK_SIZE) < chunkViewDistance) {
                 // Chunk should be loaded, so we load/generate it if it's not already loaded or being loaded
                 if (!city->isChunkLoaded(chunkPos)) {
+                    if (chunkPos == Vector2(2000, -4000)) {
+                        int a = 1;
+                    }
                     city->loadChunk(chunkPos);
                 }
             }
         }
     }
 
-    // We now have a bounding square in which all Chunks inside should be loaded, and all outside should be unloaded.
+    // Unload Chunks that are outside the ChunkViewArea
+    float toleranceMultiplier = 1.5f;
+    /* This multiplier creates an unloading area bigger than the loading area, so the Chunks will load closer and
+     * unload a little further away from the Player. This prevents loading/unloading chaos when the Player gets near
+     * the loading limit.
+     */
+    Chunk *toBeUnloaded = nullptr;
+    city->lockMutex();
+    auto itBegin = city->getChunks()->begin();
+    auto itEnd = city->getChunks()->end();
+    for (auto it = itBegin; it != itEnd; it++) {
+        Vector2 chunkCentre = (*it)->getCentrePos();
+        float distance = (cameraPos2f - chunkCentre).getLength();
+        if (distance > (chunkViewDistance * toleranceMultiplier)) {
+            toBeUnloaded = *it;
+        }
+    }
+    if (toBeUnloaded != nullptr) city->unloadChunk(toBeUnloaded);
+    city->unlockMutex();
 
-    unlockMutex();
+
+    unlockUpdateMutex();
 }
 
 void CityScene::addEntity(Entity *entity, std::string name) {

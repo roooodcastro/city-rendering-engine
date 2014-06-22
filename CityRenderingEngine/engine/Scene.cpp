@@ -14,7 +14,8 @@ Scene::Scene() {
     lightSource = nullptr;
     dragging = false;
     draggingRight = false;
-    mutex = SDL_CreateMutex();
+    updateMutex = SDL_CreateMutex();
+    renderMutex = SDL_CreateMutex();
     userInterface = nullptr;
     frustum = new Frustum(*projectionMatrix * *cameraMatrix);
 }
@@ -29,7 +30,7 @@ Scene::Scene(const Scene &copy) {
     this->lightSource = new Light(*(copy.lightSource));
     this->projectionMatrix = new Matrix4(*(copy.projectionMatrix));
     this->userInterface = new UserInterface(*(copy.userInterface));
-    this->mutex = copy.mutex;
+    this->updateMutex = copy.updateMutex;
     this->frustum = new Frustum(*(copy.frustum));
 }
 
@@ -43,7 +44,8 @@ Scene::Scene(UserInterface *userInterface) {
     lightSource = nullptr;
     dragging = false;
     draggingRight = false;
-    mutex = SDL_CreateMutex();
+    updateMutex = SDL_CreateMutex();
+    renderMutex = SDL_CreateMutex();
     frustum = new Frustum(*projectionMatrix * *cameraMatrix);
 }
 
@@ -79,7 +81,14 @@ Scene::~Scene(void) {
         delete frustum;
         frustum = nullptr;
     }
-    SDL_DestroyMutex(mutex);
+    if (updateMutex != nullptr) {
+        SDL_DestroyMutex(updateMutex);
+        updateMutex = nullptr;
+    }
+    if (renderMutex != nullptr) {
+        SDL_DestroyMutex(renderMutex);
+        renderMutex = nullptr;
+    }
 }
 
 void Scene::onMouseMoved(Vector2 &position, Vector2 &amount) {
@@ -210,6 +219,8 @@ bool Scene::isEntityInScene(std::string name) {
 }
 
 void Scene::addEntity(Entity *entity, std::string name) {
+    lockUpdateMutex();
+    lockRenderMutex();
     if (entity && name != "") {
         if (entity->getParent() == nullptr) {
             // Only add to this map if it's a root entity 
@@ -229,18 +240,26 @@ void Scene::addEntity(Entity *entity, std::string name) {
         std::sort_heap(transparentEntities->begin(), transparentEntities->end(), Entity::compareByCameraDistance);
         std::sort_heap(opaqueEntities->begin(), opaqueEntities->end(), Entity::compareByCameraDistance);
     }
+    unlockUpdateMutex();
+    unlockRenderMutex();
 }
 
 bool Scene::removeEntity(std::string name) {
+    lockUpdateMutex();
+    lockRenderMutex();
     if (isEntityInScene(name)) {
+        unlockUpdateMutex();
+        unlockRenderMutex();
         return entities->erase(name) > 0;
     }
+    unlockRenderMutex();
+    unlockUpdateMutex();
     return false;
 }
 
 void Scene::update(float millisElapsed) {
     Profiler::getTimer(2)->startMeasurement();
-    lockMutex();
+    lockUpdateMutex();
     if (userInterface != nullptr)
         userInterface->update(millisElapsed);
 
@@ -284,11 +303,12 @@ void Scene::update(float millisElapsed) {
     // We only set this to false here because the Entities use it to recalculate their distanceToCamera
     camera->setChanged(false);
 
-    unlockMutex();
+    unlockUpdateMutex();
     Profiler::getTimer(2)->finishMeasurement();
 }
 
 void Scene::render(Renderer *renderer, float millisElapsed) {
+    lockRenderMutex();
     bool updatedCameraMatrix = false;
     if (renderer->getCurrentShader() != nullptr && renderer->getCurrentShader()->isLoaded()) {
         renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
@@ -298,10 +318,12 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
     auto it = entities->begin();
     auto itEnd = entities->end();
     for (; it != itEnd; it++) {
-        // We first get the right shader to use with this entity
-        Entity *entity = it->second;
-        if (frustum->isEntityInside(entity)) {
-            entity->draw(millisElapsed);
+        if (&it) {
+            // We first get the right shader to use with this entity
+            Entity *entity = it->second;
+            if (frustum->isEntityInside(entity)) {
+                entity->draw(millisElapsed);
+            }
         }
     }
 
@@ -342,6 +364,7 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
         //glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, false, (float*) &(Matrix4::Orthographic(-1, 1, 1920.0f, 0, 1080, 0)));
         //userInterface->draw(millisElapsed);
     }
+    unlockRenderMutex();
 }
 //
 //void Scene::addLightSource(Light &lightSource) {
@@ -387,12 +410,20 @@ void Scene::applyShaderLight(GLuint program) {
     ////GameApp::logOpenGLError("APPLY_SHADER_LIGHT");
 }
 
-void Scene::lockMutex() {
-    SDL_mutexP(mutex);
+void Scene::lockUpdateMutex() {
+    SDL_mutexP(updateMutex);
 }
 
-void Scene::unlockMutex() {
-    SDL_mutexV(mutex);
+void Scene::unlockUpdateMutex() {
+    SDL_mutexV(updateMutex);
+}
+
+void Scene::lockRenderMutex() {
+    SDL_mutexP(renderMutex);
+}
+
+void Scene::unlockRenderMutex() {
+    SDL_mutexV(renderMutex);
 }
 
 void Scene::useShader(Shader *shader) {

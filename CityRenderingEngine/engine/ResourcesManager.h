@@ -7,6 +7,10 @@
  * having to load them again, saving useful memory space and computational time to reload them.
  */
 
+// TODO: Make this smarter, implementing a list of who's using each resource, when no one is using it, unload from
+// memory, while keeping it in the manager. Only load it again when someone requests it again. Basically make it more
+// like a MemoryManager than a ResourceManager.
+
 #pragma once
 
 #include <map>
