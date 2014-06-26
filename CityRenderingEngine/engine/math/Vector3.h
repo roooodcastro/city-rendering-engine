@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "Vector2.h"
 
 class Vector3 {
 public:
@@ -65,6 +66,21 @@ public:
             normalised.z = z * length;
         }
         return normalised;
+    }
+
+    /*
+     * Converts this Vector3 to a Vector2. The parameter axis determines which axis will not be used on the new vector.
+     * If a Vector2 with the X and Z axis is required, the axis parameter should be Vector3(0, 1, 0). If axis is in an
+     * incorrect format, it will select the Z axis as default to eliminate.
+     */
+    Vector2 toVec2(const Vector3 &axis) {
+        if (axis.x == 1.0f) {
+            return Vector2(y, z);
+        } else if (axis.y == 1.0f) {
+            return Vector2(x, z);
+        } else {
+            return Vector2(x, y);
+        }
     }
 
     /* Set all three values of this vector to zero. */

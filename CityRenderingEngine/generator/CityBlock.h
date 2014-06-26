@@ -31,6 +31,8 @@ public:
     /* Adds an intersection to this CityBlock. */
     void addVertice(Intersection *intersection);
 
+    std::vector<Intersection*> *getVertices() { return vertices; }
+
     /*
      * This function should be called after all vertices are set. This will calculate the space of the block and decide
      * the number, size and position of buildings inside the block. This will erase all previous buildings, if any, and

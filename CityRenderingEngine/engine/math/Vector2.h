@@ -58,6 +58,12 @@ public:
         return sqrt((x * x) + (y * y));
     }
 
+    /* Returns the angle of this vector in degrees, with 0 being a vector pointing to positive X. */
+    float getAngle() const {
+        // I had to rewrite toDegrees function here because I can't include Common.h here due to circular dependency
+        return atan2f(y, x) * 180.0f / 3.14159265358979323846f;
+    }
+
     /* Inverts the vector. */
     void invert() {
         x = -x;

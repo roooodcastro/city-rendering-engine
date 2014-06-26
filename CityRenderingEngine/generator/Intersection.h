@@ -27,6 +27,8 @@ public:
     /* Connects this intersction to another, creating a connection and a road between them. */
     Road *connectTo(Intersection *other);
 
+    std::vector<Intersection*> *getConnections() { return connections; }
+
     /* Returns the number of Chunks that are currently using this Intersection. */
     int getNumChunksSharing() { return (int) numChunksSharing; }
 
@@ -35,6 +37,18 @@ public:
 
     /* Tells the Intersection that a Chunk that was previously using it is not using it anymore. */
     void removeChunkSharing() { numChunksSharing--; }
+
+    /*
+     * Calculates and returns the distance between two Intersection. If one or both Intersections are invalid, it will
+     * return -1.
+     */
+    static float distanceBetween(Intersection *a, Intersection *b);
+
+    /*
+     * Iterates through the list and returns the Intersection that is closest, in position, to the origin Intersection.
+     * If the list is empty it will return nullptr. It does not return the distance between the two Intersections.
+     */
+    static Intersection *getClosestIntersectionTo(Intersection *origin, std::vector<Intersection*> *list);
 
 protected:
 

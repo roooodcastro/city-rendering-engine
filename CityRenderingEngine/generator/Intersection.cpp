@@ -53,3 +53,21 @@ Road *Intersection::connectTo(Intersection *other) {
     other->roads->push_back(road);
     return road;
 }
+
+float Intersection::distanceBetween(Intersection *a, Intersection *b) {
+    return (a->getPosition() - b->getPosition()).getLength();
+}
+
+Intersection *Intersection::getClosestIntersectionTo(Intersection *origin, std::vector<Intersection*> *list) {
+    Intersection *closest = nullptr;
+    float minDistance = MAX_INT;
+    auto itEnd = list->end();
+    for (auto it = list->begin(); it != itEnd; it++) {
+        float distance = distanceBetween(origin, (*it));
+        if (distance < minDistance) {
+            minDistance = distance;
+            closest = (*it);
+        }
+    }
+    return closest;
+}

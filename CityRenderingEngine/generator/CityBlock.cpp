@@ -2,6 +2,10 @@
 
 CityBlock::CityBlock(void) : Entity() {
     vertices = new std::vector<Intersection*>();
+    model = Model::getOrCreate("cube", "resources/meshes/cube.obj", false);
+    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+        "resources/shaders/fragLight.glsl", false);
+    this->scale = Vector3(50, 50, 50);
 }
 
 CityBlock::~CityBlock(void) {
@@ -28,8 +32,9 @@ void CityBlock::update(float millisElapsed) {
 }
 
 void CityBlock::addVertice(Intersection *intersection) {
-    this->vertices->emplace_back(intersection);
+    this->vertices->push_back(intersection);
     this->position = getCentralPosition();
+    this->posChanged = true;
 }
 
 void CityBlock::generateBuildings() {

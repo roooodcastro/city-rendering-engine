@@ -53,7 +53,6 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
                     // Check if the new Intersection is too close to any Intersection on the neighbours
                     for (auto it = neighbourChunks.begin(); it != neighbourChunks.end(); it++) {
                         Intersection *closest = (*it)->getClosestIntersectionTo(newInter);
-                        //(*it)->getClosestIntersectionsTo(newInter, 10);
                         if (closest != nullptr) {
                             float distance = (newInter->getWorldPosition() - closest->getWorldPosition()).getLength();
                             if (distance < minDistanceIntersections) {
@@ -64,20 +63,12 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
                         }
                     }
                     if (neighbourSubstitute != nullptr) {
-                        //std::cout << "Substituted " << newInter->getPosition() << " with " << neighbourSubstitute->getPosition() << " at " << newInter->getWorldPosition() << std::endl;
                         chunk->removeIntersection(newInter);
                         delete newInter;
                         newInter = neighbourSubstitute;
                         chunk->addIntersection(newInter);
                     }
-                    //std::cout << "Intersection " << newInter->getWorldPosition() << std::endl;
                     gridLayout.generateRoads(chunk, newInter);
-                    // Get 10 closest intersections to newIntPos    O(n)
-                    // Create roads between newIntPos and these 10  O(10)
-                    // Check which of those cross each other and existing roads, remove them    O(10*log10)
-                    // Check which of those cross other intersections, remove them              O(10*10)
-                    // Apply a random factor to the remaining roads, so some may not be added   O(10)
-                    // Add the ones that manage to get to the end
                 }
             }
         }
@@ -86,6 +77,26 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
     /*
      * Generate City Blocks
      */
+
+    auto itEnd = chunk->getIntersections()->end();
+    for (auto it = chunk->getIntersections()->begin(); it != itEnd; it++) {
+        gridLayout.generateCityBlock(chunk, (*it));
+    }
+
+    // Use convex hull algorithm called Gift wrapping to find the city blocks given N intersections.
+    // This won't work for non-convex city blocks
+    // Use the grid layout to get a preferred angle for the build of the city block. If rectangular city blocks
+    // are expected, the angle should be 90 degrees. If triangular city blocks are expected, the angle should be less
+    // than 60, and if polygon-like, big city blocks are expected, the angle should be greater than 90 degrees.
+    // When including a new intersection on the city block, make a triangle with the new,the last intersection and the
+    // first one added, and check if another intersection is within this triangle. If it is, use it instead of the
+    // chosen one.
+
+
+    // Iterate through the intersections, performing a breadth-first tree search running along the roads to do a loop
+    // and find the smalest path going out and back to the starting intersection, using at least three intersections.
+
+    // Verify that the city block generated doesn't already exist and doesn't overlap other city blocks.
 
     //std::cout << "Chunk " << position << " generated" << std::endl;
 

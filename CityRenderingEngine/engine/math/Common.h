@@ -17,6 +17,8 @@
 #include <sstream>
 #include "Vector2.h"
 
+static const int MAX_INT = 2147483647;
+
 //It's pi(ish)...
 static const float PI = 3.14159265358979323846f;	
 
@@ -91,4 +93,14 @@ static float distancePointToLineSeg(Vector2 lineA, Vector2 lineB, Vector2 point)
     else if (t > 1.0f) return (lineB - point).getLength();  // Beyond the 'w' end of the segment
     const Vector2 projection = lineA + (line * t);  // Projection falls on the segment
     return (projection - point).getLength();
+}
+
+/* Checks if a point is inside a triangle defined by the vertices a, b and c. */
+static bool isPointInTriangle(const Vector2 &point, const Vector2 &a, const Vector2 &b, const Vector2 &c) {
+    float A = 1/2 * (-b.y * c.x + a.y * (-b.x + c.x) + a.x * (b.y - c.y) + b.x * c.y);
+    float sign = A < 0 ? -1.0f : 1.0f;
+    float s = (a.y * c.x - a.x * c.y + (c.y - a.y) * point.x + (a.x - c.x) * point.y) * sign;
+    float t = (a.x * b.y - a.y * b.x + (a.y - b.y) * point.x + (b.x - a.x) * point.y) * sign;
+    
+    return s > 0 && t > 0 && (s + t) < 2 * A * sign;
 }

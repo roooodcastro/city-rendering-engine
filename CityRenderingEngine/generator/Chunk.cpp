@@ -111,7 +111,7 @@ void Chunk::addRoad(Road *road) {
 
 void Chunk::addCityBlock(CityBlock *cityBlock) {
     cityBlocks->push_back(cityBlock);
-    addChild(cityBlock);
+    //addChild(cityBlock);
 }
 
 Intersection *Chunk::getClosestIntersectionTo(Intersection *intersection) {

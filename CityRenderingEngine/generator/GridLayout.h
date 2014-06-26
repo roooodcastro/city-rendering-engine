@@ -35,6 +35,13 @@ public:
      */
     virtual void generateRoads(Chunk *chunk, Intersection *newIntersection) = 0;
 
+    /*
+     * Generates a new CityBlock using a variation of the Gift-wrapping algorithm. The start Intersection is the start
+     * point of the algorithm. It will use the cityBlockAngle to determine the best next Intersection to add to the
+     * CityBlock. Once the algorithm reaches the start point again, the City Block is created and added to the Chunk.
+     */
+    virtual void generateCityBlock(Chunk *chunk, Intersection *start);
+
     /* The unique identifier of this type of GridLayout. To be defined by inherited classes. */
     const int GRID_LAYOUT_ID;
 };
