@@ -57,8 +57,9 @@ void Model::draw() {
     if (!loaded) load(); // If it's not yet loaded, try to load it
     if (loaded) { // Check it again in case there's a proble loading the Model
         glBindVertexArray(vao);
-        if (material != nullptr && material->getTexture()) {
-            if (!material->getTexture()->isLoaded()) material->getTexture()->load();
+        if (material != nullptr && material->getTexture() != nullptr) {
+            if (!material->getTexture()->isLoaded())
+                material->getTexture()->load();
             if (material->getTexture()->isTextureValid()) {
                 GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
                 material->getTexture()->bindTexture(program, TEXTURE0);
@@ -199,6 +200,11 @@ void Model::bufferData() {
 
 void Model::load() {
     if (!loaded) {
+        if (fileName == "") {
+            // It's not a Model from a file, so let's just buffer its data
+            bufferData();
+            return;
+        }
         std::vector<std::string> lines = FileIO::readTextFile(fileName);
         std::vector<Material*> materials;
 
@@ -418,14 +424,15 @@ Model *Model::getOrCreate(std::string name, std::vector<Vector3> vertices, Colou
         m->vertexes = new Vector3[m->numVertices];
         m->uv_maps = new Vector2[m->numVertices];
         m->name = name;
-        Material *material = new Material();
+        m->material = new Material();
 
         for (int i = 0; i < m->numVertices; i++) {
             m->vertexes[i] = Vector3(vertices.at(i));
             m->uv_maps[i] = Vector2(vertices.at(i).x, vertices.at(i).z).normalised();
         }
         m->generateNormals();
-        m->bufferData();
+        if (preLoad)
+            m->bufferData();
         ResourcesManager::addResource(m, preLoad);
         return m;
     }

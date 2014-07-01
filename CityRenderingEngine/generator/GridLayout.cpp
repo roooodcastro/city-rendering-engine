@@ -5,13 +5,13 @@ GridLayout::GridLayout(const int layoutId, const Vector2 &posMin, const Vector2 
     this->posMax = posMax;
 }
 
-void GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
+CityBlock *GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
     std::vector<Intersection*> vertices = std::vector<Intersection*>();
     Intersection *current = start;
     Intersection *last = nullptr;
     int numTries = 0; // A limiter to avoid infinite loop
     do {
-        if (numTries > 10) return;
+        if (numTries > 10) return nullptr;
         std::vector<Intersection*> *connections = current->getConnections();
         Intersection *bestAlternative = nullptr;
         if (last == nullptr) {
@@ -69,7 +69,7 @@ void GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
             vertices.push_back(bestAlternative);
             last = current;
             current = bestAlternative;
-        } else return; // If we can't find the next vertex, it means there's no possible CityBlock to be found
+        } else return nullptr; // If we can't find the next vertex, it means there's no possible CityBlock to be found
         numTries++;
     } while (current != start);
     if (current == start) { // Checks if the CityBlock is continuous
@@ -79,6 +79,9 @@ void GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
                 cityBlock->addVertice((*it));
             }
             chunk->addCityBlock(cityBlock);
+            return cityBlock;
         }
     }
+    // If the CityBlock can't be created, just return null
+    return nullptr;
 }

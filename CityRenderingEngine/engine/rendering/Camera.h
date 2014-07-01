@@ -27,6 +27,7 @@ public:
     void setChanged(bool changed) { this->changed = changed; }
     Vector3 getPosition() const { return position; }
     Vector3 getRotation() const { return rotation; }
+    Matrix4 getCameraMatrix() const { return cameraMatrix; }
     bool hasChanged() { return changed; }
 
     /* Moves the camera in world space by amount. */
@@ -34,10 +35,13 @@ public:
     /* Rotates the camera in world space by amount on each axis. */
     void rotateCamera(const Vector3 &amount) { this->rotation += amount; changed = true; }
 
-    /* Builds and returns the ViewMatrix for the camera. */
+    /* Builds and returns the ViewMatrix for the camera. This also sets cameraMatrix to the calculated value. */
     Matrix4 buildViewMatrix();
 
 protected:
+
+    /* A copy of the CameraMatrix. */
+    Matrix4 cameraMatrix;
 
     /* The camera's position in world space. Defaults to (0, 0, 0). */
     Vector3 position;

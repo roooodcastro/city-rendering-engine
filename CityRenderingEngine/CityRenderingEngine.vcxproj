@@ -148,6 +148,7 @@
     <ClCompile Include="engine\input\FileIO.cpp" />
     <ClCompile Include="engine\input\Keyboard.cpp" />
     <ClCompile Include="engine\input\Mouse.cpp" />
+    <ClCompile Include="engine\math\Triangulation.cpp" />
     <ClCompile Include="engine\Profiler.cpp" />
     <ClCompile Include="engine\ProfilingTimer.cpp" />
     <ClCompile Include="engine\rendering\Camera.cpp" />
@@ -197,6 +198,8 @@
     <ClInclude Include="engine\input\FileIO.h" />
     <ClInclude Include="engine\input\Keyboard.h" />
     <ClInclude Include="engine\input\Mouse.h" />
+    <ClInclude Include="engine\math\Geom.h" />
+    <ClInclude Include="engine\math\Triangulation.h" />
     <ClInclude Include="engine\Profiler.h" />
     <ClInclude Include="engine\ProfilingTimer.h" />
     <ClInclude Include="engine\rendering\Camera.h" />

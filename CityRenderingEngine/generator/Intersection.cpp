@@ -60,7 +60,7 @@ float Intersection::distanceBetween(Intersection *a, Intersection *b) {
 
 Intersection *Intersection::getClosestIntersectionTo(Intersection *origin, std::vector<Intersection*> *list) {
     Intersection *closest = nullptr;
-    float minDistance = MAX_INT;
+    float minDistance = (float) MAX_INT;
     auto itEnd = list->end();
     for (auto it = list->begin(); it != itEnd; it++) {
         float distance = distanceBetween(origin, (*it));

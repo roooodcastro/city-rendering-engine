@@ -93,6 +93,7 @@ public:
     //std::vector<Light*> *getLightSources() { return lightSources; }
     void setCamera(Camera &camera) { *(this->camera) = camera; camera.setChanged(true); }
     Camera *getCamera() const { return camera; }
+    Frustum *getFrustum() const { return frustum; }
 
     /* Checks if the entity with the provided name has been added to this level */
     bool isEntityInScene(std::string name);

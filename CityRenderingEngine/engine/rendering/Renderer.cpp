@@ -63,6 +63,7 @@ Renderer::Renderer(void) {
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
 
     // We initialize the primitive meshes that will be used by the interface
     Model::initializePrimitiveMeshes();
@@ -75,9 +76,10 @@ void Renderer::render(Scene *scene, float millisElapsed) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LEQUAL);
+    //glEnable(GL_CULL_FACE);
+    //glDisable(GL_CULL_FACE);
     // Draw current scene
     if (scene != nullptr)
         scene->render(this, millisElapsed);
@@ -90,7 +92,9 @@ bool Renderer::useShader(Shader *shader) {
     if (currentShader == nullptr || currentShader->getShaderProgram() != shader->getShaderProgram()) {
         glUseProgram(shader->getShaderProgram());
         this->currentShader = shader;
-        return (glIsProgram(shader->getShaderProgram()) == GL_TRUE);
+        // TODO: Check if this affects performance
+        //return (glIsProgram(shader->getShaderProgram()) == GL_TRUE);
+        return true;
     }
     return currentShader != nullptr;
 }

@@ -75,12 +75,15 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
     }
 
     /*
-     * Generate City Blocks
+     * Generate City Blocks and Buildings
      */
 
     auto itEnd = chunk->getIntersections()->end();
     for (auto it = chunk->getIntersections()->begin(); it != itEnd; it++) {
-        gridLayout.generateCityBlock(chunk, (*it));
+        CityBlock *cityBlock = gridLayout.generateCityBlock(chunk, (*it));
+        if (cityBlock != nullptr) {
+            cityBlock->generateBuildings();
+        }
     }
 
     // Use convex hull algorithm called Gift wrapping to find the city blocks given N intersections.

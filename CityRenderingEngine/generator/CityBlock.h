@@ -15,6 +15,7 @@
 #include "Intersection.h"
 #include "Building.h"
 #include "../engine/Entity.h"
+#include "../engine/math/Geom.h"
 
 class Building;
 
@@ -45,6 +46,19 @@ public:
 
 protected:
 
+    /*
+     * This function will take a polygon made of Vector2s and split it recursively until it reaches a perimeter smaller
+     * than the set value for the type of this CityBlock. When it reaches this size, it'll create an empty Building and
+     * add it to the final building list, only if the final lot has direct contato with the sides of the CityBlock, ie.
+     * with the street. To split a lot, it takes the longest side of the delimitating polygon and traces a line that is
+     * perpendicular to it. The lot is divided using this line and the process continues recursively, until the correct
+     * size is reached.
+     */
+    std::vector<Building*> splitLots(std::vector<Vector2> &lotPolygon);
+
     /* The Intersections that are "vertices" to this CityBlock. A CityBlock must have at least 3 vertices. */
     std::vector<Intersection*> *vertices;
+
+    /* The maximum perimiter that a single Building lot can occupy. This depends on the type of this CityBlock. */
+    float maximumPerimeterPerBuilding;
 };

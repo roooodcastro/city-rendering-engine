@@ -46,9 +46,6 @@ void CityScene::update(float millisElapsed) {
             if ((distance - Chunk::CHUNK_SIZE) < chunkViewDistance) {
                 // Chunk should be loaded, so we load/generate it if it's not already loaded or being loaded
                 if (!city->isChunkLoaded(chunkPos)) {
-                    if (chunkPos == Vector2(2000, -4000)) {
-                        int a = 1;
-                    }
                     city->loadChunk(chunkPos);
                 }
             }

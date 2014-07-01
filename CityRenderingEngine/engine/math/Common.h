@@ -17,7 +17,11 @@
 #include <sstream>
 #include "Vector2.h"
 
+/* Maximum value that a int type can have. */
 static const int MAX_INT = 2147483647;
+
+/* Error tolerance for float type values. */
+static const float EPS = 0.0000000001f;
 
 //It's pi(ish)...
 static const float PI = 3.14159265358979323846f;	

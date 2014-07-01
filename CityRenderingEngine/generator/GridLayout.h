@@ -40,7 +40,7 @@ public:
      * point of the algorithm. It will use the cityBlockAngle to determine the best next Intersection to add to the
      * CityBlock. Once the algorithm reaches the start point again, the City Block is created and added to the Chunk.
      */
-    virtual void generateCityBlock(Chunk *chunk, Intersection *start);
+    virtual CityBlock *generateCityBlock(Chunk *chunk, Intersection *start);
 
     /* The unique identifier of this type of GridLayout. To be defined by inherited classes. */
     const int GRID_LAYOUT_ID;

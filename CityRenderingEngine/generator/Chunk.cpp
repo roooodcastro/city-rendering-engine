@@ -4,7 +4,7 @@ Chunk::Chunk(void) : Entity(), Resource() {
     this->intersections = new std::vector<Intersection*>();
     this->roads = new std::vector<Road*>();
     this->cityBlocks = new std::vector<CityBlock*>();
-    this->setRenderRadius(Chunk::CHUNK_SIZE * 1.42f);
+    this->setRenderRadius((Chunk::CHUNK_SIZE * 1.42f) / 2.0f);
     this->city = nullptr;
 }
 
@@ -13,7 +13,7 @@ Chunk::Chunk(const Vector2 &position, City *city) : Entity(), Resource() {
     this->intersections = new std::vector<Intersection*>();
     this->roads = new std::vector<Road*>();
     this->cityBlocks = new std::vector<CityBlock*>();
-    this->setRenderRadius(Chunk::CHUNK_SIZE * 1.42f);
+    this->setRenderRadius((Chunk::CHUNK_SIZE * 1.42f) / 2.0f);
     this->city = city;
 }
 
@@ -36,6 +36,17 @@ Chunk::~Chunk(void) {
     city = nullptr;
 }
 
+void Chunk::calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz, bool pDiff, bool rDiff, bool sDiff) {
+    // A Chunk won't be rendered itself, so it does not need a modelMatrix
+    // We only need to update its children's modelMatrix
+    if (numChildEntities > 0) {
+        for(auto it = childEntities->begin(); it != childEntities->end(); it++) {
+            // We also don't pass any derived transform values, as all children will have world coordinate transforms
+            (*it)->calculateModelMatrix(Vector3(), Vector3(), Vector3(1, 1, 1), false, false, false);
+        }
+    }
+}
+
 void Chunk::update(float millisElapsed) {
     calculateModelMatrix(Vector3(), Vector3(), Vector3(1, 1, 1), false, false, false);
     // Update the distanceToCamera if that's changed
@@ -44,74 +55,46 @@ void Chunk::update(float millisElapsed) {
         Vector3 dir = position - camera->getPosition();
         distanceToCamera = Vector3::dot(dir, dir);
     }
-    // Update the Intersection, Roads and CityBlocks
-    auto interItBeg = intersections->begin();
-    auto interItEnd = intersections->end();
-    auto roadsItBeg = roads->begin();
-    auto roadsItEnd = roads->end();
-    auto blockItBeg = cityBlocks->begin();
-    auto blockItEnd = cityBlocks->end();
 
-    // Renders the City Blocks
-    for (auto it = blockItBeg; it != blockItEnd; it++) {
-        (*it)->update(millisElapsed);
-    }
-
-    // Renders the Intersections
-    for (auto it = interItBeg; it != interItEnd; it++) {
-        (*it)->update(millisElapsed);
-    }
-
-    // Renders the Roads
-    for (auto it = roadsItBeg; it != roadsItEnd; it++) {
-        (*it)->update(millisElapsed);
+    if (numChildEntities > 0) {
+        for (std::vector<Entity*>::iterator it = childEntities->begin(); it != childEntities->end(); it++) {
+            (*it)->update(millisElapsed);
+        }
     }
 }
 
 void Chunk::draw(float millisElapsed) {
-    auto interItBeg = intersections->begin();
-    auto interItEnd = intersections->end();
-    auto roadsItBeg = roads->begin();
-    auto roadsItEnd = roads->end();
-    auto blockItBeg = cityBlocks->begin();
-    auto blockItEnd = cityBlocks->end();
-
-    // Renders the City Blocks
-    for (auto it = blockItBeg; it != blockItEnd; it++) {
-        (*it)->draw(millisElapsed);
-    }
-
-    // Renders the Intersections
-    for (auto it = interItBeg; it != interItEnd; it++) {
-        (*it)->draw(millisElapsed);
-    }
-
-    // Renders the Roads
-    for (auto it = roadsItBeg; it != roadsItEnd; it++) {
-        (*it)->draw(millisElapsed);
+    if (numChildEntities > 0) {
+        Frustum *frustum = Naquadah::getInstance()->getCurrentScene()->getFrustum();
+        for (auto it = childEntities->begin(); it != childEntities->end(); ++it) {
+            if (frustum->isEntityInside(*it)) {
+                (*it)->draw(millisElapsed);
+            }
+        }
     }
 }
 
 void Chunk::addIntersection(Intersection *intersection) {
     intersections->push_back(intersection);
     intersection->addChunkSharing();
-    //addChild(intersection);
+    addChild(intersection);
 }
 
 void Chunk::removeIntersection(Intersection *intersection) {
     auto itEnd = intersections->end();
     intersections->erase(std::remove(intersections->begin(), itEnd, intersection), itEnd);
     intersection->removeChunkSharing();
-    //removeChild(intersection);
+    removeChild(intersection);
 }
 
 void Chunk::addRoad(Road *road) {
     roads->push_back(road);
+    addChild(road);
 }
 
 void Chunk::addCityBlock(CityBlock *cityBlock) {
     cityBlocks->push_back(cityBlock);
-    //addChild(cityBlock);
+    addChild(cityBlock);
 }
 
 Intersection *Chunk::getClosestIntersectionTo(Intersection *intersection) {

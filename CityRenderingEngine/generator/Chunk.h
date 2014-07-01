@@ -42,6 +42,17 @@ public:
     Chunk(const Vector2 &position, City *city);
     virtual ~Chunk(void);
 
+    /*
+     * Here we get the entity's attributes and calculate the final model matrix. If the entity has children, it will
+     * update its child's matrices as well. The three parameter Vector3 are the offset of the Transform, and should be
+     * set to make children position, rotate and scale relative to their parents and grandparents. If the Entity don't
+     * have any parent, these vectors should be passed at their neutral values. The bool parameters indicate if their
+     * correspondent offset Vector3 has changed since the last frame. If they changed, the modelMatrix will have to be
+     * updated even if this Entity's Transform didn't change.
+     */
+    virtual void calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz,
+        bool pDiff, bool rDiff, bool sDiff);
+
     virtual void update(float millisElapsed);
     virtual void draw(float millisElapsed);
 
@@ -117,6 +128,11 @@ public:
         std::stringstream name;
         name << "CHUNK_" << position.x << "-" << position.z;
         return name.str();
+    }
+
+    /* Calculates and returns the world position of this entity. */
+    virtual Vector3 getWorldPosition() {
+        return Vector3();
     }
 
 protected:

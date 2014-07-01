@@ -216,6 +216,9 @@
     <ClCompile Include="generator\CityScene.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="engine\math\Triangulation.cpp">
+      <Filter>Source Files\engine\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Vector2.h">
@@ -373,6 +376,12 @@
     </ClInclude>
     <ClInclude Include="generator\CityScene.h">
       <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Geom.h">
+      <Filter>Header Files\engine\math</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\math\Triangulation.h">
+      <Filter>Header Files\engine\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

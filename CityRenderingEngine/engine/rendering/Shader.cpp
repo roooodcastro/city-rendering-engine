@@ -171,7 +171,7 @@ void Shader::removeShaderParameter(std::string parameterName) {
 }
 
 ShaderParameter *Shader::getShaderParameter(std::string parameterName) {
-    for (int i = 0; i << shaderParameters->size(); i++) {
+    for (int i = 0; i < shaderParameters->size(); i++) {
         if (shaderParameters->at(i)->parameterName == parameterName) {
             return shaderParameters->at(i);
         }

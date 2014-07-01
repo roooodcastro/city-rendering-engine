@@ -7,7 +7,7 @@ Scene::Scene() {
     transparentEntities = new std::vector<Entity*>();
     transparentEntities->reserve(25000);
     //setProjectionMatrix(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
-    projectionMatrix = new Matrix4(Matrix4::Perspective(-1.0f, 100.0f, 1280.0f/720.0f, 45.0f));
+    projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280.0f/720.0f, 45.0f));
     cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     camera = new Camera();
     //lightSources = new std::vector<Light*>();
@@ -271,25 +271,19 @@ void Scene::update(float millisElapsed) {
     float cosTheta = cosf((float) toRadians(camera->getRotation().y));
     Vector3 movement = Vector3();
     if (Keyboard::isKeyPressed(SDLK_w)) {
-        movement -= Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
-    }
-    if (Keyboard::isKeyPressed(SDLK_s)) {
         movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
     }
-    if (Keyboard::isKeyPressed(SDLK_a)) {
-        movement += Vector3(-cosTheta, 0, -sinTheta);
+    if (Keyboard::isKeyPressed(SDLK_s)) {
+        movement -= Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
     }
-    if (Keyboard::isKeyPressed(SDLK_d)) {
+    if (Keyboard::isKeyPressed(SDLK_a)) {
         movement += Vector3(cosTheta, 0, sinTheta);
     }
-    if (movement.getLength() > 0.00001f) {
-        camera->moveCamera(movement * speed);
+    if (Keyboard::isKeyPressed(SDLK_d)) {
+        movement += Vector3(-cosTheta, 0, -sinTheta);
     }
-
-    // Recalculate camera
-    if (camera && camera->hasChanged()) {
-        *cameraMatrix = camera->buildViewMatrix();
-        frustum->updateMatrix(*projectionMatrix * *cameraMatrix);
+    if (movement.getLength() > EPS) {
+        camera->moveCamera(movement * speed);
     }
 
     unsigned numEntities = (unsigned) entities->size();
@@ -300,7 +294,10 @@ void Scene::update(float millisElapsed) {
         it->second->update(millisElapsed);
     }
 
-    // We only set this to false here because the Entities use it to recalculate their distanceToCamera
+    // Recalculate camera
+    if (camera && camera->hasChanged()) {
+        camera->buildViewMatrix();
+    }
     camera->setChanged(false);
 
     unlockUpdateMutex();
@@ -309,6 +306,10 @@ void Scene::update(float millisElapsed) {
 
 void Scene::render(Renderer *renderer, float millisElapsed) {
     lockRenderMutex();
+    // Apply camera's changes since last frame and update the view frustum
+    *cameraMatrix = camera->getCameraMatrix();
+    frustum->updateMatrix(*projectionMatrix * *cameraMatrix);
+
     bool updatedCameraMatrix = false;
     if (renderer->getCurrentShader() != nullptr && renderer->getCurrentShader()->isLoaded()) {
         renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
@@ -428,10 +429,11 @@ void Scene::unlockRenderMutex() {
 
 void Scene::useShader(Shader *shader) {
     if (shader != nullptr) {
-        if (!shader->isLoaded()) shader->load(); // If it's not loaded yet, load it.
+        if (!shader->isLoaded())
+            shader->load(); // If it's not loaded yet, load it.
         if (shader->isLoaded()) { // Check this again just on case there's a problem loading the Shader
             Renderer *renderer = Naquadah::getRenderer();
-            if (*shader != *(renderer->getCurrentShader())) {
+            if (shader != renderer->getCurrentShader()) {
                 renderer->useShader(shader);
                 renderer->updateShaderMatrix("projMatrix", projectionMatrix);
                 renderer->updateShaderMatrix("viewMatrix", cameraMatrix);

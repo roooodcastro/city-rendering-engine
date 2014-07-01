@@ -213,31 +213,9 @@ void Entity::draw(float millisElapsed) {
         Naquadah::getRenderer()->updateShaderMatrix("modelMatrix", modelMatrix);
         model->draw();
     }
-    if (numChildEntities > 0 && false) {
-        for (auto it = childEntities->begin(); it != childEntities->end(); ++it) {
+    if (numChildEntities > 0) {
+        for (auto it = childEntities->begin(); it != childEntities->end(); it++) {
             (*it)->draw(millisElapsed);
-        }
-    }
-
-    // If debug mode enabled, draw the collision spheres to track their position and check if collisions are correct
-    bool debug = false;
-    if (debug) {
-        //GLuint program = GameApp::getInstance()->getDefaultShader()->getShaderProgram();
-        Model *sphere = (Model*) Model::getOrCreate("SPHERE_MESH", "resources/models/sphere.mdl", true);
-        if (sphere != NULL) {
-            //std::vector<CollisionBody*> *colBodies = physicalBody->getCollisionBodies();
-            //for (unsigned i = 0; i < min(colBodies->size(), 2); i++) {
-            //	CollisionBody *colBody = (*colBodies)[i];
-            //	if (colBody->getType() == BodyType::SPHERE) {
-            //		Vector3 calcPos = Vector3(*(colBody->getAbsolutePosition()));
-            //		Vector3 calcSiz = Vector3(colBody->getRadius(), colBody->getRadius(), colBody->getRadius());
-
-            //		// Now that we calculated the final attributes, build the matrix
-            //		Matrix4 colModelMatrix = Matrix4::Translation(calcPos) * Matrix4::Scale(calcSiz);
-            //		glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) &colModelMatrix);
-            //		sphere->draw();
-            //	}
-            //}
         }
     }
 }
