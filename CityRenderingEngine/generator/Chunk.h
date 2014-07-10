@@ -65,6 +65,9 @@ public:
     /* Unloads this chunk from memory. */
     virtual void unload();
 
+    /* Unloads OpenGL resources and references. This function MUST ONLY be called from the render thread. */
+    virtual void unloadOpenGL();
+
     std::vector<Intersection*> *getIntersections() const { return intersections; }
     std::vector<CityBlock*> *getCityBlocks() const { return cityBlocks; }
     std::vector<Road*> *getRoads() const { return roads; }
@@ -81,8 +84,11 @@ public:
     /* Adds a new CityBlock to this Chunk. */
     void addCityBlock(CityBlock *cityBlock);
     
+    /* Removes a CityBlock from this Chunk. */
+    void removeCityBlock(CityBlock *cityBlock);
+
     /* Returns the closest Intersection to the intersection provided. */
-    Intersection *getClosestIntersectionTo(Intersection *intersection);
+    Intersection *getClosestIntersectionTo(const Vector3 &position);
 
     /* Returns the closest Intersections to the intersection provided. */
     std::vector<Intersection*> getClosestIntersectionsTo(Intersection *intersection, int number);
@@ -109,6 +115,12 @@ public:
         return this->getCentrePos() - Vector2(offset, offset);
     }
 
+    /* Indicates if OpenGL resources have already been safely released by the render main thread. */
+    bool isSafeToDelete() { return safeToDelete; }
+
+    /* Sets the bool that indicates if the OpenGL resources were safely released. */
+    void setSafeToDelete(bool safeToDelete) { this->safeToDelete = safeToDelete; }
+
     /* Checks if the Chunk exists as a file. Returns true if ti exists, and false if it needs to be generated. */
     static bool chunkExists(const Vector2 &position);
 
@@ -131,9 +143,9 @@ public:
     }
 
     /* Calculates and returns the world position of this entity. */
-    virtual Vector3 getWorldPosition() {
-        return Vector3();
-    }
+    //virtual Vector3 getWorldPosition() {
+        //return Vector3();
+    //}
 
 protected:
 
@@ -148,4 +160,7 @@ protected:
 
     /* The City in which this Chunk is loaded. */
     City *city;
+
+    /* Indicates if OpenGL resources have already been safely released by the render main thread. Defaults to false. */
+    bool safeToDelete;
 };

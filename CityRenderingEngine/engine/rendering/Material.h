@@ -32,7 +32,7 @@ public:
 
     Material(void);
     Material(const Material &copy);
-    Material(std::string name, float shininess, Colour diffuse, Colour ambient, Colour specular, Texture *texture);
+    Material(int name, float shininess, Colour diffuse, Colour ambient, Colour specular, Texture *texture);
     ~Material(void);
 
     /*
@@ -48,10 +48,10 @@ public:
      * Loads one or more materials from a .mtl file. It returns a vector of materials because a single material file
      * can define more than one material.
      */
-    static std::vector<Material*> loadMaterialsFromFile(const char *filename);
+    static std::vector<Material*> loadMaterialsFromFile(const std::string &filename);
 
     /* Checks if a .mtl file defines a material with the name specified. */
-    static bool fileHasMaterial(const char *filename, const char *materialName);
+    static bool fileHasMaterial(const std::string &filename, const std::string &materialName);
 
     /* General getters and setters */
     void setDiffuse(Colour &diffuse) { this->diffuse = diffuse; }
@@ -60,8 +60,12 @@ public:
     Colour getAmbient() { return ambient; }
     void setSpecular(Colour &specular) { this->specular = specular; }
     Colour getSpecular() { return specular; }
-    void setTexture(Texture *texture) { this->texture = texture; }
+    void setMaterialName(const std::string &materialName) { this->materialName = materialName; }
+    std::string getMaterialName() { return materialName; }
+
+    void setTexture(Texture *texture);
     Texture *getTexture() { return texture; }
+
     void setAlpha(float alpha) { this->alpha = alpha; }
     float getAlpha() { return alpha; }
     void setNs(float ns) { this->ns = ns; }
@@ -76,6 +80,7 @@ public:
 protected:
 
     std::string filename; // File name of this material
+    std::string materialName; // Name of this material
     float alpha; // Transparency of this material
     float ns; // Weight of the specular light (the bigger the shinier)
     float ni; // Optical Density (Index of Refraction)

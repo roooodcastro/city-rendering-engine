@@ -8,6 +8,7 @@
 #pragma once
 
 #include "City.h"
+#include "ChunkLoader.h"
 #include "../engine/Scene.h"
 
 class CityScene : public Scene {
@@ -41,6 +42,9 @@ public:
 
     /* Updates the Scene logic. */
     virtual void update(float millisElapsed);
+
+    /* Renders all the Scene objects and the interface. Renderer is the active renderer on the engine. */
+    virtual void render(Renderer *renderer, float millisElapsed);
 
     /* Renders all the Scene objects and the interface. Renderer is the active renderer on the engine. */
     //virtual void render(Renderer *renderer, float millisElapsed);

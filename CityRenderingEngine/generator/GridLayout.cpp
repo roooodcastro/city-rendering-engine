@@ -12,7 +12,7 @@ CityBlock *GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
     int numTries = 0; // A limiter to avoid infinite loop
     do {
         if (numTries > 10) return nullptr;
-        std::vector<Intersection*> *connections = current->getConnections();
+        std::vector<Road*> *connections = current->getConnections();
         Intersection *bestAlternative = nullptr;
         if (last == nullptr) {
             // If we don't have a reference to the last vertex added, add the one closest to the positive X-axis line.
@@ -20,26 +20,29 @@ CityBlock *GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
             int bestAngle = MAX_INT;
             for (auto it = connections->begin(); it != connections->end(); it++) {
                 // Calculate angle between the connection and the current Intersection
-                angle = abs((int) ((*it)->getPosition() - current->getPosition()).toVec2(Vector3(0, 1, 0)).getAngle());
+                Intersection *intersection = (*it)->getOtherEnd(current);
+                Vector3 posDiff = (intersection->getPosition() - current->getPosition());
+                angle = abs((int) posDiff.toVec2(Vector3(0, 1, 0)).getAngle());
                 if (angle < bestAngle) {
                     // If we have a better Intersection to choose, choose it.
                     // A better Intersection is the one that was the smallest angle
                     bestAngle = angle;
-                    bestAlternative = (*it);
+                    bestAlternative = intersection;
                 }
             }
         } else {
             // If we do have a last vertex, add the one that's in the most clockwise position
             for (auto it = connections->begin(); it != connections->end(); it++) {
+                Intersection *intersection = (*it)->getOtherEnd(current);
                 Vector3 a = current->getPosition() - last->getPosition();
-                Vector3 b = (*it)->getPosition() - current->getPosition();
+                Vector3 b = intersection->getPosition() - current->getPosition();
                 a.y = a.z;
                 b.y = b.z;
                 a.z = 0;
                 b.z = 0;
                 Vector3 c = Vector3::cross(a, b);
                 if (c.z < 0) {
-                    bestAlternative = (*it);
+                    bestAlternative = intersection;
                 }
             }
         }

@@ -1,9 +1,9 @@
 #include "Shader.h"
 
-Shader::Shader(std::string shaderName, std::string vertexFilename, std::string fragmentFilename) : 
-    Resource(shaderName) {
-    this->vertexFilename = vertexFilename;
-    this->fragmentFilename = fragmentFilename;
+Shader::Shader(int name, const std::string &vertexFilename, const std::string &fragmentFilename) : 
+    Resource(name) {
+    this->vertexFilename = std::string(vertexFilename);
+    this->fragmentFilename = std::string(fragmentFilename);
     this->geometryFilename = "";
     this->tessCtrlFilename = "";
     this->tessEvalFilename = "";
@@ -11,6 +11,9 @@ Shader::Shader(std::string shaderName, std::string vertexFilename, std::string f
 }
 
 Shader::~Shader(void) {
+    for (auto it = shaderParameters->begin(); it != shaderParameters->end(); it++) {
+        delete (*it);
+    }
     shaderParameters->clear();
     delete shaderParameters;
     shaderParameters = nullptr;
@@ -36,9 +39,10 @@ void Shader::load() {
         }
         setDefaultAttributes();
         if (linkProgram(program))
-            loaded = true;
+            valid = true;
     } else
-        loaded = false;
+        valid = false;
+    loaded = true;
 }
 
 void Shader::unload() {
@@ -47,6 +51,7 @@ void Shader::unload() {
     //glDeleteShader(vertexShader);
     glDeleteProgram(program);
     loaded = false;
+    valid = false;
 }
 
 /*
@@ -180,7 +185,8 @@ ShaderParameter *Shader::getShaderParameter(std::string parameterName) {
 }
 
 
-Shader *Shader::getOrCreate(std::string name, std::string vertexFilename, std::string fragFilename, bool preLoad) {
+Shader *Shader::getOrCreate(int name, const std::string &vertexFilename, const std::string &fragFilename,
+    bool preLoad) {
     if (ResourcesManager::resourceExists(name)) {
         return (Shader*) ResourcesManager::getResource(name);
     } else {

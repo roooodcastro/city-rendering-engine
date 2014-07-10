@@ -27,7 +27,8 @@ public:
     /* Connects this intersction to another, creating a connection and a road between them. */
     Road *connectTo(Intersection *other);
 
-    std::vector<Intersection*> *getConnections() { return connections; }
+    std::vector<Road*> *getConnections() { return roads; }
+    //std::vector<Intersection*> *getConnections() { return connections; }
 
     /* Returns the number of Chunks that are currently using this Intersection. */
     int getNumChunksSharing() { return (int) numChunksSharing; }
@@ -50,9 +51,14 @@ public:
      */
     static Intersection *getClosestIntersectionTo(Intersection *origin, std::vector<Intersection*> *list);
 
+    /* Calculates and returns the world position of this entity. */
+    virtual Vector3 getWorldPosition() {
+        return Vector3(position);
+    }
+
 protected:
 
-    std::vector<Intersection*> *connections;
+    //std::vector<Intersection*> *connections;
     std::vector<Road*> *roads;
 
     /* Indicates the number of Chunks that currently have this Intersection within. Defaults to zero. */

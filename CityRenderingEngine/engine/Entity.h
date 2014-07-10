@@ -19,6 +19,7 @@
 #include <vector>
 #include "math/Vector3.h"
 #include "math/Matrix4.h"
+#include "ResourceNames.h"
 #include "rendering/Model.h"
 #include "rendering/Shader.h"
 #include "Naquadah.h"
@@ -64,20 +65,22 @@ public:
     virtual void onKeyUp(SDL_Keysym key); // Will fire every time a key is released
 
     /* General getters and setters */
-    Entity *getParent() { return parent; }
+    void setModel(Model *model);
     void setShader(Shader *shader) { this->shader = shader; }
-    Shader *getShader() { return shader; }
-    Matrix4 getModelMatrix() { return *modelMatrix; }
-    void setModel(Model *model) { this->model = model; }
     Model *getModel() { return model; }
+    Shader *getShader() { return shader; }
+    Entity *getParent() { return parent; }
+    Matrix4 getModelMatrix() { return *modelMatrix; }
     void setPhysicalBody(PhysicalBody &body);
     PhysicalBody *getPhysicalBody() { return physicalBody; }
-    inline Vector3 getPosition() const { return position; }
-    inline Vector3 getRotation() const { return rotation; }
-    inline Vector3 getScale() const { return scale; }
+
     void setPosition(const Vector3 &position) { this->position = position; posChanged = true; }
     void setRotation(const Vector3 &rotation) { this->rotation = rotation; rotChanged = true; }
     void setScale(const Vector3 &scale) { this->scale = scale; scaleChanged = true; }
+    inline Vector3 getPosition() const { return position; }
+    inline Vector3 getRotation() const { return rotation; }
+    inline Vector3 getScale() const { return scale; }
+
     void setIsTranslucent(bool translucent) { this->translucent = translucent; }
     bool isTranslucent() { return translucent; }
     void setRenderRadius(float renderRadius) { this->renderRadius = renderRadius; }

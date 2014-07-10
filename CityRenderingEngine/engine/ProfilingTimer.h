@@ -50,6 +50,9 @@ public:
     /* Gets the current timestamp, relative to the start of this cycle. */
     double getTime();
 
+    /* Returns the amount of time that was measured since the last reset. */
+    float getMeasuredTime() { return measurementTime; }
+
     /* Returns the average duration of the last numCyclesToAverage cycles. */
     float getAverageTime() { return cycleTimeAverage; }
 

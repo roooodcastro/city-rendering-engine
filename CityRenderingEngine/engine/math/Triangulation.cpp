@@ -64,6 +64,7 @@ bool Triangulation::triangulate(const std::vector<Vector2> &polygon, std::vector
         /* If we loop, it is probably a non-simple polygon */
         if (0 >= (count--)) {
             /* Triangulate: ERROR - probable bad polygon! */
+            delete[] vertexIndices;
             return false;
         }
 
@@ -98,6 +99,6 @@ bool Triangulation::triangulate(const std::vector<Vector2> &polygon, std::vector
             count = 2 * nv;
         }
     }
-    delete vertexIndices;
+    delete[] vertexIndices;
     return true;
 }

@@ -23,7 +23,7 @@ void CityScene::update(float millisElapsed) {
     Scene::update(millisElapsed);
     lockUpdateMutex();
 
-    // Distance that new chunks should be loaded
+    // TODO: Move distance that new chunks should be loaded to config
     float chunkViewDistance = 3000.0f;
 
     // Use current camera position to calculate which Chunks must be loaded or unloaded.
@@ -38,19 +38,28 @@ void CityScene::update(float millisElapsed) {
 
     // Load Chunks that are inside the ChunkViewArea
     Vector2 cameraPos2f = Vector2(cameraPos.x, cameraPos.z);
-    for (int x = (int) chunkMin.x; x < (int) chunkMax.x; x += 1000) {
-        for (int y = (int) chunkMin.y; y < (int) chunkMax.y; y += 1000) {
+    Vector2 chunkPosToBeLoaded = Vector2((float) MAX_INT, (float) MAX_INT);
+    float minDistance = (float) MAX_INT;
+    for (int x = (int) chunkMin.x; x < (int) chunkMax.x; x += Chunk::CHUNK_SIZE) {
+        for (int y = (int) chunkMin.y; y < (int) chunkMax.y; y += Chunk::CHUNK_SIZE) {
             Vector2 chunkCentre = Vector2((float) x, (float) y);
-            Vector2 chunkPos = Vector2((float) x - 500.0f, (float) y - 500.0f); // Take it back from the centre of the Chunk
+            Vector2 chunkPos = Vector2((float) x - (Chunk::CHUNK_SIZE / 2.0f), (float) y - (Chunk::CHUNK_SIZE / 2.0f));
             float distance = (cameraPos2f - chunkCentre).getLength();
             if ((distance - Chunk::CHUNK_SIZE) < chunkViewDistance) {
                 // Chunk should be loaded, so we load/generate it if it's not already loaded or being loaded
                 if (!city->isChunkLoaded(chunkPos)) {
-                    city->loadChunk(chunkPos);
+                    if (distance <= minDistance) {
+                        // Prioritize the Chunks that are closer to the player
+                        // TODO: Prioritize the Chunks that are close and in front of the player
+                        chunkPosToBeLoaded = chunkPos;
+                        minDistance = distance;
+                    }
                 }
             }
         }
     }
+    if (abs(chunkPosToBeLoaded.x - (float) MAX_INT) > EPS)
+        ChunkLoader::getInstance()->loadChunk(chunkPosToBeLoaded, city);
 
     // Unload Chunks that are outside the ChunkViewArea
     float toleranceMultiplier = 1.5f;
@@ -69,11 +78,32 @@ void CityScene::update(float millisElapsed) {
             toBeUnloaded = *it;
         }
     }
-    if (toBeUnloaded != nullptr) city->unloadChunk(toBeUnloaded);
+    if (toBeUnloaded != nullptr) {
+        ChunkLoader::getInstance()->unloadChunk(toBeUnloaded, city);
+    }
     city->unlockMutex();
-
-
     unlockUpdateMutex();
+}
+
+void CityScene::render(Renderer *renderer, float millisElapsed) {
+    Scene::render(renderer, millisElapsed);
+
+    // Check if there's a Chunk waiting for the OpenGL stuff be unloaded
+    //Profiler::getTimer(4)->startMeasurement();
+    bool unloaded = false;
+    ChunkOperation chunkOp = ChunkLoader::getInstance()->getFirstInTheQueue();
+    if (chunkOp.city != nullptr && !chunkOp.load) {
+        Chunk *chunk = chunkOp.city->getChunkAt(chunkOp.chunkPos, false);
+        if (chunk != nullptr && !chunk->isSafeToDelete()) {
+            //chunk->unloadOpenGL();
+            chunk->setSafeToDelete(true);
+            unloaded = true;
+        }
+    }
+    //Profiler::getTimer(4)->finishMeasurement();
+    //Profiler::getTimer(4)->resetCycle();
+    //if (unloaded)
+        //std::cout << chunkOp.chunkPos << " unloaded in " << Profiler::getTimer(4)->getAverageTime() << "ms" << std::endl;
 }
 
 void CityScene::addEntity(Entity *entity, std::string name) {

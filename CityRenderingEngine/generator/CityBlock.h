@@ -34,6 +34,15 @@ public:
 
     std::vector<Intersection*> *getVertices() { return vertices; }
 
+    /* Returns the number of Chunks that are currently using this CityBlock. */
+    int getNumChunksSharing() { return (int) numChunksSharing; }
+
+    /* Tells the CityBlock that another Chunks is now using it. */
+    void addChunkSharing() { numChunksSharing++; }
+
+    /* Tells the CityBlock that a Chunk that was previously using it is not using it anymore. */
+    void removeChunkSharing() { numChunksSharing--; }
+
     /*
      * This function should be called after all vertices are set. This will calculate the space of the block and decide
      * the number, size and position of buildings inside the block. This will erase all previous buildings, if any, and
@@ -41,8 +50,16 @@ public:
      */
     void generateBuildings();
 
+    /* Unloads OpenGL resources and references. This function MUST ONLY be called from the render thread. */
+    void unloadOpenGL();
+
     /* Returns the center point of this CityBlock, calculated averaging the position of all its Intersections. */
     Vector3 getCentralPosition();
+
+    /* Calculates and returns the world position of this entity. */
+    virtual Vector3 getWorldPosition() {
+        return Vector3(position);
+    }
 
 protected:
 
@@ -61,4 +78,7 @@ protected:
 
     /* The maximum perimiter that a single Building lot can occupy. This depends on the type of this CityBlock. */
     float maximumPerimeterPerBuilding;
+
+    /* Indicates the number of Chunks that currently have this CityBlock within. Defaults to zero. */
+    char numChunksSharing;
 };

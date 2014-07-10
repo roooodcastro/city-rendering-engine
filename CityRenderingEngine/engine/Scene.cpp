@@ -264,26 +264,32 @@ void Scene::update(float millisElapsed) {
         userInterface->update(millisElapsed);
 
     // Calculate WASD movement (only debug purposes, NOT permanent)
-    float speed = 10.0f;
+    float speed = 1.0f;
     float sinPhi = sinf((float) toRadians(camera->getRotation().x));
     float cosPhi = cosf((float) toRadians(camera->getRotation().x));
     float sinTheta = sinf((float) toRadians(camera->getRotation().y));
     float cosTheta = cosf((float) toRadians(camera->getRotation().y));
     Vector3 movement = Vector3();
     if (Keyboard::isKeyPressed(SDLK_w)) {
-        movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
-    }
-    if (Keyboard::isKeyPressed(SDLK_s)) {
         movement -= Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
     }
+    if (Keyboard::isKeyPressed(SDLK_s)) {
+        movement += Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
+    }
     if (Keyboard::isKeyPressed(SDLK_a)) {
-        movement += Vector3(cosTheta, 0, sinTheta);
+        movement -= Vector3(cosTheta, 0, sinTheta);
     }
     if (Keyboard::isKeyPressed(SDLK_d)) {
-        movement += Vector3(-cosTheta, 0, -sinTheta);
+        movement -= Vector3(-cosTheta, 0, -sinTheta);
+    }
+    if (Keyboard::isKeyPressed(SDLK_q)) {
+        movement += Vector3(0, 1, 0);
+    }
+    if (Keyboard::isKeyPressed(SDLK_e)) {
+        movement += Vector3(0, -1, 0);
     }
     if (movement.getLength() > EPS) {
-        camera->moveCamera(movement * speed);
+        camera->moveCamera(movement * speed * millisElapsed);
     }
 
     unsigned numEntities = (unsigned) entities->size();
@@ -431,7 +437,7 @@ void Scene::useShader(Shader *shader) {
     if (shader != nullptr) {
         if (!shader->isLoaded())
             shader->load(); // If it's not loaded yet, load it.
-        if (shader->isLoaded()) { // Check this again just on case there's a problem loading the Shader
+        if (shader->isValid()) { // Check this again just on case there's a problem loading the Shader
             Renderer *renderer = Naquadah::getRenderer();
             if (shader != renderer->getCurrentShader()) {
                 renderer->useShader(shader);

@@ -11,6 +11,7 @@ std::vector<std::string> FileIO::readTextFile(std::string fileName) {
             lines.emplace_back(lineBuffer);
         }
     }
+    file.close();
     return lines;
 }
 
@@ -26,10 +27,7 @@ std::string FileIO::mergeLines(std::vector<std::string> lines, char delimiter) {
 }
 
 bool FileIO::fileExists(const std::string &filePath) {
-    if (FILE *file = fopen(filePath.c_str(), "r")) {
-        fclose(file);
-        return true;
-    } else {
-        return false;
-    }   
+    std::ifstream file;
+    file.open(filePath);
+    return file.is_open();
 }

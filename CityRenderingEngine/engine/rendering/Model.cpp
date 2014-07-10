@@ -1,7 +1,7 @@
 ﻿#include "Model.h"
 
-const char *Model::meshTriangleName = "MESH_TRI";
-const char *Model::meshQuadName = "MESH_QUAD";
+const int Model::meshTriangleName = 100;
+const int Model::meshQuadName = 101;
 
 Model::Model(void) : Resource() {
     vertexes = nullptr;
@@ -18,7 +18,7 @@ Model::Model(void) : Resource() {
     }
 }
 
-Model::Model(std::string fileName, std::string name) : Resource(name) {
+Model::Model(std::string fileName, int name) : Resource(name) {
     vertexes = nullptr;
     uv_maps = nullptr;
     normals = nullptr;
@@ -40,8 +40,8 @@ Model::Model(const Model &copy) : Resource(copy) {
     indexes = copy.indexes;
     numVertices = copy.numVertices;
     numIndexes = copy.numIndexes;
-    material = new Material(*(copy.material));
-    shader = new Shader(*(copy.shader));
+    material = copy.material;
+    shader = copy.shader;
     fileName = copy.fileName;
     for (int i = 0; i < MAX_BUFFER; i++) {
         this->bufferObjects[i] = copy.bufferObjects[i];
@@ -51,16 +51,19 @@ Model::Model(const Model &copy) : Resource(copy) {
 Model::~Model(void) {
     material = nullptr;
     shader = nullptr;
+    loaded = false;
+    valid = false;
+    numVertices = -1;
 }
 
 void Model::draw() {
     if (!loaded) load(); // If it's not yet loaded, try to load it
-    if (loaded) { // Check it again in case there's a proble loading the Model
+    if (loaded && valid) { // Check it again in case there's a proble loading the Model
         glBindVertexArray(vao);
         if (material != nullptr && material->getTexture() != nullptr) {
             if (!material->getTexture()->isLoaded())
                 material->getTexture()->load();
-            if (material->getTexture()->isTextureValid()) {
+            if (material->getTexture()->isValid()) {
                 GLuint program = Naquadah::getRenderer()->getCurrentShader()->getShaderProgram();
                 material->getTexture()->bindTexture(program, TEXTURE0);
             }
@@ -94,7 +97,9 @@ Model *Model::generateTriangle() {
     m->indexes[1] = 1;
     m->indexes[2] = 2;
 
-    m->material = new Material("MAT_TRIANGLE", 1.0f, Colour::WHITE, Colour::WHITE, Colour::WHITE, nullptr);
+    m->material = new Material(MATERIAL_BASIC, 1.0f, Colour::WHITE, Colour::WHITE, Colour::WHITE, nullptr);
+    ResourcesManager::addResource(m->material, true);
+    m->material->addUser();
 
     m->generateNormals();
     m->bufferData();
@@ -126,7 +131,9 @@ Model* Model::generateQuad() {
     m->uv_maps[2] = Vector2(1.0f, 1.0f);
     m->uv_maps[3] = Vector2(0, 1.0f);
 
-    m->material = new Material("MAT_QUAD", 1.0f, Colour::WHITE, Colour::WHITE, Colour::WHITE, nullptr);
+    m->material = new Material(MATERIAL_BASIC, 1.0f, Colour::WHITE, Colour::WHITE, Colour::WHITE, nullptr);
+    ResourcesManager::addResource(m->material, true);
+    m->material->addUser();
 
     m->generateNormals();
     m->bufferData();
@@ -134,7 +141,7 @@ Model* Model::generateQuad() {
 }
 
 void Model::generateNormals() {
-    if (normals == NULL) {
+    if (normals == nullptr) {
     	normals = new Vector3[numVertices];
     }
     for (int i = 0; i < numVertices; i += 3) {
@@ -195,6 +202,7 @@ void Model::bufferData() {
 
         // Only set the resource as loaded once it has actually been loaded to the GPU
         loaded = true;
+        valid = true;
     }
 }
 
@@ -205,8 +213,16 @@ void Model::load() {
             bufferData();
             return;
         }
+        return;
         std::vector<std::string> lines = FileIO::readTextFile(fileName);
         std::vector<Material*> materials;
+
+        if (lines.size() < 2) {
+            // We probably couldn't load the file, or the file is invalid.
+            loaded = true;
+            valid = false;
+            return;
+        }
 
         // To store the vertexes, uvmaps and normals.
         std::vector<Vector3> vecVertices;
@@ -263,28 +279,7 @@ void Model::load() {
                  */
                 int viX, viY, viZ, niX, niY, niZ, tiX, tiY, tiZ;
 
-                if (count(line.begin(), line.end(), ' ') == 4) {
-                    //// It's a quadrilateral face
-                    //if (line.find("//") != std::string::npos) {
-                    //    // If there's a normal vector index
-                    //    sscanf(line.c_str(),"f %d//%d %d//%d %d//%d %d//%d", &viX ,&niX, &viY, &niY, &viZ, &niZ, &viW, &niW);
-                    //    vecFaces.emplace_back(new Face(viX, viY, viZ, viW, 0, 0, 0, 0, niX, niY, niZ, niW, *currentMaterial));
-                    //} else if (line.find("/") != std::string::npos) {
-                    //    if (count(line.begin(), line.end(), '/') == 8) {
-                    //        // If there's both texture coordinates and normal vector
-                    //        sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &viX, &tiX, &niX, &viY, &tiY, &niY, &viZ, &tiZ, &niZ, &viW, &tiW, &niW);
-                    //        vecFaces.emplace_back(new Face(viX, viY, viZ, viW, tiX, tiY, tiZ, tiW, niX, niY, niZ, niW, *currentMaterial));
-                    //    } else {
-                    //        // If there's texture coordinate indexes
-                    //        sscanf(line.c_str(), "f %d/%d %d/%d %d/%d %d/%d", &viX, &tiX, &viY, &tiY, &viZ, &tiZ, &viW, &tiW);
-                    //        vecFaces.emplace_back(new Face(viX, viY, viZ, viW, tiX, tiY, tiZ, tiW, 0, 0, 0, 0, *currentMaterial));
-                    //    }
-                    //} else {
-                    //    // If we just have vertices, no normals or texture coordinates
-                    //    sscanf(line.c_str(), "f %d %d %d %d", &viX, &viY, &viZ, &viW);
-                    //    vecFaces.emplace_back(new Face(viX, viY, viZ, viW, 0, 0, 0, 0, 0, 0, 0, 0, *currentMaterial));
-                    //}
-                } else {
+                if (count(line.begin(), line.end(), ' ') == 3) {
                     // It's a triangle face
                     if (line.find("//") != std::string::npos) {
                         // If it's a face with vertexes and normals
@@ -324,7 +319,7 @@ void Model::load() {
                     char matName[200];
                     sscanf(line.c_str(), "%*s %s", matName);
                     for (unsigned i = 0; i < materials.size(); i++) {
-                        if (((std::string) matName).compare(materials.at(i)->getName()) == 0) {
+                        if (std::string(matName).compare(materials.at(i)->getMaterialName()) == 0) {
                             // If we find the material in the materials list, use it instead of the current one
                             material = materials.at(i);
                         }
@@ -337,8 +332,8 @@ void Model::load() {
                     char matFileName[200];
                     sscanf(line.c_str(), "%*s %s", matFileName);
                     // TODO: change the call below to use the model's path, not this hardcoded path
-                    std::string matFileString = "resources/meshes/" + ((std::string) matFileName);
-                    std::vector<Material*> newMaterials = Material::loadMaterialsFromFile(matFileString.c_str());
+                    std::string matFileString = "resources/meshes/" + std::string(matFileName);
+                    std::vector<Material*> newMaterials = Material::loadMaterialsFromFile(matFileString);
                     materials.insert(materials.end(), newMaterials.begin(), newMaterials.end());
                 }
             }
@@ -348,7 +343,7 @@ void Model::load() {
         numVertices = (int) vecCorrectVertices.size();
         int numUvMaps = (int) vecCorrectUvMaps.size();
         int numNormals = (int) vecCorrectNormals.size();
-        
+
         this->vertexes = new Vector3[numVertices];
         this->uv_maps = new Vector2[numVertices];
         this->normals = new Vector3[numVertices];
@@ -360,32 +355,51 @@ void Model::load() {
                 normals[i] = Vector3(vecCorrectNormals.at(i));
         }
 
-        this->bufferData();
+        if (numVertices < 1) {
+            // If we don't have at least a point, this is an invalid model.
+            valid = false;
+        } else {
+            this->bufferData();
+        }
 
         // Now we discard all the materials that were loaded but we won't use.
         for (unsigned i = 0; i < materials.size(); i++) {
             if (materials.at(i) != this->material) {
-                materials.at(i)->unload();
-                delete materials.at(i);
+                ResourcesManager::releaseResource(materials.at(i)->getName());
             }
         }
+        if (this->material != nullptr)
+            this->material->addUser();
     }
+    loaded = true;
 }
 
 void Model::unload() {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(MAX_BUFFER, bufferObjects);
-    delete[] vertexes;
-    delete[] uv_maps;
-    delete[] normals;
-    delete[] indexes;
-    vertexes = nullptr;
-    uv_maps = nullptr;
-    normals = nullptr;
-    indexes = nullptr;
-    loaded = false;
-    shader = nullptr;
-    material = nullptr;
+    if (loaded && glIsVertexArray(vao) == GL_TRUE) {
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(MAX_BUFFER, bufferObjects);
+        loaded = false;
+        vao = 0;
+    }
+    if (vertexes != nullptr) {
+        if (material != nullptr) {
+            ResourcesManager::releaseResource(material->getName());
+            material = nullptr;
+        }
+        if (shader != nullptr) {
+            ResourcesManager::releaseResource(shader->getName());
+            shader = nullptr;
+        }
+        delete[] vertexes; // Not really deleting and freeing the memory?!
+        delete[] uv_maps;
+        delete[] normals;
+        delete[] indexes;
+        vertexes = nullptr;
+        uv_maps = nullptr;
+        normals = nullptr;
+        indexes = nullptr;
+        valid = false;
+    }
 }
 
 void Model::initializePrimitiveMeshes() {
@@ -403,7 +417,7 @@ Model *Model::getQuadMesh() {
     return (Model*) ResourcesManager::getResource(Model::meshQuadName);
 }
 
-Model *Model::getOrCreate(const char *name, const char *fileName, bool preLoad) {
+Model *Model::getOrCreate(int name, const std::string &fileName, bool preLoad) {
     if (ResourcesManager::resourceExists(name)) {
         return (Model*) ResourcesManager::getResource(name);
     } else {
@@ -413,32 +427,43 @@ Model *Model::getOrCreate(const char *name, const char *fileName, bool preLoad) 
     }
 }
 
-Model *Model::getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture,
-    bool preLoad) {
-    if (ResourcesManager::resourceExists(name)) {
-        return (Model*) ResourcesManager::getResource(name);
+Model *Model::getOrCreate(int name, const std::vector<Vector3> &vertices, const std::vector<Vector2> &uv_maps,
+    const Colour &colour, Texture *texture, bool preLoad) {
+    Model *m = (Model*) ResourcesManager::getResource(name);
+    if (m != nullptr) {
+        return m;
     } else {
-        Model *m = new Model();
-
+        m = new Model();
         m->numVertices = (int) vertices.size();
         m->vertexes = new Vector3[m->numVertices];
         m->uv_maps = new Vector2[m->numVertices];
         m->name = name;
-        m->material = new Material();
+        Material *material = new Material(ResourcesManager::generateNextName(), 1.0f, colour, colour, colour, texture);
+        ResourcesManager::addResource(material, true);
+        m->setMaterial(material);
 
         for (int i = 0; i < m->numVertices; i++) {
-            m->vertexes[i] = Vector3(vertices.at(i));
-            m->uv_maps[i] = Vector2(vertices.at(i).x, vertices.at(i).z).normalised();
+            m->vertexes[i] = vertices.at(i);
+            m->uv_maps[i] = uv_maps.at(i);
         }
         m->generateNormals();
-        if (preLoad)
-            m->bufferData();
         ResourcesManager::addResource(m, preLoad);
         return m;
     }
 }
 
 void Model::setTexture(Texture *texture) {
-    if (material != nullptr)
+    if (material != nullptr) {
         material->setTexture(texture);
+    }
+}
+
+void Model::setMaterial(Material *material) {
+    if (this->material != nullptr && this->material != material) {
+        ResourcesManager::releaseResource(this->material->getName());
+    }
+    this->material = material;
+    if (this->material != nullptr) {
+        this->material->addUser();
+    }
 }

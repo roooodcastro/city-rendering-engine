@@ -6,6 +6,7 @@ CityBlock::CityBlock(void) : Entity() {
     //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
         //"resources/shaders/fragLight.glsl", false);
     this->maximumPerimeterPerBuilding = 250.0f;
+    this->numChunksSharing = 0;
 }
 
 CityBlock::~CityBlock(void) {
@@ -37,10 +38,20 @@ void CityBlock::addVertice(Intersection *intersection) {
     this->posChanged = true;
 }
 
+void CityBlock::unloadOpenGL() {
+    auto itEnd = childEntities->end();
+    for (auto it = childEntities->begin(); it != itEnd; it++) {
+        Model *model = (*it)->getModel();
+        if (model != nullptr && model->getNumUsers() <= 1) {
+            model->unload();
+        }
+    }
+}
+
 void CityBlock::generateBuildings() {
     // First we define the CityBlock's RenderRadius. This is the best place to do this as all the vertices (should) be
     // added already.
-    Vector2 minPos = Vector2(MAX_INT, MAX_INT);
+    Vector2 minPos = Vector2((float) MAX_INT, (float) MAX_INT);
     Vector2 maxPos = Vector2();
 
     // TODO: Move the roadWidth and pavementWidth to Road.h, and make them relative to the road type and size

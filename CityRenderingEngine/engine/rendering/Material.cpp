@@ -9,6 +9,7 @@ Material::Material(void) : Resource() {
     ns = 1.0f;
     ni = 0;
     illum = 0;
+    materialName = "";
 }
 
 Material::Material(const Material &copy) : Resource(copy) {
@@ -20,18 +21,21 @@ Material::Material(const Material &copy) : Resource(copy) {
     this->ns = copy.ns;
     this->ni = copy.ni;
     this->illum = copy.illum;
+    this->materialName = copy.materialName;
 }
 
-Material::Material(std::string name, float shininess, Colour diffuse, Colour ambient, Colour specular,
+Material::Material(int name, float shininess, Colour diffuse, Colour ambient, Colour specular,
     Texture *texture) : Resource(name) {
     this->diffuse = diffuse;
     this->ambient = ambient;
     this->specular = specular;
-    this->texture = texture;
+    this->texture = nullptr;
+    this->setTexture(texture);
     this->alpha = diffuse.alpha;
     this->ns = shininess;
     this->ni = 0;
     this->illum = 0;
+    this->materialName = "";
 }
 
 Material::~Material(void) {
@@ -41,8 +45,7 @@ Material::~Material(void) {
 void Material::unload() {
     // The only thing to unload is basically the texture, so we just remove it from the resources manager.
     if (texture != nullptr) {
-        ResourcesManager::removeResource(texture->getName());
-        delete texture;
+        ResourcesManager::releaseResource(texture->getName());
         texture = nullptr;
     }
 }
@@ -60,7 +63,17 @@ Material &Material::operator=(const Material &other) {
     return *this;
 }
 
-std::vector<Material*> Material::loadMaterialsFromFile(const char *filename) {
+void Material::setTexture(Texture *texture) {
+    if (this->texture != nullptr && this->texture != texture) {
+        ResourcesManager::releaseResource(texture->getName());
+    }
+    this->texture = texture;
+    if (this->texture != nullptr) {
+        this->texture->addUser();
+    }
+}
+
+std::vector<Material*> Material::loadMaterialsFromFile(const std::string &filename) {
     std::vector<std::string> lines = FileIO::readTextFile(filename);
     std::vector<Material*> materials = std::vector<Material*>();
     if (lines.size() > 0) {
@@ -86,7 +99,7 @@ std::vector<Material*> Material::loadMaterialsFromFile(const char *filename) {
                     materials.emplace_back(currentMaterial);
                 }
                 currentMaterial = new Material();
-                currentMaterial->name = nameC;
+                currentMaterial->materialName = std::string(nameC);
                 break;
             case 'N':
                 // Sets the Ni or Ns of the current material
@@ -133,8 +146,9 @@ std::vector<Material*> Material::loadMaterialsFromFile(const char *filename) {
                 if (currentMaterial != nullptr) {
                     char texFilename[150];
                     sscanf(line.c_str(), "map_Kd %s", &texFilename);
-                    std::string texName = "Texture" + std::string(currentMaterial->name);
-                    currentMaterial->texture = Texture::getOrCreate(texName.c_str(), texFilename, false);
+                    // TODO: think of a way to store the int name and associate it with the 6 textures in runtime
+                    currentMaterial->setTexture(Texture::getOrCreate(ResourcesManager::generateNextName(),
+                        std::string(texFilename), false));
                 }
                 break;
             }
@@ -142,13 +156,14 @@ std::vector<Material*> Material::loadMaterialsFromFile(const char *filename) {
         if (currentMaterial != nullptr) {
             // Adds the last material to the vector
             currentMaterial->loaded = true;
+            currentMaterial->valid = true;
             materials.emplace_back(currentMaterial);
         }
     }
     return materials;
 }
 
-bool Material::fileHasMaterial(const char *filename, const char *materialName) {
+bool Material::fileHasMaterial(const std::string &filename, const std::string &materialName) {
     std::vector<std::string> lines = FileIO::readTextFile(filename);
     if (lines.size() == 0) {
         return false; // Material file couldn't be opened
@@ -163,9 +178,9 @@ bool Material::fileHasMaterial(const char *filename, const char *materialName) {
         char firstChar = line[0];
 
         if (firstChar == 'n') {
-            char name[100];
+            char name[256];
             sscanf(line.c_str(),"%*s %s", &name);
-            hasMaterial = std::string(name).compare(std::string(materialName)) == 0;
+            hasMaterial = std::string(name).compare(materialName) == 0;
             if (hasMaterial) return true; // If material is found, no need to finish reading the file
         }
     }

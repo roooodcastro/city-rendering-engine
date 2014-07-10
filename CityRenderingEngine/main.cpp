@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
     scene->setLightSource(new Light(Colour(1.0f, 1.0f, 0.9f, 1.0f), Vector3(0, 50, 0), Vector3(0.2f, -0.5f, 0.1f), 0.95f, 0, LIGHT_DIRECTIONAL));
     //scene->getCamera()->setPosition(Vector3(1000, -600, 1000));
-    scene->getCamera()->setPosition(Vector3(0, -600, 0));
+    scene->getCamera()->setPosition(Vector3(0, 600, 0));
     //scene->getCamera()->setRotation(Vector3(15, 135, 0));
     //scene->getCamera()->setRotation(Vector3(180, 0, 0));
 
@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
     Profiler::addProfilingTimer(entityMatrixTimer);
     Profiler::addProfilingTimer(entityLoopTimer);
     Profiler::addProfilingTimer(creationTimer);
+    Profiler::addProfilingTimer(new ProfilingTimer(4, 1));
     Profiler::startProfiler();
 
     //Chunk *chunk = ChunkGenerator::generateChunk(Vector2(0, 0));

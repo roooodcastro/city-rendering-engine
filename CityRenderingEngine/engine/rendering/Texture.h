@@ -17,8 +17,8 @@ class Texture : public Resource {
 public:
 	Texture(void);
 	Texture(const Texture &copy);
-	Texture(const char *filename, const char *name);
-	Texture(Colour &colour, const char *name);
+	Texture(const std::string &filename, int name);
+    Texture(Colour &colour, int name);
 	virtual ~Texture(void);
 
 	Texture &operator=(const Texture &other);
@@ -37,8 +37,8 @@ public:
      * or creating them if they're not present in the manager. The preLoad flag determines if the Texture should be
      * buffered to the GPU now, instead of being able to do this later.
 	 */
-	static Texture *getOrCreate(const char *name, const char *fileName, bool preLoad);
-	static Texture *getOrCreate(const char *name, Colour &colour, bool preLoad);
+	static Texture *getOrCreate(int name, const std::string &fileName, bool preLoad);
+	static Texture *getOrCreate(int name, Colour &colour, bool preLoad);
 
 	/*
 	 * Creates a text texture, which is basically a text rendered into an image. This is the only type of texture that
@@ -59,7 +59,6 @@ public:
 	GLuint getTextureId() { return textureId; }
 	int getTextureWidth() { return texWidth; }
 	int getTextureHeight() { return texHeight; }
-	bool isTextureValid() { return textureId >= 0 && textureId < 4000000 && loaded; }
 
 	void setColour(Colour &colour);
 
@@ -80,11 +79,11 @@ public:
 	static Texture *getColourRed();
 	static Texture *getColourGreen();
 	static Texture *getColourBlue();
-	static const char *texColNameWhite;
-	static const char *texColNameBlack;
-	static const char *texColNameRed;
-	static const char *texColNameGreen;
-	static const char *texColNameBlue;
+	static const int texColNameWhite;
+	static const int texColNameBlack;
+	static const int texColNameRed;
+	static const int texColNameGreen;
+	static const int texColNameBlue;
 
 protected:
 
@@ -96,7 +95,7 @@ protected:
 	int texHeight;
 
 	/* The filename to load the texture from */
-	const char *fileName;
+	std::string fileName;
 	/* Or the colour, if it's a colour texture */
 	Colour *colour;
 

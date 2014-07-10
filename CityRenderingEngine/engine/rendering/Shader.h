@@ -32,7 +32,7 @@ public:
      * resource that will be created. Note that the actual OpenGL shaders won't be created here, but only when the
      * resource is loaded, using load().
      */
-    Shader(std::string shaderName, std::string vertexFilename, std::string fragmentFilename);
+    Shader(int name, const std::string &vertexFilename, const std::string &fragmentFilename);
     virtual ~Shader(void);
 
     /* This function should load the shader into OpenGL */
@@ -128,7 +128,8 @@ public:
      * creates and returns a new Shader. The preLoad flag determines if the Shader should be also loaded in this call,
      * if set to false it will still need to be loaded before it can be used.
      */
-    static Shader *getOrCreate(std::string name, std::string vertexFilename, std::string fragFilename, bool preLoad);
+    static Shader *getOrCreate(int name, const std::string &vertexFilename, const std::string &fragFilename,
+        bool preLoad);
 
     bool operator==(Shader &other);
     bool operator!=(Shader &other);

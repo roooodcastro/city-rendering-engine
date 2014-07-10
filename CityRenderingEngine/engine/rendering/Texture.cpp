@@ -1,17 +1,17 @@
 #include "Texture.h"
 
-const char *Texture::texColNameWhite = "TEXTURE_WHITE";
-const char *Texture::texColNameBlack = "TEXTURE_BLACK";
-const char *Texture::texColNameRed = "TEXTURE_RED";
-const char *Texture::texColNameGreen = "TEXTURE_GREEN";
-const char *Texture::texColNameBlue = "TEXTURE_BLUE";
+const int Texture::texColNameWhite = 1100;
+const int Texture::texColNameBlack = 1101;
+const int Texture::texColNameRed = 1102;
+const int Texture::texColNameGreen = 1103;
+const int Texture::texColNameBlue = 1104;
 
 Texture::Texture(void) : Resource() {
 	texWidth = -1;
 	texHeight = -1;
 	textureId = -1;
 	// By default create a white colour texture
-	fileName = NULL;
+	fileName = "";
 	colour = new Colour(0xFFFFFFFF);
 }
 
@@ -20,30 +20,25 @@ Texture::Texture(const Texture &copy) : Resource(copy) {
 	texWidth = copy.texWidth;
 	texHeight = copy.texHeight;
 	fileName = copy.fileName;
-	if (copy.colour != NULL) {
+	if (copy.colour != nullptr) {
 		colour = new Colour(*(copy.colour));
 	} else {
-		colour = NULL;
+		colour = nullptr;
 	}
 }
 
-Texture::Texture(const char *filename, const char *name) : Resource(name) {
+Texture::Texture(const std::string &filename, int name) : Resource(name) {
 	this->fileName = filename;
-	this->colour = NULL;
+	this->colour = nullptr;
 }
 
-Texture::Texture(Colour &colour, const char *name) : Resource(name) {
-	this->fileName = NULL;
+Texture::Texture(Colour &colour, int name) : Resource(name) {
+	this->fileName = "";
 	this->colour = new Colour(colour);
 }
 
 Texture::~Texture(void) {
-	if (fileName) {
-		delete fileName;
-	}
-	if (colour) {
-		delete colour;
-	}
+    delete colour;
 }
 
 Texture &Texture::operator=(const Texture &other) {
@@ -58,13 +53,15 @@ Texture &Texture::operator=(const Texture &other) {
 void Texture::load() {
 	if (!loaded) {
 		// It's a texture from an image file
-		if (fileName != NULL) {
+		if (fileName != "") {
 			SDL_Surface *surface;
 			int mode;
-			surface = IMG_Load(fileName);
+            surface = IMG_Load(fileName.c_str());
 			// Could not load file
 			if (!surface) {
 				logSDLError(std::cout, "IMAGE_LOAD");
+                loaded = true;
+                valid = false;
 				return;
 			}
 			// work out what format to tell glTexImage2D to use...
@@ -74,6 +71,8 @@ void Texture::load() {
 				mode = GL_RGBA;
 			} else { // Not a valid image
 				SDL_FreeSurface(surface);
+                loaded = true;
+                valid = false;
 				return;
 			}
 			this->texWidth = surface->w;
@@ -85,13 +84,13 @@ void Texture::load() {
 			glTexImage2D(GL_TEXTURE_2D, 0, mode, texWidth, texHeight, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
 
 			// these affect how this texture is drawn later on...
-			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			// clean up
 			SDL_FreeSurface(surface);
 			//GameApp::logOpenGLError("TEX_LOAD");
-		} else if (colour != NULL) {
+		} else if (colour != nullptr) {
 			// It's a colour texture
 			this->texWidth = 1;
 			this->texHeight = 1;
@@ -101,15 +100,15 @@ void Texture::load() {
 			Uint32 col = colour->getColour();
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, &col);
 
-			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			//GameApp::logOpenGLError("TEX_LOAD");
 		}
-
+        loaded = true;
 		if (textureId >= 0) {
-			loaded = true;
-		}
+			valid = true;
+        }
 	}
 }
 
@@ -201,17 +200,18 @@ Texture *Texture::createFromText(std::string textureText, Colour &textColour, TT
 	return texture;
 }
 
-Texture *Texture::getOrCreate(const char *name, const char *fileName, bool preLoad) {
-	if (ResourcesManager::resourceExists(name)) {
-		return (Texture*) ResourcesManager::getResource(name);
+Texture *Texture::getOrCreate(int name, const std::string &fileName, bool preLoad) {
+    Texture *texture = (Texture*) ResourcesManager::getResource(name);
+	if (texture != nullptr) {
+		return texture;
 	} else {
-		Texture *newTexture = new Texture(fileName, name);
-		ResourcesManager::addResource(newTexture, preLoad);
-		return newTexture;
+		texture = new Texture(fileName, name);
+		ResourcesManager::addResource(texture, preLoad);
+		return texture;
 	}
 }
 
-Texture *Texture::getOrCreate(const char *name, Colour &colour, bool preLoad) {
+Texture *Texture::getOrCreate(int name, Colour &colour, bool preLoad) {
 	if (ResourcesManager::resourceExists(name)) {
 		return (Texture*) ResourcesManager::getResource(name);
 	} else {

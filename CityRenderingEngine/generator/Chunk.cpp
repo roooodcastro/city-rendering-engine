@@ -2,34 +2,40 @@
 
 Chunk::Chunk(void) : Entity(), Resource() {
     this->intersections = new std::vector<Intersection*>();
+    this->intersections->reserve(100);
     this->roads = new std::vector<Road*>();
     this->cityBlocks = new std::vector<CityBlock*>();
     this->setRenderRadius((Chunk::CHUNK_SIZE * 1.42f) / 2.0f);
     this->city = nullptr;
+    this->safeToDelete = false;
+    this->childEntities->reserve(500);
 }
 
 Chunk::Chunk(const Vector2 &position, City *city) : Entity(), Resource() {
     this->position = Vector3(position.x + 500.0f, 0, position.y + 500.0f);
     this->intersections = new std::vector<Intersection*>();
+    this->intersections->reserve(100);
     this->roads = new std::vector<Road*>();
     this->cityBlocks = new std::vector<CityBlock*>();
     this->setRenderRadius((Chunk::CHUNK_SIZE * 1.42f) / 2.0f);
     this->city = city;
+    this->safeToDelete = false;
+    this->childEntities->reserve(500);
 }
 
 Chunk::~Chunk(void) {
     if (intersections != nullptr) {
-        intersections->clear();
+        //intersections->clear();
         delete intersections;
         intersections = nullptr;
     }
     if (roads != nullptr) {
-        roads->clear();
+        //roads->clear();
         delete roads;
         roads = nullptr;
     }
     if (cityBlocks != nullptr) {
-        cityBlocks->clear();
+        //cityBlocks->clear();
         delete cityBlocks;
         cityBlocks = nullptr;
     }
@@ -77,7 +83,7 @@ void Chunk::draw(float millisElapsed) {
 void Chunk::addIntersection(Intersection *intersection) {
     intersections->push_back(intersection);
     intersection->addChunkSharing();
-    addChild(intersection);
+    //addChild(intersection);
 }
 
 void Chunk::removeIntersection(Intersection *intersection) {
@@ -94,16 +100,24 @@ void Chunk::addRoad(Road *road) {
 
 void Chunk::addCityBlock(CityBlock *cityBlock) {
     cityBlocks->push_back(cityBlock);
+    cityBlock->addChunkSharing();
     addChild(cityBlock);
 }
 
-Intersection *Chunk::getClosestIntersectionTo(Intersection *intersection) {
+void Chunk::removeCityBlock(CityBlock *cityBlock) {
+    auto itEnd = cityBlocks->end();
+    cityBlocks->erase(std::remove(cityBlocks->begin(), itEnd, cityBlock), itEnd);
+    cityBlock->removeChunkSharing();
+    removeChild(cityBlock);
+}
+
+Intersection *Chunk::getClosestIntersectionTo(const Vector3 &position) {
     auto beginIt = intersections->begin();
     auto endIt = intersections->end();
     Intersection *closest = nullptr;
     float closestDistance = 999999.9f;
     for (auto it = beginIt; it != endIt; it++) {
-        float distance = (intersection->getWorldPosition() - (*it)->getWorldPosition()).getLength();
+        float distance = (position - (*it)->getWorldPosition()).getLength();
         if (distance < closestDistance) {
             closest = (*it);
             closestDistance = distance;
@@ -144,13 +158,30 @@ void Chunk::load() {
 }
 
 void Chunk::unload() {
+    // Unload the CityBlocks
+    auto itEnd = cityBlocks->end();
+    for (auto it = cityBlocks->begin(); it != itEnd; it++) {
+        removeChild(*it);
+        if ((*it)->getNumChunksSharing() <= 1) {
+            delete *it;
+        } else {
+            (*it)->removeChunkSharing();
+        }
+    }
+    cityBlocks->clear();
+
+    // Unload the Roads
     for (auto it = roads->begin(); it != roads->end(); it++) {
+        removeChild(*it);
         if ((*it)->getPointA()->getNumChunksSharing() == 1 && (*it)->getPointB()->getNumChunksSharing() == 1) {
             delete *it;
         }
     }
     roads->clear();
+
+    // Unload the Intersections
     for (auto it = intersections->begin(); it != intersections->end(); it++) {
+        removeChild(*it);
         if ((*it)->getNumChunksSharing() == 1) {
             delete *it;
         } else {
@@ -159,6 +190,15 @@ void Chunk::unload() {
     }
     intersections->clear();
     // TODO: Find and fix a small memoryleak on the chunk loading/unloading, about 4kb each 20 or so chunks
+}
+
+void Chunk::unloadOpenGL() {
+    auto itEnd = cityBlocks->end();
+    for (auto it = cityBlocks->begin(); it != itEnd; it++) {
+        if ((*it)->getNumChunksSharing() <= 1) {
+            (*it)->unloadOpenGL();
+        }
+    }
 }
 
 void Chunk::saveToFile() {
@@ -174,6 +214,7 @@ bool Chunk::chunkExists(const Vector2 &position) {
 }
 
 Chunk *Chunk::loadChunk(const Vector2 &position, City *city) {
-    Chunk *chunk = new Chunk(position, city);
-    return chunk;
+    //Chunk *chunk = new Chunk(position, city);
+    //return chunk;
+    return nullptr;
 }

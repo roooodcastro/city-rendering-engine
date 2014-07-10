@@ -40,7 +40,7 @@ class Model : public Resource {
 public:
     Model(void);
     Model(const Model &copy);
-    Model(std::string fileName, std::string name);
+    Model(std::string fileName, int name);
     virtual ~Model(void);
 
     virtual void draw();
@@ -54,7 +54,7 @@ public:
     /* Sets the texture to the Material of this Model. */
     void setTexture(Texture *texture);
 
-    void setMaterial(Material *material) { this->material = material; }
+    void setMaterial(Material *material);
 
     /*
      * Functions to create some primitive models/meshes.
@@ -73,7 +73,7 @@ public:
      * returns a new model. The bool preLoad determines if the Model should be also loaded in this call, if set to
      * false it will still need to be loaded before it can be used.
      */
-    static Model *getOrCreate(const char *name, const char *fileName, bool preLoad);
+    static Model *getOrCreate(int name, const std::string &fileName, bool preLoad);
 
     /*
      * Tries to retrieve a Model from ResourcesManager with the provided name. If there's no loaded Model with this
@@ -82,11 +82,11 @@ public:
      * for more complex 3D shapes. The bool preLoad determines if the Model should be also loaded in this call, if set
      * to false it will still need to be loaded before it can be used.
      */
-    static Model *getOrCreate(std::string name, std::vector<Vector3> vertices, Colour colour, Texture *texture,
-        bool preLoad);
+    static Model *getOrCreate(int name, const std::vector<Vector3> &vertices, const std::vector<Vector2> &uv_maps,
+        const Colour &colour, Texture *texture, bool preLoad);
 
-    static const char *meshTriangleName;
-    static const char *meshQuadName;
+    static const int meshTriangleName;
+    static const int meshQuadName;
 
 protected:
 

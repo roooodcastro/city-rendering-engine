@@ -1,8 +1,10 @@
 #include "Intersection.h"
 
-Intersection::Intersection(void) {
-    model = Model::getOrCreate("Intersection", "resources/meshes/plane.obj", false);
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+Intersection::Intersection(void) : Entity() {
+    setModel(Model::getOrCreate(MODEL_PLANE, "resources/meshes/plane.obj", false));
+    model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_INTERSECTION_1, "resources/textures/road_intersection.png",
+        false));
+    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
         "resources/shaders/fragLight.glsl", false);
     // Calculate the plane's model rotation, position and scale
     this->position = Vector3();
@@ -10,14 +12,15 @@ Intersection::Intersection(void) {
     this->scale = Vector3(10, 0, 10);
     this->setRenderRadius(15);
     this->numChunksSharing = 0;
-    connections = new std::vector<Intersection*>();
+    //connections = new std::vector<Intersection*>();
     roads = new std::vector<Road*>();
 }
 
-Intersection::Intersection(Vector3 position) {
-    model = Model::getOrCreate("Intersection", "resources/meshes/plane.obj", false);
-    model->setTexture(Texture::getOrCreate("RoadIntersection", "resources/textures/road_intersection.png", false));
-    shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
+Intersection::Intersection(Vector3 position) : Entity() {
+    setModel(Model::getOrCreate(MODEL_PLANE, "resources/meshes/plane.obj", false));
+    model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_INTERSECTION_1, "resources/textures/road_intersection.png",
+        false));
+    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
         "resources/shaders/fragLight.glsl", false);
     // Calculate the plane's model rotation, position and scale
     this->position = position;
@@ -25,16 +28,16 @@ Intersection::Intersection(Vector3 position) {
     this->scale = Vector3(10, 0, 10);
     this->setRenderRadius(15);
     this->numChunksSharing = 0;
-    connections = new std::vector<Intersection*>();
+    //connections = new std::vector<Intersection*>();
     roads = new std::vector<Road*>();
 }
 
 Intersection::~Intersection(void) {
-    if (connections != nullptr) {
+    /*if (connections != nullptr) {
         connections->clear();
         delete connections;
         connections = nullptr;
-    }
+    }*/
     if (roads != nullptr) {
         roads->clear();
         delete roads;
@@ -43,11 +46,11 @@ Intersection::~Intersection(void) {
 }
 
 Road *Intersection::connectTo(Intersection *other) {
-    for (auto it = connections->begin(); it != connections->end(); it++) {
-        if ((*it) == other) return nullptr; // Avoid duplicate connections
+    for (auto it = roads->begin(); it != roads->end(); it++) {
+        if ((*it)->getOtherEnd(this) == other) return nullptr; // Avoid duplicate connections
     }
-    this->connections->push_back(other);
-    other->connections->push_back(this);
+    //this->connections->push_back(other);
+    //other->connections->push_back(this);
     Road *road = new Road(this, other);
     this->roads->push_back(road);
     other->roads->push_back(road);

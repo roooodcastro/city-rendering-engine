@@ -10,7 +10,6 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
     if (FileIO::fileExists(Chunk::getFileName(position))) {
         return nullptr;
     }
-    Profiler::getTimer(3)->startMeasurement();
 
     /*
      * Generate Intersections and Roads
@@ -18,9 +17,8 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
 
     //TODO: Put this condition on the different grid layout generators. Each may have different limits
     int minDistanceIntersections = 50; // Minimum distance between intersections
-
     Chunk *chunk = new Chunk(position, city);
-    std::vector<Chunk*> neighbourChunks = city->getNeighbourChunks(chunk, true);
+    //std::vector<Chunk*> neighbourChunks = city->getNeighbourChunks(chunk, true);
     ManhattanGridLayout gridLayout = ManhattanGridLayout(Vector2(), Vector2());
     int numSubChunks = Chunk::CHUNK_SIZE / Chunk::SUBCHUNK_SIZE;
     float subChunkSize = (float) Chunk::SUBCHUNK_SIZE;
@@ -33,46 +31,54 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
             if (intersectionPos.x >= 0 && intersectionPos.y >= 0) {
                 // If there's an intersection in this subchunk, check if it has enough distance from the others
                 intersectionPos += position; // Convert to World Position
-                auto intersectionsBegin = chunk->getIntersections()->begin();
-                auto intersectionsEnd = chunk->getIntersections()->end();
+                //auto intersectionsBegin = chunk->getIntersections()->begin();
+                //auto intersectionsEnd = chunk->getIntersections()->end();
                 bool tooClose = false;
                 Vector3 newIntPos = Vector3(intersectionPos.x, 0, intersectionPos.y);
-                for (auto it = intersectionsBegin; it != intersectionsEnd; it++) {
+                /*for (auto it = intersectionsBegin; it != intersectionsEnd; it++) {
                     Intersection *intersection = (*it);
-                    // Chunk position for the new intersection position (0 to 1000)
+                     Chunk position for the new intersection position (0 to 1000)
                     if ((intersection->getPosition() - newIntPos).getLength() < minDistanceIntersections) {
                         tooClose = true;
                         break;
                     }
-                }
+                }*/
+                Profiler::getTimer(3)->startMeasurement();
                 if (!tooClose) {
                     // If the new intersections is sufficiently distant from all the others, proceed
-                    Intersection *newInter = new Intersection(newIntPos);
-                    chunk->addIntersection(newInter);
+                    //Intersection *newInter = new Intersection(newIntPos);
+                    //chunk->addIntersection(newInter);
                     Intersection *neighbourSubstitute = nullptr;
                     // Check if the new Intersection is too close to any Intersection on the neighbours
-                    for (auto it = neighbourChunks.begin(); it != neighbourChunks.end(); it++) {
-                        Intersection *closest = (*it)->getClosestIntersectionTo(newInter);
-                        if (closest != nullptr) {
-                            float distance = (newInter->getWorldPosition() - closest->getWorldPosition()).getLength();
-                            if (distance < minDistanceIntersections) {
-                                // The new Intersection is too close to an Intersection on an neighbour. Use the
-                                // neighbour's Intersection instead
-                                neighbourSubstitute = closest;
-                            }
-                        }
-                    }
-                    if (neighbourSubstitute != nullptr) {
-                        chunk->removeIntersection(newInter);
-                        delete newInter;
+                    //for (auto it = neighbourChunks.begin(); it != neighbourChunks.end(); it++) {
+                    //    Intersection *closest = (*it)->getClosestIntersectionTo(newIntPos);
+                    //    if (closest != nullptr) {
+                    //        float distance = (newIntPos - closest->getWorldPosition()).getLength();
+                    //        if (distance < minDistanceIntersections) {
+                    //            // The new Intersection is too close to an Intersection on an neighbour. Use the
+                    //            // neighbour's Intersection instead
+                    //            neighbourSubstitute = closest;
+                    //        }
+                    //    }
+                    //}
+                    Intersection *newInter = new Intersection(newIntPos);
+                    /*if (neighbourSubstitute != nullptr) {
                         newInter = neighbourSubstitute;
-                        chunk->addIntersection(newInter);
-                    }
-                    gridLayout.generateRoads(chunk, newInter);
+                    } else {
+                        newInter = new Intersection(newIntPos);
+                    }*/
+                    chunk->addIntersection(newInter);
+                    //gridLayout.generateRoads(chunk, newInter);
                 }
+                Profiler::getTimer(3)->finishMeasurement();
             }
         }
     }
+
+    Profiler::getTimer(3)->resetCycle();
+    std::cout << chunk->getChunkPos() << " generated in " << Profiler::getTimer(3)->getAverageTime() << "ms" << std::endl;
+
+    return chunk;
 
     /*
      * Generate City Blocks and Buildings
@@ -82,30 +88,26 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
     for (auto it = chunk->getIntersections()->begin(); it != itEnd; it++) {
         CityBlock *cityBlock = gridLayout.generateCityBlock(chunk, (*it));
         if (cityBlock != nullptr) {
-            cityBlock->generateBuildings();
+            auto itEndC = chunk->getCityBlocks()->end();
+            bool duplicate = false;
+            for (auto itC = chunk->getCityBlocks()->begin(); itC != itEndC; itC++) {
+                if ((*itC)->getCentralPosition() == cityBlock->getCentralPosition() && (*itC) != cityBlock) {
+                    duplicate = true;
+                }
+            }
+            if (!duplicate) {
+                //cityBlock->generateBuildings();
+            } else {
+                chunk->removeCityBlock(cityBlock);
+                delete cityBlock;
+            }
         }
     }
-
-    // Use convex hull algorithm called Gift wrapping to find the city blocks given N intersections.
-    // This won't work for non-convex city blocks
-    // Use the grid layout to get a preferred angle for the build of the city block. If rectangular city blocks
-    // are expected, the angle should be 90 degrees. If triangular city blocks are expected, the angle should be less
-    // than 60, and if polygon-like, big city blocks are expected, the angle should be greater than 90 degrees.
-    // When including a new intersection on the city block, make a triangle with the new,the last intersection and the
-    // first one added, and check if another intersection is within this triangle. If it is, use it instead of the
-    // chosen one.
-
-
-    // Iterate through the intersections, performing a breadth-first tree search running along the roads to do a loop
-    // and find the smalest path going out and back to the starting intersection, using at least three intersections.
-
-    // Verify that the city block generated doesn't already exist and doesn't overlap other city blocks.
-
-    //std::cout << "Chunk " << position << " generated" << std::endl;
-
     Profiler::getTimer(3)->finishMeasurement();
     Profiler::getTimer(3)->resetCycle();
     std::cout << chunk->getChunkPos() << " generated in " << Profiler::getTimer(3)->getAverageTime() << "ms" << std::endl;
+    //std::cout << ResourcesManager::getResourcesCount() << std::endl;
+
     return chunk;
 
     /* Chunk Generator Algorithm: */

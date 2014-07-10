@@ -30,15 +30,6 @@ public:
     City(void);
     ~City(void);
 
-    /* Returns an intersection at the specified position. If no intersections are found, this will return null. */
-    Intersection *getIntersectionAt(Vector3 position);
-
-    /* Returns the vector containint the Intersections. */
-    std::vector<Intersection*> *getIntersections() { return intersections; }
-
-    /* Returns the vector containing the CityBlocks. */
-    std::vector<CityBlock*> *getCityBlocks() { return cityBlocks; }
-
     /* Returns the vector containing the Chunks. */
     std::vector<Chunk*> *getChunks() { return chunks; }
 
@@ -48,27 +39,14 @@ public:
      */
     void addChunk(Chunk *chunk);
 
-    /*
-     * Unloads and removes the chunk from memory. This will remove the Chunk from the list of loaded Chunks of the
-     * city, and also unload it from memory, requiring it to be loaded again.
-     */
-    void unloadChunk(Chunk *chunk);
-
-    /*
-     * Requests that the Chunk at position chunkPos be loaded OR generated. This will delegate the task to a worker
-     * thread, which will add the new Chunk to the list, and the function isChunkLoaded() will be able to determine
-     * when the Chunk finished loading. chunkPos is a world space position, and MUST be in multiples of 1000.
-     */
-    void loadChunk(const Vector2 &chunkPos);
+    /* Removes a Chunk from the City. The Chunk should be unloaded before it's removed. */
+    void removeChunk(Chunk *chunk);
 
     /*
      * Checks if the Chunk at chunkPos is currently loaded. It doesn't check if the Chunk already exists or needs to be
      * generated.
      */
     bool isChunkLoaded(const Vector2 &chunkPos);
-
-    /* Tells the City that the chunk has finished loading. This tells the City that the next Chunk may be loaded. */
-    void flagChunkAsLoaded(Chunk *chunk);
 
     /*
      * Returns the Chunk at chunkPos. If the Chunk is not already loaded, it'll load from disk if the flag is set. If
@@ -85,26 +63,11 @@ public:
     // TODO: do the loading from disk part
     std::vector<Chunk*> getNeighbourChunks(Chunk *chunk, bool loadFromDisk);
 
-    /*
-     * Generates a City that is composed of square blocks, like NYC. The parameters width and height relate to the size
-     * of the city, in blocks. All roads and intersections are parallel.
-     */
-    static City *generateManhattanGrid(int witdh, int height);
-
     /* Locks and unlocks the mutex, to prevent errors while accessing and editting the entities map */
     void lockMutex();
     void unlockMutex();
 
 protected:
-
-    /* A vector to store the position of all the Chunks that are currently being loaded. */
-    std::vector<Vector2> chunksLoading;
-
-    // TODO: turn this into an ordered map, with the position as key, and implement binary search or similar to find.
-    std::vector<Intersection*> *intersections;
-
-    /* The CityBlocks that exist in this city. */
-    std::vector<CityBlock*> *cityBlocks;
 
     /* The loaded chunks of the city. */
     std::vector<Chunk*> *chunks;

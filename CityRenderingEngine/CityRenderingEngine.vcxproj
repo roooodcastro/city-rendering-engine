@@ -77,6 +77,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\SDL2_mixer-2.0.0\include;..\SDL2_ttf-2.0.12\include;..\SDL2-2.0.3\include;..\SDL2_image-2.0.0\include;..\glew-1.10.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\SDL2_mixer-2.0.0\lib\x64;..\SDL2_ttf-2.0.12\lib\x64;..\SDL2_image-2.0.0\lib\x64;..\glew-1.10.0\lib\Release\x64;..\SDL2-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -91,6 +93,7 @@
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>.\SDL2-2.0.3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ENTRY:"mainCRTStartup" %(AdditionalOptions)</AdditionalOptions>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,6 +110,7 @@
       <AdditionalDependencies>glew32.lib;glu32.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -123,12 +127,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -139,6 +144,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glew32.lib;glu32.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -182,6 +189,7 @@
     <ClCompile Include="generator\Building.cpp" />
     <ClCompile Include="generator\Chunk.cpp" />
     <ClCompile Include="generator\ChunkGenerator.cpp" />
+    <ClCompile Include="generator\ChunkLoader.cpp" />
     <ClCompile Include="generator\City.cpp" />
     <ClCompile Include="generator\CityBlock.cpp" />
     <ClCompile Include="generator\CityScene.cpp" />
@@ -208,6 +216,7 @@
     <ClInclude Include="engine\rendering\Plane.h" />
     <ClInclude Include="engine\rendering\Renderer.h" />
     <ClInclude Include="engine\rendering\ShaderParameter.h" />
+    <ClInclude Include="engine\ResourceNames.h" />
     <ClInclude Include="engine\Scene.h" />
     <ClInclude Include="engine\math\Common.h" />
     <ClInclude Include="engine\math\Matrix3.h" />
@@ -239,6 +248,7 @@
     <ClInclude Include="generator\Building.h" />
     <ClInclude Include="generator\Chunk.h" />
     <ClInclude Include="generator\ChunkGenerator.h" />
+    <ClInclude Include="generator\ChunkLoader.h" />
     <ClInclude Include="generator\City.h" />
     <ClInclude Include="generator\CityBlock.h" />
     <ClInclude Include="generator\CityScene.h" />

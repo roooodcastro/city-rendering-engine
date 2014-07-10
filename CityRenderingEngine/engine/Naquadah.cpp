@@ -189,7 +189,7 @@ void Naquadah::render(float millisElapsed) {
     }
     Profiler::getTimer(1)->finishMeasurement();
     Profiler::getTimer(1)->resetCycle();
-    std::cout << Profiler::getTimer(1)->getAverageTime() << std::endl;
+    //std::cout << Profiler::getTimer(1)->getAverageTime() << std::endl;
 }
 
 /* Callback function created to be called by the logic timer, and call the update logic function of Naquadah. */

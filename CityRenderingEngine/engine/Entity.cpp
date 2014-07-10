@@ -60,16 +60,27 @@ Entity::Entity(Vector3 position, Vector3 rotation, Vector3 scale) {
 }
 
 Entity::~Entity(void) {
-    if (parent != NULL) {
-        parent->removeChild(this);
+    if (parent != nullptr) {
+        //parent->removeChild(this);
     }
-    delete modelMatrix;
-    modelMatrix = nullptr;
-    delete childEntities;
-    childEntities = nullptr;
+    if (modelMatrix != nullptr) {
+        delete modelMatrix;
+        modelMatrix = nullptr;
+    }
+    if (childEntities != nullptr) {
+        auto itEnd = childEntities->end();
+        for (auto it = childEntities->begin(); it != itEnd; ++it) {
+            delete *it;
+        }
+        childEntities->clear();
+        delete childEntities;
+        childEntities = nullptr;
+    }
     shader = nullptr;
-    delete physicalBody;
-    physicalBody = nullptr;
+    if (physicalBody != nullptr) {
+        delete physicalBody;
+        physicalBody = nullptr;
+    }
 }
 
 Entity &Entity::operator=(const Entity &other) {
@@ -221,32 +232,23 @@ void Entity::draw(float millisElapsed) {
 }
 
 void Entity::addChild(Entity *child) {
-    if (child) {
-        // If we don't have space to store the entity, make some!
-        // I set this if to >= to always have an empty space in the array, just in case
-        if ((childEntities->size() + 1) >= childEntities->capacity()) {
-            childEntities->reserve(childEntities->capacity() + 5);
-        }
-        childEntities->emplace_back(child);
-        numChildEntities = (int) childEntities->size();
+    if (child != nullptr) {
+        childEntities->push_back(child);
+        numChildEntities++;
         child->parent = this;
     }
 }
 
 void Entity::removeChild(Entity *child) {
-    if (child) {
+    if (child != nullptr) {
         childEntities->erase(std::remove(childEntities->begin(), childEntities->end(), child), childEntities->end());
-        numChildEntities = (int) childEntities->size();
-        // If vector becomes too big, shrink it
-        if (childEntities->size() + 10 < childEntities->capacity()) {
-            childEntities->shrink_to_fit();
-        }
+        numChildEntities--;
         child->parent = nullptr;
     }
 }
 
 void Entity::makeOrphan() {
-    if (parent) {
+    if (parent != nullptr) {
         parent->removeChild(this);
     }
 }
@@ -262,4 +264,14 @@ std::vector<Entity*> Entity::getAllChildren(Entity *entity) {
         }
     }
     return children;
+}
+
+void Entity::setModel(Model *model) {
+    if (this->model != nullptr && this->model != model) {
+        ResourcesManager::releaseResource(this->model->getName());
+    }
+    this->model = model;
+    if (this->model != nullptr) {
+        this->model->addUser();
+    }
 }
