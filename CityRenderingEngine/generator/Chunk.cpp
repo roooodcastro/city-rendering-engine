@@ -83,7 +83,7 @@ void Chunk::draw(float millisElapsed) {
 void Chunk::addIntersection(Intersection *intersection) {
     intersections->push_back(intersection);
     intersection->addChunkSharing();
-    //addChild(intersection);
+    addChild(intersection);
 }
 
 void Chunk::removeIntersection(Intersection *intersection) {

@@ -2,12 +2,15 @@
 
 std::map<int, Resource*> *ResourcesManager::resources = nullptr;
 int ResourcesManager::nameSequence = 1000000;
+SDL_mutex *ResourcesManager::mutex = nullptr;
 
 void ResourcesManager::initialize() {
     ResourcesManager::resources = new std::map<int, Resource*>();
+    //mutex = SDL_CreateMutex();
 }
 
 void ResourcesManager::terminate() {
+    lockMutex();
     // First unload all loaded resources, then delete the map
     for (auto it = resources->begin(); it != resources->end(); it++) {
         (*it).second->unload();
@@ -15,29 +18,38 @@ void ResourcesManager::terminate() {
     }
     delete resources;
     resources = nullptr;
+    unlockMutex();
+    SDL_DestroyMutex(mutex);
 }
 
 bool ResourcesManager::addResource(Resource *resource, bool load) {
+    lockMutex();
     if (resource != nullptr && !resourceExists(resource->getName())) {
         resources->insert(std::pair<int, Resource*>(resource->getName(), resource));
         if (load) resource->load();
+        unlockMutex();
         return true;
     }
+    unlockMutex();
     return false;
 }
 
 bool ResourcesManager::removeResource(int name) {
+    lockMutex();
     if (resourceExists(name)) {
         Resource *resource = getResource(name);
         resource->unload();
         resources->erase(name);
         delete resource;
+        unlockMutex();
         return true;
     }
+    unlockMutex();
     return false;
 }
 
 bool ResourcesManager::releaseResource(int name) {
+    lockMutex();
     if (resourceExists(name)) {
         Resource *resource = getResource(name);
         resource->removeUser();
@@ -45,22 +57,31 @@ bool ResourcesManager::releaseResource(int name) {
             resource->unload();
             resources->erase(name);
             delete resource;
+            unlockMutex();
             return true;
         }
     }
+    unlockMutex();
     return false;
 }
 
 Resource* ResourcesManager::getResource(int name) {
+    lockMutex();
     if (ResourcesManager::resourceExists(name)) {
-        return resources->at(name);
+        Resource *resource = resources->at(name);
+        unlockMutex;
+        return resource;
     }
+    unlockMutex();
     return nullptr;
 }
 
 bool ResourcesManager::resourceExists(int name) {
     if (resources != nullptr && name > 0) {
-        return resources->find(name) != resources->end();
+        lockMutex();
+        bool find = resources->find(name) != resources->end();
+        unlockMutex();
+        return find;
     }
     return false;
 }

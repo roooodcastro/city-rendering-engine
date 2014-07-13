@@ -1,7 +1,7 @@
 #include "Intersection.h"
 
 Intersection::Intersection(void) : Entity() {
-    setModel(Model::getOrCreate(MODEL_PLANE, "resources/meshes/plane.obj", false));
+    setModel(Model::getOrCreate(MODEL_INTERSECTION, "resources/meshes/plane.obj", false));
     model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_INTERSECTION_1, "resources/textures/road_intersection.png",
         false));
     shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
@@ -17,7 +17,7 @@ Intersection::Intersection(void) : Entity() {
 }
 
 Intersection::Intersection(Vector3 position) : Entity() {
-    setModel(Model::getOrCreate(MODEL_PLANE, "resources/meshes/plane.obj", false));
+    setModel(Model::getOrCreate(MODEL_INTERSECTION, "resources/meshes/plane.obj", false));
     model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_INTERSECTION_1, "resources/textures/road_intersection.png",
         false));
     shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",

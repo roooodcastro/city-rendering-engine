@@ -49,22 +49,22 @@ bool City::isChunkLoaded(const Vector2 &chunkPos) {
 }
 
 Chunk *City::getChunkAt(const Vector2 &chunkPos, bool loadFromDisk) {
-    //lockMutex();
+    lockMutex();
     for (auto it = chunks->begin(); it != chunks->end(); it++) {
         if (*it) {
             Vector2 pos = (*it)->getChunkPos();
             if (pos == chunkPos) {
-                //unlockMutex();
+                unlockMutex();
                 return (*it);
             }
         }
     }
-    //unlockMutex();
+    unlockMutex();
     return nullptr;
 }
 
 std::vector<Chunk*> City::getNeighbourChunks(Chunk *chunk, bool loadFromDisk) {
-    //lockMutex();
+    lockMutex();
     std::vector<Chunk*> neighbours = std::vector<Chunk*>();
     Vector2 minPos = chunk->getChunkPos() - 1000.0f;
     Vector2 maxPos = chunk->getChunkPos() + 1000.0f;
@@ -76,14 +76,14 @@ std::vector<Chunk*> City::getNeighbourChunks(Chunk *chunk, bool loadFromDisk) {
             }
         }
     }
-    //unlockMutex();
+    unlockMutex();
     return neighbours;
 }
 
 void City::lockMutex() {
-    //SDL_mutexP(mutex);
+    SDL_mutexP(mutex);
 }
 
 void City::unlockMutex() {
-    //SDL_mutexV(mutex);
+    SDL_mutexV(mutex);
 }

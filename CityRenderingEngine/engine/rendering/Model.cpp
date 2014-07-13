@@ -213,7 +213,6 @@ void Model::load() {
             bufferData();
             return;
         }
-        return;
         std::vector<std::string> lines = FileIO::readTextFile(fileName);
         std::vector<Material*> materials;
 

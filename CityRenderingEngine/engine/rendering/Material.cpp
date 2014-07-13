@@ -9,6 +9,7 @@ Material::Material(void) : Resource() {
     ns = 1.0f;
     ni = 0;
     illum = 0;
+    filename = "";
     materialName = "";
 }
 
@@ -21,7 +22,8 @@ Material::Material(const Material &copy) : Resource(copy) {
     this->ns = copy.ns;
     this->ni = copy.ni;
     this->illum = copy.illum;
-    this->materialName = copy.materialName;
+    this->filename = std::string(copy.filename);
+    this->materialName = std::string(copy.materialName);
 }
 
 Material::Material(int name, float shininess, Colour diffuse, Colour ambient, Colour specular,
@@ -35,6 +37,7 @@ Material::Material(int name, float shininess, Colour diffuse, Colour ambient, Co
     this->ns = shininess;
     this->ni = 0;
     this->illum = 0;
+    this->filename = "";
     this->materialName = "";
 }
 
@@ -60,6 +63,8 @@ Material &Material::operator=(const Material &other) {
     this->ns = other.ns;
     this->ni = other.ni;
     this->illum = other.illum;
+    this->filename = std::string(other.filename);
+    this->materialName = std::string(other.materialName);
     return *this;
 }
 

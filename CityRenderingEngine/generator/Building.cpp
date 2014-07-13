@@ -124,10 +124,12 @@ void Building::constructGeometry() {
             std::stringstream texFileName;
             int texIndex = (int) generateRandom(1, 6);
             texFileName << "resources/textures/buildings/office_" << texIndex << ".jpg";
-            //Texture *texture = Texture::getOrCreate(texIndex + 1010, texFileName.str(), false);
+            Texture *texture = Texture::getOrCreate(texIndex + 1010, texFileName.str(), false);
 
-            //setModel(Model::getOrCreate(ResourcesManager::generateNextName(), vertices, uv_maps, Colour::WHITE,
-                //nullptr, false));
+            Model::getOrCreate(ResourcesManager::generateNextName(), vertices, uv_maps, Colour::WHITE, texture, false);
+
+            setModel(Model::getOrCreate(ResourcesManager::generateNextName(), vertices, uv_maps, Colour::WHITE,
+                texture, false));
         }
     }
 }

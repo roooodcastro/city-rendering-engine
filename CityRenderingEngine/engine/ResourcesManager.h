@@ -14,6 +14,7 @@
 #pragma once
 
 #include <map>
+#include <SDL.h>
 #include <string>
 #include "Resource.h"
 
@@ -79,6 +80,15 @@ public:
         return nameSequence++;
     }
 
+    /* Locks and unlocks the mutex, to prevent errors while accessing and editting the entities map */
+    static void lockMutex() {
+        //SDL_mutexP(mutex);
+    }
+
+    static void unlockMutex() {
+        //SDL_mutexV(mutex);
+    }
+
 protected:
 
     ResourcesManager(void) {}
@@ -89,5 +99,8 @@ protected:
 
     /* This stores the last name that was issued by the ResourcesManager. The first valid name is 1000000. */
     static int nameSequence;
+
+    /* Mutex to prevent errors caused by racing conditions, especially when loading Chunks on worker threads. */
+    static SDL_mutex *mutex;
 
 };

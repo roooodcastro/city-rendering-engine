@@ -17,6 +17,9 @@ static const int MODEL_CUBE = 3;
 static const int MODEL_SPHERE = 4; // unused
 static const int MODEL_PLANE = 5;
 
+static const int MODEL_INTERSECTION = 10;
+static const int MODEL_ROAD = 11;
+
 // Textures (from 1000)
 static const int TEXTURE_ROAD_INTERSECTION_1 = 1000;
 static const int TEXTURE_ROAD_1 = 1001;

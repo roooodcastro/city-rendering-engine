@@ -95,7 +95,7 @@ void CityScene::render(Renderer *renderer, float millisElapsed) {
     if (chunkOp.city != nullptr && !chunkOp.load) {
         Chunk *chunk = chunkOp.city->getChunkAt(chunkOp.chunkPos, false);
         if (chunk != nullptr && !chunk->isSafeToDelete()) {
-            //chunk->unloadOpenGL();
+            chunk->unloadOpenGL();
             chunk->setSafeToDelete(true);
             unloaded = true;
         }

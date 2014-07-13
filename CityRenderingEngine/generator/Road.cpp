@@ -1,17 +1,19 @@
 #include "Road.h"
 
 Road::Road(void) : Entity() {
-    setModel(Model::getOrCreate(MODEL_PLANE, "resources/meshes/plane.obj", false));
+    setModel(Model::getOrCreate(MODEL_ROAD, "resources/meshes/plane.obj", false));
     model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_1, "resources/textures/road_straight_1.png", false));
-    //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC,
+        "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false);
     pointA = nullptr;
     pointB = nullptr;
 }
 
 Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
-    setModel(Model::getOrCreate(MODEL_PLANE, "resources/meshes/plane.obj", false));
+    setModel(Model::getOrCreate(MODEL_ROAD, "resources/meshes/plane.obj", false));
     model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_1, "resources/textures/road_straight_1.png", false));
-    //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl");
+    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC,
+        "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false);
     this->pointA = pointA;
     this->pointB = pointB;
 

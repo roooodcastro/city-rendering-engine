@@ -72,6 +72,6 @@ protected:
     /* The loaded chunks of the city. */
     std::vector<Chunk*> *chunks;
 
-    /* Mutex to prevent errors caused by racing conditions, especially when loading Chunks on worlker threads. */
+    /* Mutex to prevent errors caused by racing conditions, especially when loading Chunks on worker threads. */
     SDL_mutex *mutex;
 };
