@@ -121,7 +121,7 @@ std::vector<Building*> CityBlock::splitLots(std::vector<Vector2> &lotPolygon) {
             for (int i = 1; i < numSides + 1; i++) {
                 Vector2 a = lotPolygon.at(i - 1);
                 Vector2 b = (i == numSides) ? lotPolygon.at(0) : lotPolygon.at(i);
-                Vector2 intersect = Geom::lineIntersection(a, b, perpA, perpB);
+                Vector2 intersect = Geom::lineSegmentIntersection(perpA, perpB, a, b);
                 if (intersect.x != MAX_INT) {
                     // The split line intersects this side
                     lotA.push_back(intersect);

@@ -41,6 +41,12 @@ public:
     /* This function should destroy the shader, unloading and releasing its data from OpenGL. */
     virtual void unload();
 
+    /*
+     * This function should reload the shader, to account for changes in the glsl files. Only works if the shader is
+     * already loaded.
+     */
+    void reload();
+
     /* Getters and setters for the filenames. */
     std::string getVertexFilename() { return vertexFilename; }
     std::string getFragmentFilename() { return fragmentFilename; }
@@ -58,10 +64,11 @@ public:
 
     /*
      * Creates and compiles a new shader, attaching it to program. The shaderType defines the type of the shader that
-     * will be created, and shaderCode is the actual shader text. Returns true if the shader was created and compiled
-     * successfully, or false if OpenGL raised an error in any of these stages, and the shader couldn't be compiled.
+     * will be created, and shaderCode is the actual shader text. Returns a positive number if the shader was created
+     * and compiled successfully, or a negative one if OpenGL raised an error in any of these stages, and the shader
+     * couldn't be compiled.
      */
-    bool compileShader(GLuint program, GLenum shaderType, const char *shaderCode);
+    int compileShader(GLuint program, GLenum shaderType, const char *shaderCode);
 
     /*
      * Links the shader program. Returns true if the program was successfully linked, or false otherwise.
@@ -136,8 +143,13 @@ public:
 
 protected:
 
-    /* The unique ID that OpenGL assigns for the Shader Program. */
+    /* The unique ID that OpenGL assigns for the Shader Program and each individual shader. */
     GLuint program;
+    GLuint vertexId;
+    GLuint fragmentId;
+    GLuint geometryId;
+    GLuint tessCtrlId;
+    GLuint tessEvalId;
 
     /* These variables hold the filname of the different Shaders that the program can have. */
     std::string vertexFilename;

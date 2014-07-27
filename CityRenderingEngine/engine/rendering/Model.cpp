@@ -73,7 +73,7 @@ void Model::draw() {
         } else {
             glDrawArrays(GL_TRIANGLES, 0, numVertices);
         }
-        //Renderer::logOpenGLError("MODEL_DRAW");
+        Renderer::logOpenGLError("MODEL_DRAW");
         glBindVertexArray(0);
     }
 }

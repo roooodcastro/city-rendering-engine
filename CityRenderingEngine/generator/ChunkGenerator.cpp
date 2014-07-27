@@ -30,17 +30,19 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
             gridLayout.posMin = Vector2(i * subChunkSize, j * subChunkSize);
             gridLayout.posMax = Vector2((i + 1) * subChunkSize, (j + 1) * subChunkSize);
             Vector2 intersectionPos = gridLayout.getIntersectionPosition();
-            if (intersectionPos.x >= 0 && intersectionPos.y >= 0) {
+            if (intersectionPos.x > -99 && intersectionPos.y > -99) {
                 // If there's an intersection in this subchunk, check if it has enough distance from the others
                 intersectionPos += position; // Convert to World Position
-                auto intersectionsBegin = chunk->getIntersections()->begin();
-                auto intersectionsEnd = chunk->getIntersections()->end();
+                auto it = chunk->getIntersections()->begin();
+                auto itEnd = chunk->getIntersections()->end();
                 bool tooClose = false;
                 Vector3 newIntPos = Vector3(intersectionPos.x, 0, intersectionPos.y);
-                for (auto it = intersectionsBegin; it != intersectionsEnd; it++) {
+                for (; it != itEnd; it++) {
                     Intersection *intersection = (*it);
                     // Chunk position for the new intersection position (0 to 1000)
-                    if ((intersection->getPosition() - newIntPos).getLength() < minDistanceIntersections) {
+                    float length = (intersection->getPosition() - newIntPos).getLength();
+                    //std::cout << length << std::endl;
+                    if (length < minDistanceIntersections) {
                         tooClose = true;
                         break;
                     }
@@ -53,11 +55,12 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
                     for (auto it = neighbourChunks.begin(); it != neighbourChunks.end(); it++) {
                         Intersection *closest = (*it)->getClosestIntersectionTo(newIntPos);
                         if (closest != nullptr) {
-                            float distance = (newIntPos - closest->getWorldPosition()).getLength();
+                            float distance = (closest->getPosition() - newIntPos).getLength();
                             if (distance < minDistanceIntersections) {
                                 // The new Intersection is too close to an Intersection on an neighbour. Use the
                                 // neighbour's Intersection instead
                                 neighbourSubstitute = closest;
+                                break;
                             }
                         }
                     }

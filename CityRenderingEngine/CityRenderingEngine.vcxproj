@@ -68,7 +68,7 @@
     <LibraryPath>..\SDL2-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\SDL2_mixer-2.0.0\include;..\SDL2_ttf-2.0.12\include;..\SDL2-2.0.3\include;..\SDL2_image-2.0.0\include;..\glew-1.10.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>..\SDL2_mixer-2.0.0\lib\x64;..\SDL2_ttf-2.0.12\lib\x64;..\SDL2_image-2.0.0\lib\x64;..\glew-1.10.0\lib\Release\x64;..\SDL2-2.0.3\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -164,6 +164,7 @@
     <ClCompile Include="engine\rendering\Plane.cpp" />
     <ClCompile Include="engine\rendering\Renderer.cpp" />
     <ClCompile Include="engine\rendering\ShaderParameter.cpp" />
+    <ClCompile Include="engine\rendering\Skybox.cpp" />
     <ClCompile Include="engine\Scene.cpp" />
     <ClCompile Include="engine\math\Matrix3.cpp" />
     <ClCompile Include="engine\math\Matrix4.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="engine\rendering\Plane.h" />
     <ClInclude Include="engine\rendering\Renderer.h" />
     <ClInclude Include="engine\rendering\ShaderParameter.h" />
+    <ClInclude Include="engine\rendering\Skybox.h" />
     <ClInclude Include="engine\ResourceNames.h" />
     <ClInclude Include="engine\Scene.h" />
     <ClInclude Include="engine\math\Common.h" />

@@ -69,7 +69,7 @@ Resource* ResourcesManager::getResource(int name) {
     lockMutex();
     if (ResourcesManager::resourceExists(name)) {
         Resource *resource = resources->at(name);
-        unlockMutex;
+        unlockMutex();
         return resource;
     }
     unlockMutex();

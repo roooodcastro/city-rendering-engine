@@ -1,4 +1,4 @@
-#include "Renderer.h"
+﻿#include "Renderer.h"
 
 Renderer::Renderer(void) {
     // Reads some configuration from the config file
@@ -12,7 +12,7 @@ Renderer::Renderer(void) {
     }
 
     // Initialize SDL graphics functionalities
-    SDL_Init(SDL_INIT_VIDEO);
+    //SDL_Init(SDL_INIT_VIDEO);
     window = SDL_CreateWindow(gameTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x,
         (int) windowSize.y, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (window == nullptr) {
@@ -59,6 +59,7 @@ Renderer::Renderer(void) {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_CULL_FACE);
@@ -76,6 +77,9 @@ void Renderer::render(Scene *scene, float millisElapsed) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    /* Enable this for wireframe view
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
+
     //glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_LEQUAL);
     //glEnable(GL_CULL_FACE);

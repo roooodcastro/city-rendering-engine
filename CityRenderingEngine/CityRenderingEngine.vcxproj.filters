@@ -222,6 +222,9 @@
     <ClCompile Include="generator\ChunkLoader.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="engine\rendering\Skybox.cpp">
+      <Filter>Source Files\engine\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Vector2.h">
@@ -391,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="engine\ResourceNames.h">
       <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\rendering\Skybox.h">
+      <Filter>Header Files\engine\rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

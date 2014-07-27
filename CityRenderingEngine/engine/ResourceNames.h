@@ -30,3 +30,4 @@ static const int MATERIAL_BASIC = 2000;
 // Shaders (from 5000)
 static const int SHADER_LIGHT_BASIC = 5000;
 static const int SHADER_INTERFACE = 5001;
+static const int SHADER_SKY_BOX = 5002;

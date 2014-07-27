@@ -1,4 +1,5 @@
 #include "Intersection.h"
+#include "Chunk.h"
 
 Intersection::Intersection(void) : Entity() {
     setModel(Model::getOrCreate(MODEL_INTERSECTION, "resources/meshes/plane.obj", false));
@@ -47,7 +48,8 @@ Intersection::~Intersection(void) {
 
 Road *Intersection::connectTo(Intersection *other) {
     for (auto it = roads->begin(); it != roads->end(); it++) {
-        if ((*it)->getOtherEnd(this) == other) return nullptr; // Avoid duplicate connections
+        if ((*it)->getOtherEnd(this) == other)
+            return nullptr; // Avoid duplicate connections
     }
     //this->connections->push_back(other);
     //other->connections->push_back(this);
@@ -55,6 +57,29 @@ Road *Intersection::connectTo(Intersection *other) {
     this->roads->push_back(road);
     other->roads->push_back(road);
     return road;
+}
+
+void Intersection::disconnectFrom(Road *connection) {
+    if (connection != nullptr) {
+        if (connection->getPointA() == this || connection->getPointB() == this) {
+            // If this Intersection actually is in the Road, remove the Road from the connections
+            auto itEnd = roads->end();
+            roads->erase(std::remove(roads->begin(), itEnd, connection), itEnd);
+        }
+    }
+}
+
+void Intersection::disconnectFromAll(Chunk *chunk) {
+    if (roads != nullptr) {
+        auto itEnd = roads->end();
+        for (auto it = roads->begin(); it != itEnd; it++) {
+            Intersection *other = (*it)->getOtherEnd(this);
+            other->disconnectFrom(*it);
+            chunk->removeRoad(*it);
+            //delete (*it);
+        }
+        roads->clear();
+    }
 }
 
 float Intersection::distanceBetween(Intersection *a, Intersection *b) {

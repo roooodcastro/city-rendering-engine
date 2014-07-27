@@ -17,6 +17,7 @@
 #include "rendering/Light.h"
 #include "ui/UserInterface.h"
 #include "rendering/Camera.h"
+#include "rendering/Skybox.h"
 #include "rendering/Frustum.h"
 #include "rendering/Renderer.h"
 
@@ -24,6 +25,7 @@ class UserInterface;
 class Renderer;
 class Frustum;
 class Entity;
+class Skybox;
 class Light;
 
 class Scene {
@@ -94,6 +96,9 @@ public:
     void setCamera(Camera &camera) { *(this->camera) = camera; camera.setChanged(true); }
     Camera *getCamera() const { return camera; }
     Frustum *getFrustum() const { return frustum; }
+    void setSkybox(Skybox *skybox) { this->skybox = skybox; }
+    Skybox *getSkybox() const { return skybox; }
+
 
     /* Checks if the entity with the provided name has been added to this level */
     bool isEntityInScene(std::string name);
@@ -140,6 +145,9 @@ protected:
 
     /* The LightSource for this Scene. Defaults to null. */
     Light *lightSource;
+
+    /* An optional Skybox to render as background. */
+    Skybox *skybox;
 
     /* The player interface, may be a menu, or a HUD. */
     UserInterface *userInterface;

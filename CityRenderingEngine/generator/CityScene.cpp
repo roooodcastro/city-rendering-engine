@@ -2,20 +2,36 @@
 
 CityScene::CityScene() : Scene() {
     this->city = nullptr;
+    this->reload = false;
 }
 
 CityScene::CityScene(const CityScene &copy) : Scene(copy) {
     this->city = new City(*(copy.city));
+    this->reload = false;
 }
 
 CityScene::CityScene(City *city) : Scene() {
     this->city = city;
+    this->skybox = new Skybox("resources/textures/skyboxes/desert/posX.png",
+        "resources/textures/skyboxes/desert/negX.png",
+        "resources/textures/skyboxes/desert/posY.png",
+        "resources/textures/skyboxes/desert/negY.png",
+        "resources/textures/skyboxes/desert/posZ.png",
+        "resources/textures/skyboxes/desert/negZ.png",
+        ResourcesManager::generateNextName());
+    this->reload = false;
 }
 
 CityScene::~CityScene(void) {
     if (city != nullptr) {
         delete city;
         city = nullptr;
+    }
+}
+
+void CityScene::onKeyPress(SDL_Keysym key) {
+    if (key.sym == SDLK_F4) {
+        reload = true;
     }
 }
 
@@ -100,6 +116,17 @@ void CityScene::render(Renderer *renderer, float millisElapsed) {
             unloaded = true;
         }
     }
+
+    // Check debug tools
+
+    // Shader reload (F4)
+    if (reload) {
+        ((Shader*) ResourcesManager::getResource(SHADER_LIGHT_BASIC))->reload();
+        std::cout << "Shaders reloaded!" << std::endl;
+        reload = false;
+    }
+
+
     //Profiler::getTimer(4)->finishMeasurement();
     //Profiler::getTimer(4)->resetCycle();
     //if (unloaded)

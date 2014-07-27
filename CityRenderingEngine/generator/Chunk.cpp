@@ -95,7 +95,15 @@ void Chunk::removeIntersection(Intersection *intersection) {
 
 void Chunk::addRoad(Road *road) {
     roads->push_back(road);
+    road->addChunkSharing();
     addChild(road);
+}
+
+void Chunk::removeRoad(Road *road) {
+    auto itEnd = roads->end();
+    roads->erase(std::remove(roads->begin(), itEnd, road), itEnd);
+    road->removeChunkSharing();
+    removeChild(road);
 }
 
 void Chunk::addCityBlock(CityBlock *cityBlock) {
@@ -112,12 +120,12 @@ void Chunk::removeCityBlock(CityBlock *cityBlock) {
 }
 
 Intersection *Chunk::getClosestIntersectionTo(const Vector3 &position) {
-    auto beginIt = intersections->begin();
+    auto it = intersections->begin();
     auto endIt = intersections->end();
     Intersection *closest = nullptr;
     float closestDistance = 999999.9f;
-    for (auto it = beginIt; it != endIt; it++) {
-        float distance = (position - (*it)->getWorldPosition()).getLength();
+    for (; it != endIt; it++) {
+        float distance = (position - (*it)->getPosition()).getLength();
         if (distance < closestDistance) {
             closest = (*it);
             closestDistance = distance;
@@ -129,12 +137,13 @@ Intersection *Chunk::getClosestIntersectionTo(const Vector3 &position) {
 std::vector<Intersection*> Chunk::getClosestIntersectionsTo(Intersection *intersection, int number) {
     std::vector<Intersection*> orderedIntersections = std::vector<Intersection*>();
     std::vector<float> distances = std::vector<float>();
-    for (auto it = intersections->begin(); it != intersections->end(); it++) {
+    auto itEnd = intersections->end();
+    for (auto it = intersections->begin(); it != itEnd; it++) {
         float distance = abs((intersection->getWorldPosition() - (*it)->getWorldPosition()).getLength());
         bool inserted = false;
-        int distantesSize = (int) distances.size();
-        for (int i = 0; i < distantesSize; i++) {
-            if (distance < distances.at(i) && distance != 0.0f) {
+        int distancesSize = (int) distances.size();
+        for (int i = 0; i < distancesSize; i++) {
+            if (distance <= distances.at(i) && distance != 0.0f) {
                 orderedIntersections.insert(orderedIntersections.begin() + i, (*it));
                 distances.insert(distances.begin() + i, distance);
                 inserted = true;
@@ -170,19 +179,11 @@ void Chunk::unload() {
     }
     cityBlocks->clear();
 
-    // Unload the Roads
-    for (auto it = roads->begin(); it != roads->end(); it++) {
-        removeChild(*it);
-        if ((*it)->getPointA()->getNumChunksSharing() == 1 && (*it)->getPointB()->getNumChunksSharing() == 1) {
-            delete *it;
-        }
-    }
-    roads->clear();
-
     // Unload the Intersections
     for (auto it = intersections->begin(); it != intersections->end(); it++) {
         removeChild(*it);
-        if ((*it)->getNumChunksSharing() == 1) {
+        if ((*it)->getNumChunksSharing() <= 1) {
+            (*it)->disconnectFromAll(this);
             delete *it;
         } else {
             (*it)->removeChunkSharing();
@@ -190,6 +191,16 @@ void Chunk::unload() {
     }
     intersections->clear();
     // TODO: Find and fix a small memoryleak on the chunk loading/unloading, about 4kb each 20 or so chunks
+
+    // Unload the Roads
+    for (auto it = roads->begin(); it != roads->end(); it++) {
+        //removeChild(*it);
+        //if (((*it)->getPointA() == nullptr || (*it)->getPointA()->getNumChunksSharing() <= 1)
+            //&& ((*it)->getPointB() == nullptr || (*it)->getPointB()->getNumChunksSharing() <= 1)) {
+            //delete *it;
+        //}
+    }
+    roads->clear();
 }
 
 void Chunk::unloadOpenGL() {

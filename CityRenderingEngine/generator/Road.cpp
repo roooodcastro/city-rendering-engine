@@ -7,6 +7,7 @@ Road::Road(void) : Entity() {
         "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false);
     pointA = nullptr;
     pointB = nullptr;
+    this->numChunksSharing = 0;
 }
 
 Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
@@ -16,6 +17,7 @@ Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
         "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false);
     this->pointA = pointA;
     this->pointB = pointB;
+    this->numChunksSharing = 0;
 
     // Calculate the quad model rotation, position and scale
     this->position = Vector3::average(pointA->getPosition(), pointB->getPosition());
@@ -29,6 +31,28 @@ Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
 }
 
 Road::~Road(void) {
+    if (pointA != nullptr) {
+        pointA->disconnectFrom(this);
+    }
+    if (pointB != nullptr) {
+        pointB->disconnectFrom(this);
+    }
     pointA = nullptr;
     pointB = nullptr;
+}
+
+void Road::setPointA(Intersection *pointA) {
+    this->pointA = pointA;
+    if (pointA == nullptr) {
+        // If we break a connection, tell the other Intersection to break it too
+        pointB->disconnectFrom(this);
+    }
+}
+
+void Road::setPointB(Intersection *pointB) {
+    this->pointB = pointB;
+    if (pointB == nullptr) {
+        // If we break a connection, tell the other Intersection to break it too
+        pointA->disconnectFrom(this);
+    }
 }

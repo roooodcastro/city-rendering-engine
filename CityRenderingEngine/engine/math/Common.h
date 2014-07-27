@@ -47,6 +47,11 @@ static inline float generateRandom(float min, float max) {
 //I blame Microsoft...
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #define min(a, b) (((a) < (b)) ? (a) : (b))
+
+template <typename T> int sign(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
 /* Clamps a value to be between a minimum and a maximum value. */
 #define clamp(val, min, max) (val < min ? min : (val > max ? max : val))
 

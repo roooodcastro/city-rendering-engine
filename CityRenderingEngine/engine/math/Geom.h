@@ -109,6 +109,24 @@ public:
         return line1A + d1 * t1;
     }
 
+    /*
+     * Calculates and returns the intersection point between two lines. Line 1 is the line between the points line1A
+     * and line1B, and line 2 is the line between the points line2A and line2B. If the lines doesn't intersect (if they
+     * are parallel, this function will return Vector2(MAX_INT, MAX_INT).
+     */
+    static Vector2 lineSegmentIntersection(Vector2 lineA, Vector2 lineB, Vector2 segA, Vector2 segB) {
+        // First check if the segment intersects the line. To do this, we check if the end points of the segment are
+        // on different sides of the line, if they are both on the same side, they do not intersect.
+        int signA = sign((lineB.x - lineA.x) * (segA.y - lineA.y) - (lineB.y - lineA.y) * (segA.x - lineA.x));
+        int signB = sign((lineB.x - lineA.x) * (segB.y - lineA.y) - (lineB.y - lineA.y) * (segB.x - lineA.x));
+        if (signA != signB) {
+            // If they intersect, we can use the generic lineIntersection algorithm to find the exact point.
+            return lineIntersection(lineA, lineB, segA, segB);
+        }
+        // In case they don't intersect
+        return Vector2((float) MAX_INT, (float) MAX_INT);
+    }
+
 protected:
 
     Geom(void) {};

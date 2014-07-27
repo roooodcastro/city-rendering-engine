@@ -22,8 +22,20 @@ public:
     Road(Intersection *pointA, Intersection *pointB);
     virtual ~Road(void);
 
+    void setPointA(Intersection *pointA);
+    void setPointB(Intersection *pointB);
+
     Intersection *getPointA() { return pointA; }
     Intersection *getPointB() { return pointB; }
+
+    /* Returns the number of Chunks that are currently using this Road. */
+    int getNumChunksSharing() { return (int) numChunksSharing; }
+
+    /* Tells the Road that another Chunks is now using it. */
+    void addChunkSharing() { numChunksSharing++; }
+
+    /* Tells the Road that a Chunk that was previously using it is not using it anymore. */
+    void removeChunkSharing() { numChunksSharing--; }
 
     /*
      * Returns the other Intersection that makes up this road that is not point. This is to get the other Intersection
@@ -48,4 +60,7 @@ protected:
 
     /* The second Intersection end of this Road. */
     Intersection *pointB;
+
+    /* Indicates the number of Chunks that currently have this Road within. Defaults to zero. */
+    char numChunksSharing;
 };

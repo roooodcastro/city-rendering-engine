@@ -29,13 +29,13 @@ void Shader::load() {
         std::string tessEvalCode = FileIO::mergeLines(FileIO::readTextFile(tessEvalFilename));
 
         this->program = glCreateProgram();
-        compileShader(program, GL_VERTEX_SHADER, vertexCode.c_str());
-        compileShader(program, GL_FRAGMENT_SHADER, fragmentCode.c_str());
+        vertexId = compileShader(program, GL_VERTEX_SHADER, vertexCode.c_str());
+        fragmentId = compileShader(program, GL_FRAGMENT_SHADER, fragmentCode.c_str());
         if (geometryCode.size() > 0)
-            compileShader(program, GL_GEOMETRY_SHADER, geometryCode.c_str());
+            geometryId = compileShader(program, GL_GEOMETRY_SHADER, geometryCode.c_str());
         if (tessCtrlCode.size() > 0 && tessEvalCode.size() > 0) {
-            compileShader(program, GL_TESS_CONTROL_SHADER, tessCtrlCode.c_str());
-            compileShader(program, GL_TESS_EVALUATION_SHADER, tessEvalCode.c_str());
+            tessCtrlId = compileShader(program, GL_TESS_CONTROL_SHADER, tessCtrlCode.c_str());
+            tessEvalId = compileShader(program, GL_TESS_EVALUATION_SHADER, tessEvalCode.c_str());
         }
         setDefaultAttributes();
         if (linkProgram(program))
@@ -46,12 +46,27 @@ void Shader::load() {
 }
 
 void Shader::unload() {
-    // TODO: store the GLuint of the shaders to be able to delete them here
-    //glDetachShader(program, vertexShader);
-    //glDeleteShader(vertexShader);
+    // First detach and delete each individual shader
+    glDetachShader(program, vertexId);
+    glDeleteShader(vertexId);
+    glDetachShader(program, fragmentId);
+    glDeleteShader(fragmentId);
+    glDetachShader(program, geometryId);
+    glDeleteShader(geometryId);
+    glDetachShader(program, tessCtrlId);
+    glDeleteShader(tessCtrlId);
+    glDetachShader(program, tessEvalId);
+    glDeleteShader(tessEvalId);
+    // Then delete the shader program
     glDeleteProgram(program);
     loaded = false;
     valid = false;
+}
+
+void Shader::reload() {
+    if (loaded)
+        unload();
+    load();
 }
 
 /*
@@ -71,7 +86,7 @@ void Shader::setDefaultAttributes()	{
     }
 }
 
-bool Shader::compileShader(GLuint program, GLenum shaderType, const char *shaderCode) {
+int Shader::compileShader(GLuint program, GLenum shaderType, const char *shaderCode) {
     if (glIsProgram(program)) {
         GLuint shader = glCreateShader(shaderType);
         glShaderSource(shader, 1, &shaderCode, nullptr);
@@ -81,7 +96,7 @@ bool Shader::compileShader(GLuint program, GLenum shaderType, const char *shader
         if (status == GL_TRUE) {
             glAttachShader(program, shader);
             //logOpenGLError("ATTACH_" + getShaderTypeName(shaderType));
-            return true;
+            return shader;
         } else {
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
             std::vector<char> infoLog(infoLogLength, 'X');
@@ -92,7 +107,7 @@ bool Shader::compileShader(GLuint program, GLenum shaderType, const char *shader
             //logOpenGLError("COMPILE_" + getShaderTypeName(shaderType));
         }
     }
-    return false;
+    return -1;
 }
 
 bool Shader::linkProgram(GLuint program) {

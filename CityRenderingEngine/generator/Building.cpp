@@ -3,14 +3,15 @@
 Building::Building(void) : Entity() {
     shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
         "resources/shaders/fragLight.glsl", false);
+    shader->addUser();
     this->cityBlock = nullptr;
 }
 
 Building::Building(CityBlock *cityBlock, Vector3 blockPosition) : Entity() {
     setModel(Model::getOrCreate(MODEL_CUBE, "resources/meshes/cube.obj", false));
-    model->addUser();
     shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
         "resources/shaders/fragLight.glsl", false);
+    shader->addUser();
     this->cityBlock = cityBlock;
     float height = generateRandom(20, 100);
     float width = 50.0f; // Width relative to the pavement
@@ -27,6 +28,7 @@ Building::Building(CityBlock *cityBlock, Vector3 blockPosition) : Entity() {
 Building::Building(std::vector<Vector2> lotArea, CityBlock *cityBlock) {
     shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
         "resources/shaders/fragLight.glsl", false);
+    shader->addUser();
     this->lotArea = new std::vector<Vector2>(lotArea);
     this->cityBlock = cityBlock;
     this->model = nullptr;
@@ -44,6 +46,10 @@ Building::~Building(void) {
     if (model != nullptr) {
         ResourcesManager::releaseResource(model->getName());
         model = nullptr;
+    }
+    if (shader != nullptr) {
+        //ResourcesManager::releaseResource(shader->getName());
+        shader = nullptr;
     }
 }
 

@@ -81,6 +81,9 @@ public:
     /* Adds a new Road to this Chunk. */
     void addRoad(Road *road);
 
+    /* Removes a Road from this Chunk. */
+    void removeRoad(Road *road);
+
     /* Adds a new CityBlock to this Chunk. */
     void addCityBlock(CityBlock *cityBlock);
     

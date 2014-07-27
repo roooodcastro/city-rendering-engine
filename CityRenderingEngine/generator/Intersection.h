@@ -16,6 +16,7 @@
 #include "../engine/math/Vector3.h"
 
 class Road;
+class Chunk;
 
 class Intersection : public Entity {
 public:
@@ -26,6 +27,12 @@ public:
 
     /* Connects this intersction to another, creating a connection and a road between them. */
     Road *connectTo(Intersection *other);
+
+    /* Disconnects this Intersection from another Intersection, removing the road from the connections. */
+    void disconnectFrom(Road *connection);
+
+    /* Disconnects this Intersection from ALL its connections, deleting all the Roads. */
+    void disconnectFromAll(Chunk *chunk);
 
     std::vector<Road*> *getConnections() { return roads; }
     //std::vector<Intersection*> *getConnections() { return connections; }

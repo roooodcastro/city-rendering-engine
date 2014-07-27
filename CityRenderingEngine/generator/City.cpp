@@ -68,8 +68,8 @@ std::vector<Chunk*> City::getNeighbourChunks(Chunk *chunk, bool loadFromDisk) {
     std::vector<Chunk*> neighbours = std::vector<Chunk*>();
     Vector2 minPos = chunk->getChunkPos() - 1000.0f;
     Vector2 maxPos = chunk->getChunkPos() + 1000.0f;
-    for (int i = (int) minPos.x; i < (int) maxPos.x; i += 1000) {
-        for (int j = (int) minPos.y; j < (int) maxPos.y; j += 1000) {
+    for (int i = (int) minPos.x; i <= (int) maxPos.x; i += 1000) {
+        for (int j = (int) minPos.y; j <= (int) maxPos.y; j += 1000) {
             Chunk *neighbour = getChunkAt(Vector2((float) i, (float) j), loadFromDisk);
             if (neighbour != nullptr && neighbour != chunk) {
                 neighbours.push_back(neighbour);

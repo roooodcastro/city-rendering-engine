@@ -31,6 +31,7 @@ void Naquadah::initialize(unsigned int initModules) {
     if (instance == nullptr) {
         instance = new Naquadah();
     }
+    SDL_Init(SDL_INIT_EVERYTHING);
     ResourcesManager::initialize();
     Profiler::startProfiler();
     bool initEverything = ((initModules >> 31) > 0);
@@ -44,7 +45,6 @@ void Naquadah::initialize(unsigned int initModules) {
         instance->renderer = new Renderer();
     }
     // Init only core SDL features
-    SDL_Init(SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_EVENTS);
     // Init keyboard and mouse managers
     Keyboard::getInstance();
     Mouse::getInstance();

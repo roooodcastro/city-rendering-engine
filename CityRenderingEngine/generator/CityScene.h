@@ -34,7 +34,7 @@ public:
     //virtual void onMouseButtonUp(Uint8 button, Vector2 &position); // Will fire every time a mouse button is released
     //virtual void onMouseWheelScroll(int amount); // Will fire every time the mouse wheel scrolls
     /* Keyboard events */
-    //virtual void onKeyPress(SDL_Keysym key); // Will fire every time a key is released
+    virtual void onKeyPress(SDL_Keysym key); // Will fire every time a key is released
     //virtual void onKeyDown(SDL_Keysym key); // Will fire in every tick that a key is down
     //virtual void onKeyUp(SDL_Keysym key); // Will fire every time a key is released
 
@@ -53,6 +53,9 @@ public:
     City *getCity() { return city; }
 
 protected:
+
+    /* Control flag to determine if the shaders need to be reloaded. Debug tool. Defaults to false. */
+    bool reload;
 
     /* The City that will be simulated in this CityScene. */
     City *city;

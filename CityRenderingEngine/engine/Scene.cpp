@@ -17,6 +17,7 @@ Scene::Scene() {
     updateMutex = SDL_CreateMutex();
     renderMutex = SDL_CreateMutex();
     userInterface = nullptr;
+    skybox = nullptr;
     frustum = new Frustum(*projectionMatrix * *cameraMatrix);
 }
 
@@ -31,6 +32,7 @@ Scene::Scene(const Scene &copy) {
     this->projectionMatrix = new Matrix4(*(copy.projectionMatrix));
     this->userInterface = new UserInterface(*(copy.userInterface));
     this->updateMutex = copy.updateMutex;
+    this->skybox = new Skybox(*(copy.skybox));
     this->frustum = new Frustum(*(copy.frustum));
 }
 
@@ -43,6 +45,7 @@ Scene::Scene(UserInterface *userInterface) {
     //lightSources = new std::vector<Light*>();
     lightSource = nullptr;
     dragging = false;
+    skybox = nullptr;
     draggingRight = false;
     updateMutex = SDL_CreateMutex();
     renderMutex = SDL_CreateMutex();
@@ -80,6 +83,10 @@ Scene::~Scene(void) {
     if (frustum != nullptr) {
         delete frustum;
         frustum = nullptr;
+    }
+    if (skybox != nullptr) {
+        delete skybox;
+        skybox = nullptr;
     }
     if (updateMutex != nullptr) {
         SDL_DestroyMutex(updateMutex);
@@ -320,8 +327,16 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
     if (renderer->getCurrentShader() != nullptr && renderer->getCurrentShader()->isLoaded()) {
         renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
     }
-    // Draw Entities
 
+    // Draw skybox, if present
+    if (skybox != nullptr) {
+        if (!skybox->isLoaded()) {
+            skybox->load();
+        }
+        skybox->render(this);
+    }
+
+    // Draw Entities
     auto it = entities->begin();
     auto itEnd = entities->end();
     for (; it != itEnd; it++) {
