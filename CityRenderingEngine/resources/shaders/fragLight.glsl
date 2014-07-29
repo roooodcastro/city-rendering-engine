@@ -28,12 +28,12 @@ in Vertex {
 
 out vec4 gl_FragColor;
 
-const vec3 fogColour = vec3(0.0, 0.0, 0.0);
+const vec4 fogColour = vec4(0.0, 0.0, 0.0, 0.0);
 const float fogDensity = 0.05;
 
 void main(void) {
 	vec3 finalColour = vec3(0, 0, 0);
-    vec3 finalColourGamma = vec3(0, 0, 0);
+    vec4 finalColourGamma = vec4(0, 0, 0, 0);
 	vec4 texCol = texture(texture0, IN.uv_map);
     //vec4 texCol = vec4(1,1,1,1);
 	
@@ -94,8 +94,8 @@ void main(void) {
             vec3 specular = texLightCol * sFactor * lightSource.intensity;
             
             // Calculate rim lighting
-            float gamma = 1.0/0.7;
-            vec3 rimColour = vec3(0.15, 0.15, 0.15) + (vec3(0.05, 0.05, 0.05) * texLightCol);
+            float gamma = 1.0/0.6;
+            vec3 rimColour = vec3(0.15, 0.10, 0.05) + (vec3(0.05, 0.05, 0.05) * texLightCol);
             float rim = 1.0 - max(dot(viewDir, IN.worldNormal), 0.0);
             rim = smoothstep(0.6, 1.0, rim);
             vec3 finalRim = rimColour * vec3(rim, rim, rim);
@@ -110,10 +110,10 @@ void main(void) {
             fogFactor = clamp(fogFactor, 0.0, 1.0);
             
             finalColour = vec3(ambient + diffuse + finalRim);
-            finalColourGamma = vec3(pow(finalColour.r, gamma), pow(finalColour.g, gamma), pow(finalColour.b, gamma));
+            finalColourGamma = vec4(pow(finalColour.r, gamma), pow(finalColour.g, gamma), pow(finalColour.b, gamma), texCol.w);
             
             finalColourGamma = mix(fogColour, finalColourGamma, fogFactor);
         }
 	}
-	gl_FragColor = vec4(finalColourGamma, texCol.w);
+	gl_FragColor = finalColourGamma;
 }

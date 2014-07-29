@@ -1,6 +1,6 @@
 #include "CityScene.h"
 
-CityScene::CityScene() : Scene() {
+CityScene::CityScene() : Scene(new CitySceneInterface()) {
     this->city = nullptr;
     this->reload = false;
 }
@@ -10,7 +10,7 @@ CityScene::CityScene(const CityScene &copy) : Scene(copy) {
     this->reload = false;
 }
 
-CityScene::CityScene(City *city) : Scene() {
+CityScene::CityScene(City *city) : Scene(new CitySceneInterface()) {
     this->city = city;
     this->skybox = new Skybox("resources/textures/skyboxes/desert/posX.png",
         "resources/textures/skyboxes/desert/negX.png",
@@ -102,6 +102,7 @@ void CityScene::update(float millisElapsed) {
 }
 
 void CityScene::render(Renderer *renderer, float millisElapsed) {
+    // Render the scene
     Scene::render(renderer, millisElapsed);
 
     // Check if there's a Chunk waiting for the OpenGL stuff be unloaded
@@ -122,6 +123,7 @@ void CityScene::render(Renderer *renderer, float millisElapsed) {
     // Shader reload (F4)
     if (reload) {
         ((Shader*) ResourcesManager::getResource(SHADER_LIGHT_BASIC))->reload();
+        ((Shader*) ResourcesManager::getResource(SHADER_SKY_BOX))->reload();
         std::cout << "Shaders reloaded!" << std::endl;
         reload = false;
     }

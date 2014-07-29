@@ -10,6 +10,7 @@
 #include "City.h"
 #include "ChunkLoader.h"
 #include "../engine/Scene.h"
+#include "CitySceneInterface.h"
 
 class CityScene : public Scene {
 public:

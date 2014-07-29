@@ -1,6 +1,6 @@
 #include "TextItem.h"
 
-const std::string TextItem::defaultFont = "resources/fonts/Arial.ttf";
+const std::string TextItem::defaultFont = "resources/fonts/CalibriBold.ttf";
 const int TextItem::defaultFontSize = 16;
 const Colour TextItem::defaultColour = Colour(0xFFFFFFFF);
 
@@ -10,6 +10,7 @@ TextItem::TextItem(void) : InterfaceItem(ITEM_TEXT) {
 	colour = new Colour(defaultColour);
 	setText("");
 	fadeControl = 0;
+    textChanged = true;
 }
 
 TextItem::TextItem(const TextItem &copy) : InterfaceItem(copy) {
@@ -20,6 +21,7 @@ TextItem::TextItem(const TextItem &copy) : InterfaceItem(copy) {
 	this->fadeControl = copy.fadeControl;
 	this->fadeStep = copy.fadeStep;
 	this->fadeDuration = copy.fadeDuration;
+    this->textChanged = copy.textChanged;
 }
 
 TextItem::TextItem(std::string text, int fontSize) : InterfaceItem(ITEM_TEXT) {
@@ -28,6 +30,7 @@ TextItem::TextItem(std::string text, int fontSize) : InterfaceItem(ITEM_TEXT) {
 	colour = new Colour(defaultColour);
 	setText(text);
 	fadeControl = 0;
+    textChanged = true;
 }
 
 TextItem::TextItem(Vector2 &position, float rotation, std::string text, int fontSize) : InterfaceItem(ITEM_TEXT, position, rotation, Vector2(SIZE_NO_RESIZE, SIZE_NO_RESIZE)) {
@@ -37,6 +40,7 @@ TextItem::TextItem(Vector2 &position, float rotation, std::string text, int font
 	setText(text);
 	this->size = new Vector2(SIZE_NO_RESIZE, SIZE_NO_RESIZE);
 	fadeControl = 0;
+    textChanged = true;
 }
 
 TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size) : InterfaceItem(ITEM_TEXT, position, rotation, size) {
@@ -45,6 +49,7 @@ TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size) : Interface
 	colour = new Colour(defaultColour);
 	setText("");
 	fadeControl = 0;
+    textChanged = true;
 }
 
 TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size, std::string text, int fontSize) : InterfaceItem(ITEM_TEXT, position, rotation, size) {
@@ -53,43 +58,42 @@ TextItem::TextItem(Vector2 &position, float rotation, Vector2 &size, std::string
 	colour = new Colour(defaultColour);
 	setText(text);
 	fadeControl = 0;
+    textChanged = true;
 }
 
 TextItem::~TextItem(void) {
 	delete colour;
-	colour = NULL;
+	colour = nullptr;
 }
 
 void TextItem::setText(std::string text) {
 	this->text = text;
-	reloadText();
+    textChanged = true;
 }
 
 void TextItem::setColour(Colour &colour) {
 	*(this->colour) = colour;
-	reloadText();
+    textChanged = true;
 }
 
 void TextItem::setFont(std::string font) {
 	this->font = font;
-	reloadText();
+    textChanged = true;
 }
 
 void TextItem::setFontSize(int fontSize) {
 	this->fontSize = fontSize;
-	reloadText();
+    textChanged = true;
 }
 
 void TextItem::reloadText() {
-	TTF_Font *ttfFont = TTF_OpenFont(font.c_str(), fontSize);
 	// We release our current texture before creating the new one
-	if (texture) {
-		GLuint texId = texture->getTextureId();
-		glDeleteTextures(1, &texId);
+	if (texture != nullptr) {
+        texture->unload();
 		delete texture;
 	}
-	texture = Texture::createFromText(text, *colour, *ttfFont);
-	TTF_CloseFont(ttfFont);
+    texture = new Texture(text, *colour, font, fontSize);
+    textChanged = false;
 }
 
 void TextItem::onMouseMoved(Vector2 &position, Vector2 &amount) {
@@ -160,6 +164,11 @@ void TextItem::update(unsigned millisElapsed) {
 		}
 	}
 	InterfaceItem::update(millisElapsed);
+}
+
+void TextItem::draw(float millisElapsed, GLuint program) {
+    reloadText();
+    InterfaceItem::draw(millisElapsed, program);
 }
 
 TextItem &TextItem::operator=(const TextItem &other) {

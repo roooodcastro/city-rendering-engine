@@ -1,24 +1,24 @@
 #include "UserInterface.h"
-#include "TextItem.h"
+//#include "TextItem.h"
 #include "ImageItem.h"
 
 UserInterface::UserInterface(void) {
     Vector2 windowSize = Naquadah::getWindowSize();
     items = new std::map<std::string, InterfaceItem*>();
-    fpsCounter = new TextItem(Vector2(20, 10), 0, "0 FPS", 20);
-    resourcesCounter = new TextItem(Vector2(20, 40), 0, "0 Resources Allocated", 20);
-    entitiesCounter = new TextItem(Vector2(20, 70), 0, "0 Entities", 20);
-    mousePosDisplay = new TextItem(Vector2(20, 100), 0, "MousePos: (0, 0)", 20);
-    interfaceShader = new Shader(SHADER_INTERFACE, "shaders/vertUI.glsl", "shaders/fragUI.glsl");
+    //fpsCounter = new TextItem(Vector2(20, 10), 0, "0 FPS", 20);
+    //resourcesCounter = new TextItem(Vector2(20, 40), 0, "0 Resources Allocated", 20);
+    //entitiesCounter = new TextItem(Vector2(20, 70), 0, "0 Entities", 20);
+    //mousePosDisplay = new TextItem(Vector2(20, 100), 0, "MousePos: (0, 0)", 20);
+    interfaceShader = new Shader(SHADER_INTERFACE, "resources/shaders/vertUI.glsl", "resources/shaders/fragUI.glsl");
     fadeOverlay = new ImageItem(Vector2(0, 0), 0, windowSize, new Texture(Colour(0x00000000), 1050));
 }
 
 UserInterface::UserInterface(const UserInterface &copy) {
     items = new std::map<std::string, InterfaceItem*>(*(copy.items));
-    fpsCounter = new TextItem(*((TextItem*) copy.fpsCounter));
-    resourcesCounter = new TextItem(*((TextItem*) copy.resourcesCounter));
-    entitiesCounter = new TextItem(*((TextItem*) copy.entitiesCounter));
-    mousePosDisplay = new TextItem(*((TextItem*) copy.mousePosDisplay));
+    //fpsCounter = new TextItem(*((TextItem*) copy.fpsCounter));
+    //resourcesCounter = new TextItem(*((TextItem*) copy.resourcesCounter));
+    //entitiesCounter = new TextItem(*((TextItem*) copy.entitiesCounter));
+    //mousePosDisplay = new TextItem(*((TextItem*) copy.mousePosDisplay));
     interfaceShader = new Shader(*(copy.interfaceShader));
     fadeOverlay = new ImageItem(*((ImageItem*) copy.fadeOverlay));
     fadeControl = copy.fadeControl;
@@ -29,19 +29,19 @@ UserInterface::UserInterface(const UserInterface &copy) {
 UserInterface::~UserInterface(void) {
     items->clear();
     delete items;
-    delete fpsCounter;
-    delete resourcesCounter;
-    delete entitiesCounter;
-    delete mousePosDisplay;
+    //delete fpsCounter;
+    //delete resourcesCounter;
+    //delete entitiesCounter;
+    //delete mousePosDisplay;
     delete interfaceShader;
 }
 
 UserInterface &UserInterface::operator=(const UserInterface &other) {
     *(this->items) = *(other.items);
-    *(this->fpsCounter) = *(other.fpsCounter);
-    *(this->resourcesCounter) = *(other.resourcesCounter);
-    *(this->entitiesCounter) = *(other.entitiesCounter);
-    *(this->mousePosDisplay) = *(other.mousePosDisplay);
+    //*(this->fpsCounter) = *(other.fpsCounter);
+    //*(this->resourcesCounter) = *(other.resourcesCounter);
+    //*(this->entitiesCounter) = *(other.entitiesCounter);
+    //*(this->mousePosDisplay) = *(other.mousePosDisplay);
     *(this->interfaceShader) = *(other.interfaceShader);
     *(this->fadeOverlay) = *((ImageItem*) other.fadeOverlay);
     fadeControl = other.fadeControl;
@@ -127,7 +127,7 @@ void UserInterface::onKeyUp(SDL_Keysym key) {
     }
 }
 
-void UserInterface::update(float millisElapsed) {
+void UserInterface::update(unsigned millisElapsed) {
     // Update inner items
     for (auto it = items->begin(); it != items->end(); ++it) {
         (*it).second->update(millisElapsed);
@@ -177,7 +177,7 @@ void UserInterface::update(float millisElapsed) {
     }
 }
 
-void UserInterface::draw(float millisElapsed) {
+void UserInterface::draw(unsigned millisElapsed) {
     for (auto it = items->begin(); it != items->end(); ++it) {
         (*it).second->draw(millisElapsed, interfaceShader->getShaderProgram());
     }

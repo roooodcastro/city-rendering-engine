@@ -11,8 +11,11 @@ Renderer::Renderer(void) {
         windowSize.y = (float) atoi(resSplit[1].c_str());
     }
 
-    // Initialize SDL graphics functionalities
-    //SDL_Init(SDL_INIT_VIDEO);
+    // Initialize SDL graphics functionalities	
+    if (TTF_Init() == -1) {
+        logSDLError(std::cout, "TTF_INIT");
+    }
+
     window = SDL_CreateWindow(gameTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (int) windowSize.x,
         (int) windowSize.y, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (window == nullptr) {

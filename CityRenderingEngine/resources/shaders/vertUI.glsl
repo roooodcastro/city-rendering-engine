@@ -1,17 +1,17 @@
-# version 150 core
+#version 330 core
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
-uniform float time;
 
 in vec3 position;
 in vec4 colour;
 in vec2 uv_map;
+in vec3 normal;
 
 out Vertex {
-	smooth vec4 colour;
-	smooth vec2 uv_map;
+	vec4 colour;
+	vec2 uv_map;
 } OUT;
 
 void main(void) {
@@ -19,6 +19,6 @@ void main(void) {
 
 	gl_Position = mvp * vec4(position, 1.0);
 
-	OUT.colour = vec4(1,1,1,1);
+	OUT.colour = colour;
 	OUT.uv_map = uv_map;
 }

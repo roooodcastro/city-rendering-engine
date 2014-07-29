@@ -194,6 +194,7 @@
     <ClCompile Include="generator\City.cpp" />
     <ClCompile Include="generator\CityBlock.cpp" />
     <ClCompile Include="generator\CityScene.cpp" />
+    <ClCompile Include="generator\CitySceneInterface.cpp" />
     <ClCompile Include="generator\GridLayout.cpp" />
     <ClCompile Include="generator\gridlayouts\ManhattanGridLayout.cpp" />
     <ClCompile Include="generator\Intersection.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="generator\City.h" />
     <ClInclude Include="generator\CityBlock.h" />
     <ClInclude Include="generator\CityScene.h" />
+    <ClInclude Include="generator\CitySceneInterface.h" />
     <ClInclude Include="generator\GridLayout.h" />
     <ClInclude Include="generator\gridlayouts\ManhattanGridLayout.h" />
     <ClInclude Include="generator\Intersection.h" />

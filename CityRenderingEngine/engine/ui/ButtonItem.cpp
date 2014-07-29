@@ -106,7 +106,7 @@ void ButtonItem::setTexture(Texture *texture) {
 	this->selectedTex = texture;
 }
 
-void ButtonItem::draw(unsigned millisElapsed, GLuint program) {
+void ButtonItem::draw(float millisElapsed, GLuint program) {
 	if (!hidden) {
 		Texture *chosenTex = normalTex;
 		switch (state) {
@@ -129,6 +129,6 @@ void ButtonItem::draw(unsigned millisElapsed, GLuint program) {
 			// Fallback in case one of the textures wasn't specified
 			normalTex->bindTexture(program, TEXTURE0);
 		}
-		Model::getQuadMesh()->draw();
+		Model::getQuadMesh(MODEL_UI_QUAD)->draw();
 	}
 }

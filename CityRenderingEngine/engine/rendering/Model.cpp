@@ -1,7 +1,6 @@
 ﻿#include "Model.h"
 
 const int Model::meshTriangleName = 100;
-const int Model::meshQuadName = 101;
 
 Model::Model(void) : Resource() {
     vertexes = nullptr;
@@ -108,12 +107,11 @@ Model *Model::generateTriangle() {
 
 Model* Model::generateQuad() {
     Model *m = new Model();
-    m->numVertices = 4;
-    m->numIndexes = 6;
+    m->numVertices = 6;
+    m->numIndexes = 0;
     m->vertexes = new Vector3[m->numVertices];
     m->uv_maps = new Vector2[m->numVertices];
-    m->indexes = new unsigned int[m->numVertices];
-    m->name = Model::meshTriangleName;
+    m->name = MODEL_QUAD;
 
     m->vertexes[0] = Vector3(-1.0f, 1.0f, 0);
     m->vertexes[1] = Vector3(1.0f, 1.0f, 0);
@@ -122,21 +120,18 @@ Model* Model::generateQuad() {
     m->vertexes[4] = Vector3(1.0f, -1.0f, 0);
     m->vertexes[5] = Vector3(-1.0f, -1.0f, 0);
 
-    m->vertexes[0] = Vector3(-1.0f, 1.0f, 0);
-    m->vertexes[1] = Vector3(1.0f, 1.0f, 0);
-    m->vertexes[2] = Vector3(1.0f, -1.0f, 0);
-    m->vertexes[3] = Vector3(-1.0f, -1.0f, 0);
     m->uv_maps[0] = Vector2(0, 0);
     m->uv_maps[1] = Vector2(1.0f, 0);
     m->uv_maps[2] = Vector2(1.0f, 1.0f);
-    m->uv_maps[3] = Vector2(0, 1.0f);
+    m->uv_maps[3] = Vector2(0, 0);
+    m->uv_maps[4] = Vector2(1.0f, 1.0f);
+    m->uv_maps[5] = Vector2(0, 1.0f);
 
     m->material = new Material(MATERIAL_BASIC, 1.0f, Colour::WHITE, Colour::WHITE, Colour::WHITE, nullptr);
     ResourcesManager::addResource(m->material, true);
     m->material->addUser();
 
     m->generateNormals();
-    m->bufferData();
     return m;
 }
 
@@ -151,8 +146,9 @@ void Model::generateNormals() {
 
     	Vector3 normal = Vector3::cross(b - a, c - a);
     	normal.normalise();
+        normal.invert();
 
-    	normals[i] = Vector3(normal);
+        normals[i] = Vector3(normal);
     	normals[i + 1] = Vector3(normal);
     	normals[i + 2] = Vector3(normal);
     }
@@ -194,8 +190,8 @@ void Model::bufferData() {
             glGenBuffers(1, &bufferObjects[INDEX_BUFFER]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferObjects[INDEX_BUFFER]);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndexes * sizeof(GLuint), &indexes[0], GL_STATIC_DRAW);
-            //glVertexAttribPointer(INDEX_BUFFER, 1, GL_FLOAT, GL_FALSE, 0, 0);
-            //glEnableVertexAttribArray(INDEX_BUFFER);
+            glVertexAttribPointer(INDEX_BUFFER, 1, GL_FLOAT, GL_FALSE, 0, 0);
+            glEnableVertexAttribArray(INDEX_BUFFER);
         }
 
         glBindVertexArray(0);
@@ -404,16 +400,24 @@ void Model::unload() {
 void Model::initializePrimitiveMeshes() {
     //Model *triangle = Model::generateTriangle();
     Model *quad = Model::generateQuad();
+    
     //ResourcesManager::addResource(triangle);
     ResourcesManager::addResource(quad, true);
+    //ResourcesManager::addResource(uiQuad, true);
 }
 
 Model *Model::getTriangleMesh() {
     return (Model*) ResourcesManager::getResource(Model::meshTriangleName);
 }
 
-Model *Model::getQuadMesh() {
-    return (Model*) ResourcesManager::getResource(Model::meshQuadName);
+Model *Model::getQuadMesh(int name) {
+    Model *quad = (Model*) ResourcesManager::getResource(name);
+    if (quad == nullptr) {
+        quad = Model::generateQuad();
+        quad->name = name;
+        ResourcesManager::addResource(quad, false);
+    }
+    return quad;
 }
 
 Model *Model::getOrCreate(int name, const std::string &fileName, bool preLoad) {

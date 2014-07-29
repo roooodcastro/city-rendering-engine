@@ -5,7 +5,6 @@ uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
 uniform float time;
 
-
 in vec3 position;
 in vec4 colour;
 in vec2 uv_map;

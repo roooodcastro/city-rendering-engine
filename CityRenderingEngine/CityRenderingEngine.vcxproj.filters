@@ -225,6 +225,9 @@
     <ClCompile Include="engine\rendering\Skybox.cpp">
       <Filter>Source Files\engine\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="generator\CitySceneInterface.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\math\Vector2.h">
@@ -397,6 +400,9 @@
     </ClInclude>
     <ClInclude Include="engine\rendering\Skybox.h">
       <Filter>Header Files\engine\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\CitySceneInterface.h">
+      <Filter>Header Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

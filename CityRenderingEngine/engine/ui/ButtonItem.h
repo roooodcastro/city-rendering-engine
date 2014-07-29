@@ -21,7 +21,7 @@ public:
 	ButtonItem(Vector2 &position, float rotation, Vector2 &size, const char *resourceName, const char *normal, const char *hovered, const char *pressed, const char *selected);
 	virtual ~ButtonItem(void);
 
-	virtual void draw(unsigned millisElapsed, GLuint program);
+	virtual void draw(float millisElapsed, GLuint program);
 
 	/* Mouse events */
 	virtual void onMouseMoved(Vector2 &position, Vector2 &amount); // Will fire every time the mouse moves

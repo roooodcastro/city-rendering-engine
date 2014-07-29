@@ -14,22 +14,22 @@ public:
 
 	UserInterface(void);
 	UserInterface(const UserInterface &copy);
-	~UserInterface(void);
+	virtual ~UserInterface(void);
 
 	/* Mouse events */
-	void onMouseMoved(Vector2 &position, Vector2 &amount); // Will fire every time the mouse moves
-	void onMouseClick(Uint8 button, Vector2 &position); // Will fire once a mouse button is released
-	void onMouseDoubleClick(Uint8 button, Vector2 &position); // Will fire on a double click
-	void onMouseButtonDown(Uint8 button, Vector2 &position); // Will fire in every tick that a button is down
-	void onMouseButtonUp(Uint8 button, Vector2 &position); // Will fire every time a mouse button is released
-	void onMouseWheelScroll(int amount); // Will fire every time the mouse wheel scrolls
+	virtual void onMouseMoved(Vector2 &position, Vector2 &amount); // Will fire every time the mouse moves
+	virtual void onMouseClick(Uint8 button, Vector2 &position); // Will fire once a mouse button is released
+	virtual void onMouseDoubleClick(Uint8 button, Vector2 &position); // Will fire on a double click
+	virtual void onMouseButtonDown(Uint8 button, Vector2 &position); // Will fire in every tick that a button is down
+	virtual void onMouseButtonUp(Uint8 button, Vector2 &position); // Will fire every time a mouse button is released
+	virtual void onMouseWheelScroll(int amount); // Will fire every time the mouse wheel scrolls
 	/* Keyboard events */
-	void onKeyPress(SDL_Keysym key); // Will fire every time a key is released
-	void onKeyDown(SDL_Keysym key); // Will fire in every tick that a key is down
-	void onKeyUp(SDL_Keysym key); // Will fire every time a key is released
+	virtual void onKeyPress(SDL_Keysym key); // Will fire every time a key is released
+	virtual void onKeyDown(SDL_Keysym key); // Will fire in every tick that a key is down
+	virtual void onKeyUp(SDL_Keysym key); // Will fire every time a key is released
 
-	void update(float millisElapsed);
-	void draw(float millisElapsed);
+	virtual void update(unsigned millisElapsed);
+	virtual void draw(unsigned millisElapsed);
 
 	/* General getters and setters */
 	void addItem(InterfaceItem *item, std::string name);
@@ -58,11 +58,11 @@ protected:
 	std::map<std::string, InterfaceItem*> *items;
 
 	/* Debug and profiling tools */
-	InterfaceItem *fpsCounter; // Average FPS
-	InterfaceItem *resourcesCounter; // Number of resources allocated
-	InterfaceItem *entitiesCounter; // Number of entities in the current level
-	InterfaceItem *mousePosDisplay; // Current mouse position
-	Vector2 mousePos; // Stores the mouse pos for debugging
+	//InterfaceItem *fpsCounter; // Average FPS
+	//InterfaceItem *resourcesCounter; // Number of resources allocated
+	//InterfaceItem *entitiesCounter; // Number of entities in the current level
+	//InterfaceItem *mousePosDisplay; // Current mouse position
+	//Vector2 mousePos; // Stores the mouse pos for debugging
 
 	Shader *interfaceShader; // The default shader to be used on the interface. Plain simple shader.
 	/* Describes if the interface is fading in (1), fading out (2), or not fading (0). Defaults to 0. */

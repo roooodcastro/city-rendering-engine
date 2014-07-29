@@ -64,9 +64,12 @@ public:
      */
     static void initializePrimitiveMeshes();
 
-    /* Methods to retrieve the primitive meshes */
+    /*
+     * Methods to retrieve the primitive meshes. This creates the mesh AND adds it to the ResourcesManager. If the mesh
+     * already exists in the manager, it just retrieves it, instead of duplicating it. This does not buffer the mesh.
+     */
     static Model *getTriangleMesh();
-    static Model *getQuadMesh();
+    static Model *getQuadMesh(int name);
 
     /*
      * This function tries to retrieve the requested model from the resource manager, and if it fails, creates and
@@ -86,7 +89,6 @@ public:
         const Colour &colour, Texture *texture, bool preLoad);
 
     static const int meshTriangleName;
-    static const int meshQuadName;
 
 protected:
 

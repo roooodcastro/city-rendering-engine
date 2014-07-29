@@ -32,7 +32,7 @@ void ManhattanGridLayout::generateRoads(Chunk *chunk, Intersection *newIntersect
             Intersection *intersection = closestInter.at(i);
             Vector3 interPos = intersection->getWorldPosition();
             Vector3 posDiff = interPos - newInterPos;
-            float angle = abs((int) posDiff.toVec2(Vector3(0, 1, 0)).getAngle());
+            float angle = (float) abs((int) posDiff.toVec2(Vector3(0, 1, 0)).getAngle());
             if (abs(angle - 90) < 15 && (interPos.x <= newInterPos.x || interPos.z < newInterPos.z)) {
                 float dist = posDiff.getLength();
                 if (dist < bestDistZ) {

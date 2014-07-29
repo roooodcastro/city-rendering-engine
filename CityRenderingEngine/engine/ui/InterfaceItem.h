@@ -15,6 +15,7 @@ enum InterfaceItemType {
 	ITEM_TEXT, // Just a text on the screen
 };
 
+class Naquadah;
 class Texture;
 
 class InterfaceItem {
@@ -27,7 +28,7 @@ public:
 
 	/* Gameloop funcions */
 	virtual void update(unsigned millisElapsed);
-	virtual void draw(unsigned millisElapsed, GLuint program);
+	virtual void draw(float millisElapsed, GLuint program);
 	
 	/* Mouse events */
 	virtual void onMouseMoved(Vector2 &position, Vector2 &amount) = 0; // Will fire every time the mouse moves

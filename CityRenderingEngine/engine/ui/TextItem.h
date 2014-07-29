@@ -45,6 +45,7 @@ public:
 
 	/* Gameloop funcions */
 	virtual void update(unsigned millisElapsed);
+    virtual void draw(float millisElapsed, GLuint program);
 
 	/*
 	 * Start a fadeIn effect from transparent to colour, for the specified duration.
@@ -79,5 +80,6 @@ protected:
 	int fadeDuration;
 	/* Stores the colour that the FadeIn is supposed to achieve */
 	Colour fadeColour;
-
+    /* A flag inditating if the text has changed. Defaults to true. */
+    bool textChanged;
 };

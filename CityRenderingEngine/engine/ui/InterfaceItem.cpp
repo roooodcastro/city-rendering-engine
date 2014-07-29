@@ -117,14 +117,17 @@ void InterfaceItem::update(unsigned millisElapsed) {
         //GameApp *gameApp = GameApp::getInstance();
         Vector2 windowSize = Naquadah::getWindowSize();
         Vector2 renderSize = getRealSize();
-        Vector2 renderPos = getRealPosition();
-        float realPosX = renderPos.x + (renderSize.x / 2.0f);
-        float realPosY = windowSize.y - renderPos.y - (renderSize.y / 2.0f);
-        modelMatrix = Matrix4::Translation(Vector3(realPosX, realPosY, 0.0f));
-        modelMatrix = modelMatrix * Matrix4::Rotation(rotation, Vector3(0, 0, 1));
+        if (renderSize.x >= 0) {
+            Vector2 renderPos = getRealPosition();
+            float realPosX = renderPos.x + (renderSize.x / 2.0f);
+            float realPosY = windowSize.y - renderPos.y - (renderSize.y / 2.0f);
+            modelMatrix = Matrix4::Translation(Vector3(realPosX, realPosY, 0.0f));
+            modelMatrix = modelMatrix * Matrix4::Rotation(rotation, Vector3(0, 0, 1));
+            modelMatrix = modelMatrix * Matrix4::Scale(Vector3(renderSize.x / 2.0f, renderSize.y / 2.0f, 1.0));
+        }
 
         // For each child, we have to manually calculate its model matrix
-        for (std::vector<InterfaceItem*>::iterator it = innerItems->begin(); it != innerItems->end(); ++it) {
+        /*for (std::vector<InterfaceItem*>::iterator it = innerItems->begin(); it != innerItems->end(); ++it) {
             // We call the default update of the child item, because that can be different from the
             // default as well
             (*it)->update(millisElapsed);
@@ -156,16 +159,19 @@ void InterfaceItem::update(unsigned millisElapsed) {
             (*it)->setModelMatrix(childModelMatrix);
             delete childRenderSize;
             delete childRenderPos;
-        }
+        }*/
     }
 }
 
-void InterfaceItem::draw(unsigned millisElapsed, GLuint program) {
+void InterfaceItem::draw(float millisElapsed, GLuint program) {
     if (!hidden) {
-        if (texture) {
+        if (texture != nullptr) {
+            if (!texture->isLoaded()) {
+                texture->load();
+            }
             glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, false, (float*) &modelMatrix);
             texture->bindTexture(program, TEXTURE0);
-            Model::getQuadMesh()->draw();
+            Model::getQuadMesh(MODEL_UI_QUAD)->draw();
         }	
         for (std::vector<InterfaceItem*>::iterator it = innerItems->begin(); it != innerItems->end(); ++it) {
             (*it)->draw(millisElapsed, program);
@@ -176,10 +182,10 @@ void InterfaceItem::draw(unsigned millisElapsed, GLuint program) {
 Vector2 InterfaceItem::getRealSize() {
     Vector2 windowSize = Naquadah::getWindowSize();
     Vector2 realSize = Vector2(*size);
-    if (size->x == SIZE_NO_RESIZE && texture != nullptr) {
+    if (size->x == SIZE_NO_RESIZE && texture != nullptr && texture->isLoaded()) {
         realSize.x = (float) texture->getTextureWidth();
     }
-    if (size->y == SIZE_NO_RESIZE && texture != nullptr) {
+    if (size->y == SIZE_NO_RESIZE && texture != nullptr && texture->isLoaded()) {
         realSize.y = (float) texture->getTextureHeight();
     }
     // Scale according to screen resolution

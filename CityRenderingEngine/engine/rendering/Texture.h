@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../Naquadah.h"
+#include "Colour.h"
 #include "../ResourcesManager.h"
 #include "Material.h"
 
 class Material;
-class Colour;
 
 enum TextureSlot {
 	TEXTURE0,
@@ -13,11 +13,23 @@ enum TextureSlot {
 	TEXTURE2
 };
 
+struct TextFontAttr {
+    std::string fontFilename;
+    int fontSize;
+};
+
 class Texture : public Resource {
 public:
 	Texture(void);
 	Texture(const Texture &copy);
 	Texture(const std::string &filename, int name);
+
+    /*
+	 * Creates a text texture, which is basically a text rendered into an image. This is the only type of texture that
+     * should not be added to the Resource Manager, because texts usually change a lot and adding and removing them
+     * from the manager every frame or so is kind of redundant.
+	 */
+    Texture(const std::string &text, const Colour &colour, const std::string &fontFilename, int fontSize);
     Texture(Colour &colour, int name);
 	virtual ~Texture(void);
 
@@ -41,13 +53,6 @@ public:
 	static Texture *getOrCreate(int name, Colour &colour, bool preLoad);
 
 	/*
-	 * Creates a text texture, which is basically a text rendered into an image. This is the only type of texture that
-     * should not be added to the Resource Manager, because texts usually change a lot and adding and removing them
-     * from the manager every frame or so is not desirable.
-	 */
-	static Texture *createFromText(std::string textureText, Colour &textColour, TTF_Font &font);
-
-	/*
 	 * Binds an already loaded texture to the specified texture unit. Call this function right before rendering a model
      * that uses a texture.
 	 */
@@ -60,7 +65,7 @@ public:
 	int getTextureWidth() { return texWidth; }
 	int getTextureHeight() { return texHeight; }
 
-	void setColour(Colour &colour);
+    void setColour(const Colour &colour) { this->colour = colour; }
 
 	/*
 	 * Log an SDL error with some error message to the output stream of our choice
@@ -96,7 +101,13 @@ protected:
 
 	/* The filename to load the texture from */
 	std::string fileName;
-	/* Or the colour, if it's a colour texture */
-	Colour *colour;
 
+    /* If it's a text texture, this is its text. */
+    std::string text;
+
+    /* If it's a text texture, this is the font that will be used to render the text. */
+    TextFontAttr fontAttr;
+
+	/* Or the colour, if it's a colour texture, or a text texture. */
+	Colour colour;
 };

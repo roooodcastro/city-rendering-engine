@@ -2,22 +2,21 @@
 
 Scene::Scene() {
     entities = new std::map<std::string, Entity*>();
-    opaqueEntities = new std::vector<Entity*>();
-    opaqueEntities->reserve(25000);
-    transparentEntities = new std::vector<Entity*>();
-    transparentEntities->reserve(25000);
-    //setProjectionMatrix(Matrix4::Perspective(1.0f, -100.0f, 1280/720, 45.0f));
+    //opaqueEntities = new std::vector<Entity*>();
+    //opaqueEntities->reserve(25000);
+    //transparentEntities = new std::vector<Entity*>();
+    //transparentEntities->reserve(25000);
     projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280.0f/720.0f, 45.0f));
     cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     camera = new Camera();
     //lightSources = new std::vector<Light*>();
     lightSource = nullptr;
+    skybox = nullptr;
     dragging = false;
     draggingRight = false;
     updateMutex = SDL_CreateMutex();
     renderMutex = SDL_CreateMutex();
     userInterface = nullptr;
-    skybox = nullptr;
     frustum = new Frustum(*projectionMatrix * *cameraMatrix);
 }
 
@@ -38,14 +37,14 @@ Scene::Scene(const Scene &copy) {
 
 Scene::Scene(UserInterface *userInterface) {
     entities = new std::map<std::string, Entity*>();
-    projectionMatrix = new Matrix4();
-    cameraMatrix = new Matrix4();
-    userInterface = userInterface;
+    projectionMatrix = new Matrix4(Matrix4::Perspective(1.0f, -100.0f, 1280.0f/720.0f, 45.0f));
+    cameraMatrix = new Matrix4(Matrix4::Translation(Vector3(0, 0, -10.0f)));
     camera = new Camera();
+    this->userInterface = userInterface;
     //lightSources = new std::vector<Light*>();
     lightSource = nullptr;
-    dragging = false;
     skybox = nullptr;
+    dragging = false;
     draggingRight = false;
     updateMutex = SDL_CreateMutex();
     renderMutex = SDL_CreateMutex();
@@ -349,42 +348,16 @@ void Scene::render(Renderer *renderer, float millisElapsed) {
         }
     }
 
-
-    //auto it = opaqueEntities->rbegin();
-    //auto itEnd = opaqueEntities->rend();
-    //for (; it != itEnd; it++) {
-    //    // We first get the right shader to use with this entity
-    //    Entity *entity = (*it);
-    //    if (frustum->isEntityInside(entity)) {
-    //        if (entity->getShader() != nullptr && entity->getShader()->isLoaded()) {
-    //            if (*(entity->getShader()) == *(renderer->getCurrentShader())) {
-    //            
-    //            } else {
-    //                renderer->useShader(entity->getShader());
-    //                renderer->updateShaderMatrix("projMatrix", projectionMatrix);
-    //                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-    //                updatedCameraMatrix = true;
-    //                if (lightSource != nullptr) {
-    //                    lightSource->updateShaderParameters(entity->getShader());
-    //                }
-    //                entity->getShader()->updateShaderParameters(false);
-    //            }
-    //            if (!updatedCameraMatrix) {
-    //                renderer->updateShaderMatrix("viewMatrix", cameraMatrix);
-    //                updatedCameraMatrix = true;
-    //            }
-    //            renderer->updateShaderMatrix("modelMatrix", &(entity->getModelMatrix()));
-    //            entity->draw(millisElapsed);
-    //        }
-    //    }
-    //}
-    //std::cout << sum << std::endl;
     // Draw Interface
     if (userInterface != nullptr) {
-        //renderer->useShader(userInterface->getInterfaceShader());
-        //glUniformMatrix4fv(glGetUniformLocation(program, "viewMatrix"), 1, false, (float*) &(Matrix4::Translation(Vector3(0, 0, 1.0f))));
-        //glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, false, (float*) &(Matrix4::Orthographic(-1, 1, 1920.0f, 0, 1080, 0)));
-        //userInterface->draw(millisElapsed);
+        if (!userInterface->getInterfaceShader()->isLoaded()) {
+            userInterface->getInterfaceShader()->load();
+        }
+        renderer->useShader(userInterface->getInterfaceShader());
+        renderer->updateShaderMatrix("viewMatrix", &(Matrix4::Translation(Vector3(0, 0, 1.0f))));
+        Vector2 windowSize = renderer->getWindowSize();
+        renderer->updateShaderMatrix("projMatrix", &(Matrix4::Orthographic(-1, 1, windowSize.x, 0, windowSize.y, 0)));
+        userInterface->draw(millisElapsed);
     }
     unlockRenderMutex();
 }

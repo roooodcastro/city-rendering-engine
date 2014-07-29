@@ -16,6 +16,7 @@ static const int MODEL_QUAD = 2;
 static const int MODEL_CUBE = 3;
 static const int MODEL_SPHERE = 4; // unused
 static const int MODEL_PLANE = 5;
+static const int MODEL_UI_QUAD = 6;
 
 static const int MODEL_INTERSECTION = 10;
 static const int MODEL_ROAD = 11;

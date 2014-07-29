@@ -12,7 +12,8 @@ Texture::Texture(void) : Resource() {
 	textureId = -1;
 	// By default create a white colour texture
 	fileName = "";
-	colour = new Colour(0xFFFFFFFF);
+    text = "";
+    colour = Colour::WHITE;
 }
 
 Texture::Texture(const Texture &copy) : Resource(copy) {
@@ -20,25 +21,33 @@ Texture::Texture(const Texture &copy) : Resource(copy) {
 	texWidth = copy.texWidth;
 	texHeight = copy.texHeight;
 	fileName = copy.fileName;
-	if (copy.colour != nullptr) {
-		colour = new Colour(*(copy.colour));
-	} else {
-		colour = nullptr;
-	}
+    text = "";
+    colour = Colour(copy.colour);
+    fontAttr = copy.fontAttr;
 }
 
 Texture::Texture(const std::string &filename, int name) : Resource(name) {
 	this->fileName = filename;
-	this->colour = nullptr;
+    this->text = "";
+    this->colour = Colour::WHITE;
+}
+
+Texture::Texture(const std::string &text, const Colour &colour, const std::string &fontFilename, int fontSize)
+    : Resource() {
+	fileName = "";
+    this->text = text;
+    this->colour = colour;
+    this->fontAttr.fontFilename = fontFilename;
+    this->fontAttr.fontSize = fontSize;
 }
 
 Texture::Texture(Colour &colour, int name) : Resource(name) {
 	this->fileName = "";
-	this->colour = new Colour(colour);
+    text = "";
+	this->colour = Colour(colour);
 }
 
 Texture::~Texture(void) {
-    delete colour;
 }
 
 Texture &Texture::operator=(const Texture &other) {
@@ -90,21 +99,63 @@ void Texture::load() {
 			// clean up
 			SDL_FreeSurface(surface);
 			//GameApp::logOpenGLError("TEX_LOAD");
-		} else if (colour != nullptr) {
+		} else if (text == "") {
 			// It's a colour texture
 			this->texWidth = 1;
 			this->texHeight = 1;
 			glGenTextures(1, &textureId);
 
 			glBindTexture(GL_TEXTURE_2D, textureId);
-			Uint32 col = colour->getColour();
+			Uint32 col = colour.getColour();
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, &col);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			//GameApp::logOpenGLError("TEX_LOAD");
-		}
+		} else {
+            // It's a text texture
+	        int mode;
+	        //Render text surface
+	        SDL_Color sdlColour = SDL_Color();
+	        sdlColour.r = colour.red;
+	        sdlColour.g = colour.green;
+	        sdlColour.b = colour.blue;
+	        sdlColour.a = colour.alpha;
+            TTF_Font *font = TTF_OpenFont(fontAttr.fontFilename.c_str(), fontAttr.fontSize);
+            SDL_Surface* textSurface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), sdlColour, 1000);
+	        if (textSurface == nullptr) {
+                logSDLError(std::cout, "Unable to render '" + text + "' on a texture: " + TTF_GetError());
+                TTF_CloseFont(font);
+                loaded = true;
+                valid = false;
+                return;
+	        }
+		    // Work out what format to tell glTexImage2D to use...
+		    if (textSurface->format->BytesPerPixel == 3) { // RGB 24bit
+			    mode = GL_RGB;
+		    } else if (textSurface->format->BytesPerPixel == 4) { // RGBA 32bit
+			    mode = GL_RGBA;
+		    } else { // Not a valid image
+			    SDL_FreeSurface(textSurface);
+                TTF_CloseFont(font);
+                loaded = true;
+                valid = false;
+			    return;
+		    }
+		    this->texWidth = textSurface->w;
+		    this->texHeight = textSurface->h;
+		    glGenTextures(1, &textureId);
+
+		    glBindTexture(GL_TEXTURE_2D, textureId);
+		    glTexImage2D(GL_TEXTURE_2D, 0, mode, texWidth, texHeight, 0, mode, GL_UNSIGNED_BYTE, textSurface->pixels);
+		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		    // Clean up
+		    SDL_FreeSurface(textSurface);
+            TTF_CloseFont(font); // We don't need this font anymore
+        }
         loaded = true;
 		if (textureId >= 0) {
 			valid = true;
@@ -153,53 +204,6 @@ void Texture::bindTexture(GLuint shaderProgram, TextureSlot slot) {
 	}
 }
 
-Texture *Texture::createFromText(std::string textureText, Colour &textColour, TTF_Font &font) {
-	Texture *texture = new Texture();
-	delete texture->colour;
-	texture->colour = NULL;
-	int mode;
-	//Render text surface
-	SDL_Color sdlColour = SDL_Color();
-	sdlColour.r = textColour.red;
-	sdlColour.g = textColour.green;
-	sdlColour.b = textColour.blue;
-	sdlColour.a = textColour.alpha;
-	SDL_Surface* textSurface = TTF_RenderText_Blended(&font, textureText.c_str(), sdlColour);
-	if (textSurface == NULL) {
-		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-	} else {
-		// Work out what format to tell glTexImage2D to use...
-		if (textSurface->format->BytesPerPixel == 3) { // RGB 24bit
-			mode = GL_RGB;
-		} else if (textSurface->format->BytesPerPixel == 4) { // RGBA 32bit
-			mode = GL_RGBA;
-		} else { // Not a valid image
-			SDL_FreeSurface(textSurface);
-			return NULL;
-		}
-		texture->texWidth = textSurface->w;
-		texture->texHeight = textSurface->h;
-		glGenTextures(1, &(texture->textureId));
-
-		// this reads from the sdl surface and puts it into an opengl texture
-		glBindTexture(GL_TEXTURE_2D, texture->textureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, mode, texture->texWidth, texture->texHeight, 0, mode, GL_UNSIGNED_BYTE, textSurface->pixels);
-
-		// these affect how this texture is drawn later on...
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-
-		// clean up
-		SDL_FreeSurface(textSurface);
-		//GameApp::logOpenGLError("TEX_LOAD");
-
-		if (texture->textureId >= 0) {
-			texture->loaded = true;
-		}
-	}
-	return texture;
-}
-
 Texture *Texture::getOrCreate(int name, const std::string &fileName, bool preLoad) {
     Texture *texture = (Texture*) ResourcesManager::getResource(name);
 	if (texture != nullptr) {
@@ -239,12 +243,4 @@ Texture *Texture::getColourGreen() {
 
 Texture *Texture::getColourBlue() {
 	return getOrCreate(Texture::texColNameBlue, Colour(0xFF0000FF), true);
-}
-
-void Texture::setColour(Colour &colour) {
-	if (this->colour) {
-		*(this->colour) = colour;
-	} else {
-		this->colour = new Colour(colour);
-	}
 }
