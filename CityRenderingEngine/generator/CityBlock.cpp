@@ -1,12 +1,14 @@
 #include "CityBlock.h"
 
-CityBlock::CityBlock(void) : Entity() {
+CityBlock::CityBlock(float density) : Entity() {
     vertices = new std::vector<Intersection*>();
     //model = Model::getOrCreate("cube", "resources/meshes/cube.obj", false);
     //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
         //"resources/shaders/fragLight.glsl", false);
     this->maximumPerimeterPerBuilding = 250.0f;
     this->numChunksSharing = 0;
+    this->type = CITY_BLOCK_COMMERCIAL_HIGH;
+    this->density = density;
 }
 
 CityBlock::~CityBlock(void) {
@@ -49,38 +51,40 @@ void CityBlock::unloadOpenGL() {
 }
 
 void CityBlock::generateBuildings() {
-    // First we define the CityBlock's RenderRadius. This is the best place to do this as all the vertices (should) be
-    // added already.
-    Vector2 minPos = Vector2((float) MAX_INT, (float) MAX_INT);
-    Vector2 maxPos = Vector2();
+    if (density > 0) {
+        // First we define the CityBlock's RenderRadius. This is the best place to do this as all the vertices (should) be
+        // added already.
+        Vector2 minPos = Vector2((float) MAX_INT, (float) MAX_INT);
+        Vector2 maxPos = Vector2();
 
-    // TODO: Move the roadWidth and pavementWidth to Road.h, and make them relative to the road type and size
-    float roadWidth = 10.0f;
-    float pavementWidth = 5.0f;
+        // TODO: Move the roadWidth and pavementWidth to Road.h, and make them relative to the road type and size
+        float roadWidth = 10.0f;
+        float pavementWidth = 5.0f;
 
-    // The usable area of the CityBlock, inset to allow space for the road and pavement.
-    std::vector<Vector2> usableArea = std::vector<Vector2>();
-    for (auto it = vertices->begin(); it != vertices->end(); it++) {
-        Vector2 vertex = Vector2((*it)->getPosition().toVec2(Vector3(0, 1, 0)));
-        usableArea.push_back(vertex);
-        // To help define the RenderRadius
-        minPos.x = min(minPos.x, vertex.x);
-        minPos.y = min(minPos.y, vertex.y);
-        maxPos.x = max(maxPos.x, vertex.x);
-        maxPos.y = max(maxPos.y, vertex.y);
-    }
-    this->renderRadius = (maxPos - minPos).getLength() / 2.0f;
+        // The usable area of the CityBlock, inset to allow space for the road and pavement.
+        std::vector<Vector2> usableArea = std::vector<Vector2>();
+        for (auto it = vertices->begin(); it != vertices->end(); it++) {
+            Vector2 vertex = Vector2((*it)->getPosition().toVec2(Vector3(0, 1, 0)));
+            usableArea.push_back(vertex);
+            // To help define the RenderRadius
+            minPos.x = min(minPos.x, vertex.x);
+            minPos.y = min(minPos.y, vertex.y);
+            maxPos.x = max(maxPos.x, vertex.x);
+            maxPos.y = max(maxPos.y, vertex.y);
+        }
+        this->renderRadius = (maxPos - minPos).getLength() / 2.0f;
 
-    usableArea = Geom::insetPolygon(usableArea, roadWidth / 2.0f + pavementWidth);
+        usableArea = Geom::insetPolygon(usableArea, roadWidth / 2.0f + pavementWidth);
 
-    // Split the usable area into lots
-    std::vector<Building*> buildingLots = splitLots(usableArea);
+        // Split the usable area into lots
+        std::vector<Building*> buildingLots = splitLots(usableArea);
 
-    // TODO: Tell each lot its type, according to its size and the type of this CityBlock, and "build" the Building.
-    auto itEnd = buildingLots.end();
-    for (auto it = buildingLots.begin(); it != itEnd; it++) {
-        addChild(*it);
-        (*it)->constructGeometry();
+        // TODO: Tell each lot its type, according to its size and the type of this CityBlock, and "build" the Building.
+        auto itEnd = buildingLots.end();
+        for (auto it = buildingLots.begin(); it != itEnd; it++) {
+            addChild(*it);
+            (*it)->constructGeometry();
+        }
     }
 }
 

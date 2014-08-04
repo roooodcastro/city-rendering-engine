@@ -73,6 +73,9 @@
     <Filter Include="Source Files\generator\gridlayouts">
       <UniqueIdentifier>{b6096982-fcb7-41e4-a0b5-4089826e77a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\generator\math">
+      <UniqueIdentifier>{b181c589-9139-4e2e-be49-46c8068e0bcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -403,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="generator\CitySceneInterface.h">
       <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\math\Perlin.h">
+      <Filter>Header Files\generator\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

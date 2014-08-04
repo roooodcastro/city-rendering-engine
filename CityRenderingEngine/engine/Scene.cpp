@@ -275,6 +275,7 @@ void Scene::update(float millisElapsed) {
     float cosPhi = cosf((float) toRadians(camera->getRotation().x));
     float sinTheta = sinf((float) toRadians(camera->getRotation().y));
     float cosTheta = cosf((float) toRadians(camera->getRotation().y));
+    float heightFactor = clamp(camera->getPosition().y / 1000.0f, 0.1f, 1.0f);
     Vector3 movement = Vector3();
     if (Keyboard::isKeyPressed(SDLK_w)) {
         movement -= Vector3(-sinTheta * cosPhi, sinPhi, cosPhi * cosTheta);
@@ -295,7 +296,7 @@ void Scene::update(float millisElapsed) {
         movement += Vector3(0, -1, 0);
     }
     if (movement.getLength() > EPS) {
-        camera->moveCamera(movement * speed * millisElapsed);
+        camera->moveCamera(movement * speed * millisElapsed * heightFactor);
     }
 
     unsigned numEntities = (unsigned) entities->size();

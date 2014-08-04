@@ -13,7 +13,8 @@ Building::Building(CityBlock *cityBlock, Vector3 blockPosition) : Entity() {
         "resources/shaders/fragLight.glsl", false);
     shader->addUser();
     this->cityBlock = cityBlock;
-    float height = generateRandom(20, 100);
+    int numFloors = (int) generateRandom(2, 10);
+    float height = numFloors * 3.2f;
     float width = 50.0f; // Width relative to the pavement
     float depth = 50.0f; // Depth relative to going inwards the city block, to the centre of it
     this->scale = Vector3(width / 2.0f, height / 2.0f, depth / 2.0f);
@@ -87,7 +88,9 @@ void Building::constructGeometry() {
             cityBlock->setPosition(cityBlockPos); // Forces the ModelMatrix to be updated
 
             float baseHeight = cityBlockPos.y;
-            float height = generateRandom(20, 100);
+            int numFloors = (int) generateRandom(2, 20);
+            //float height = numFloors * 3.2f;
+            float height = cityBlock->getDensity() * 1000.0f;
 
             std::vector<Vector3> vertices = std::vector<Vector3>();
             std::vector<Vector2> uv_maps = std::vector<Vector2>();
@@ -110,6 +113,8 @@ void Building::constructGeometry() {
                 Vector3 b = Vector3(b2.x, height, b2.y); // | \    |
                 Vector3 c = Vector3(a2.x, 0, a2.y);      // |   \  |
                 Vector3 d = Vector3(b2.x, 0, b2.y);      // C ---- D
+                float width = (a - b).getLength();
+                float texScaleX = width / 10.0f;
                 // Add the 2 triangles that form up the quad for each wall
                 vertices.push_back(a); // Triangle 1: ABD
                 vertices.push_back(b);
@@ -118,18 +123,18 @@ void Building::constructGeometry() {
                 vertices.push_back(d);
                 vertices.push_back(c);
                 uv_maps.push_back(Vector2(0.0f, 0.0f));
-                uv_maps.push_back(Vector2(1.0f, 0.0f));
-                uv_maps.push_back(Vector2(1.0f, 1.0f));
+                uv_maps.push_back(Vector2(texScaleX, 0.0f));
+                uv_maps.push_back(Vector2(texScaleX, (float) numFloors));
                 uv_maps.push_back(Vector2(0.0f, 0.0f));
-                uv_maps.push_back(Vector2(1.0f, 1.0f));
-                uv_maps.push_back(Vector2(0.0f, 1.0f));
+                uv_maps.push_back(Vector2(texScaleX, (float) numFloors));
+                uv_maps.push_back(Vector2(0.0f, (float) numFloors));
             }
             // Create the Model using the vertices
             std::string modelName = getEntityName();
             modelName.replace(0, 8, "MODEL");
             std::stringstream texFileName;
             int texIndex = (int) generateRandom(1, 6);
-            texFileName << "resources/textures/buildings/office_" << texIndex << ".jpg";
+            texFileName << "resources/textures/buildings/office_" << texIndex << ".png";
             Texture *texture = Texture::getOrCreate(texIndex + 1010, texFileName.str(), false);
 
             Model::getOrCreate(ResourcesManager::generateNextName(), vertices, uv_maps, Colour::WHITE, texture, false);

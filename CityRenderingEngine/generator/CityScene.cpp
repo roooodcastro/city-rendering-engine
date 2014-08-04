@@ -40,7 +40,7 @@ void CityScene::update(float millisElapsed) {
     lockUpdateMutex();
 
     // TODO: Move distance that new chunks should be loaded to config
-    float chunkViewDistance = 3000.0f;
+    float chunkViewDistance = 4000.0f;
 
     // Use current camera position to calculate which Chunks must be loaded or unloaded.
     Vector3 cameraPos = camera->getPosition();

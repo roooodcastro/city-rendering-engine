@@ -89,7 +89,26 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
     auto itEnd = chunk->getIntersections()->end();
     for (auto it = chunk->getIntersections()->begin(); it != itEnd; it++) {
         CityBlock *cityBlock = gridLayout.generateCityBlock(chunk, (*it));
+
         if (cityBlock != nullptr) {
+            // Check if this CityBlock has any Intersections that are in mutiple Chunks. If it does, add the CityBlock to
+            // those Chunks
+            /*Intersection *multiIntersection = nullptr;
+            for (auto it = cityBlock->getVertices()->begin(); it != cityBlock->getVertices()->end(); it++) {
+                if ((*it)->getNumChunksSharing() > 1) {
+                    multiIntersection = *it;
+                }
+            }
+            if (multiIntersection != nullptr) {
+                for (auto it = neighbourChunks.begin(); it != neighbourChunks.end(); it++) {
+                    if ((*it)->hasIntersection(multiIntersection)) {
+                        (*it)->addCityBlock(cityBlock);
+                    }
+                }
+            }*/
+
+
+
             auto itEndC = chunk->getCityBlocks()->end();
             bool duplicate = false;
             for (auto itC = chunk->getCityBlocks()->begin(); itC != itEndC; itC++) {

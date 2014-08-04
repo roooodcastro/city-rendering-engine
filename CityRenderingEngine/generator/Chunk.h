@@ -78,6 +78,9 @@ public:
     /* Removes an Intersection from this Chunk. */
     void removeIntersection(Intersection *intersection);
 
+    /* Returns true if the provided Intersection is in this Chunk, false otherwise. */
+    bool hasIntersection(Intersection *intersection);
+
     /* Adds a new Road to this Chunk. */
     void addRoad(Road *road);
 

@@ -93,6 +93,15 @@ void Chunk::removeIntersection(Intersection *intersection) {
     removeChild(intersection);
 }
 
+bool Chunk::hasIntersection(Intersection *intersection) {
+    auto itEnd = intersections->end();
+    for (auto it = intersections->begin(); it != itEnd; it++) {
+        if (*it == intersection)
+            return true;
+    }
+    return false;
+}
+
 void Chunk::addRoad(Road *road) {
     roads->push_back(road);
     road->addChunkSharing();

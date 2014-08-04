@@ -19,10 +19,21 @@
 
 class Building;
 
+enum CityBlockType {
+    CITY_BLOCK_RESIDENTIAL_LOW = 0,     // Small family houses                      NOT YET IMPLEMENTED
+    CITY_BLOCK_RESIDENTIAL_MEDIUM = 1,  // Big houses and small commonholds         NOT YET IMPLEMENTED
+    CITY_BLOCK_RESIDENTIAL_HIGH = 2,    // Big residential buildings                NOT YET IMPLEMENTED
+    CITY_BLOCK_COMMERCIAL_LOW = 3,      // Small stores                             NOT YET IMPLEMENTED
+    CITY_BLOCK_COMMERCIAL_MEDIUM = 4,   // Superstores and small office buildings   NOT YET IMPLEMENTED
+    CITY_BLOCK_COMMERCIAL_HIGH = 5,     // Skyscrapers
+    CITY_BLOCK_PARK = 6,                // Squares and parks                        NOT YET IMPLEMENTED
+    CITY_BLOCK_VOID = 7                 // Empty terrain, sometimes fenced          NOT YET IMPLEMENTED
+};
+
 class CityBlock : public Entity {
 public:
 
-    CityBlock(void);
+    CityBlock(float density);
     virtual ~CityBlock(void);
 
     /* Overload of Entity's methods. */
@@ -42,6 +53,15 @@ public:
 
     /* Tells the CityBlock that a Chunk that was previously using it is not using it anymore. */
     void removeChunkSharing() { numChunksSharing--; }
+
+    /* Returns the type of this CityBlock. */
+    CityBlockType getType() { return type; }
+
+    /* Sets the type of this CityBlock. */
+    void setType(CityBlockType type) { this->type = type; }
+
+    /* Returns the populational density of this CityBlock. */
+    float getDensity() { return density; }
 
     /*
      * This function should be called after all vertices are set. This will calculate the space of the block and decide
@@ -81,4 +101,13 @@ protected:
 
     /* Indicates the number of Chunks that currently have this CityBlock within. Defaults to zero. */
     char numChunksSharing;
+
+    /*
+     * The "population density" of this CityBlock. This is used to calculate the type of CityBlock and the size of the
+     * buildings.
+     */
+    float density;
+
+    /* The type of Buildings that this CityBlock will contain. */
+    CityBlockType type;
 };

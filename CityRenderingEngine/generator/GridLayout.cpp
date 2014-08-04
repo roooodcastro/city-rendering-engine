@@ -1,4 +1,5 @@
 #include "GridLayout.h"
+#include "math/Perlin.h"
 
 GridLayout::GridLayout(const int layoutId, const Vector2 &posMin, const Vector2 &posMax) : GRID_LAYOUT_ID(layoutId) {
     this->posMin = posMin;
@@ -85,13 +86,22 @@ CityBlock *GridLayout::generateCityBlock(Chunk *chunk, Intersection *start) {
                 centralPosition += vertices.at(i)->getPosition();
             }
             centralPosition = centralPosition / (float) numVertices;
+            // Perform a simple boundary check to see if this CityBlock is contained whiin the Chunk
+            Vector2 chunkMin = chunk->getChunkPos();
+            Vector2 chunkMax = chunkMin + 1000.0f;
+            if (centralPosition.x <= chunkMin.x || centralPosition.x > chunkMax.x) {
+                if (centralPosition.y <= chunkMin.y || centralPosition.y > chunkMax.y) {
+                    return nullptr; // The CityBlock centre is outside the Chunk, discard it
+                }
+            }
             auto itEnd = chunk->getCityBlocks()->end();
             for (auto it = chunk->getCityBlocks()->begin(); it != itEnd; it++) {
                 if (((*it)->getCentralPosition() - centralPosition).getLength() <= 10) {
                     return nullptr; // If we find a CityBlock too close, it means it's duplicated
                 }
             }
-            CityBlock *cityBlock = new CityBlock();
+            float density = Perlin::getCityBlockDensity(centralPosition.x, centralPosition.z);
+            CityBlock *cityBlock = new CityBlock(density);
             for (auto it = vertices.begin(); it != vertices.end(); it++) {
                 cityBlock->addVertice((*it));
             }

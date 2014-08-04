@@ -259,6 +259,7 @@
     <ClInclude Include="generator\GridLayout.h" />
     <ClInclude Include="generator\gridlayouts\ManhattanGridLayout.h" />
     <ClInclude Include="generator\Intersection.h" />
+    <ClInclude Include="generator\math\Perlin.h" />
     <ClInclude Include="generator\Road.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
