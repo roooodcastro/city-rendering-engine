@@ -43,9 +43,10 @@ public:
 
     /*
      * Sets a new value for this Shader Parameter, changing the flag valueChanged to true. This will destroy the
-     * previous value, so any value being entered here should be copied before.
+     * previous value, so any value being entered here should be copied before. The deletePrevious bool, if set to
+     * true, deletes the previous value from memory, if there was any.
      */
-    void setValue(void *value);
+    void setValue(void *value, bool deletePrevious);
 
     /* Returns the current value of this Shader Parameter. */
     void *getValue() { return value; }

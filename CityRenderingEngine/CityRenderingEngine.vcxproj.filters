@@ -76,6 +76,9 @@
     <Filter Include="Header Files\generator\math">
       <UniqueIdentifier>{b181c589-9139-4e2e-be49-46c8068e0bcd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\generator\math">
+      <UniqueIdentifier>{4e1f3a0f-f627-4709-8f60-0b1cc4fc6027}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -230,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="generator\CitySceneInterface.cpp">
       <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\math\Perlin.cpp">
+      <Filter>Source Files\generator\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

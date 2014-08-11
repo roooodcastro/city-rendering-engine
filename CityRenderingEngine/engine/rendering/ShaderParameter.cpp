@@ -12,8 +12,8 @@ ShaderParameter::~ShaderParameter() {
     value = nullptr;
 }
 
-void ShaderParameter::setValue(void *value) {
-    if (this->value != nullptr) delete this->value;
+void ShaderParameter::setValue(void *value, bool deletePrevious) {
+    if (this->value != nullptr && deletePrevious) delete this->value;
     this->value = value;
     valueChanged = true;
 }

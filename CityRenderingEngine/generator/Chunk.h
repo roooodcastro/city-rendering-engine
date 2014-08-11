@@ -167,6 +167,9 @@ protected:
     /* The City in which this Chunk is loaded. */
     City *city;
 
+    /* A quad drawn to represent the ground. Defaults to a grass texture. */
+    Entity *ground;
+
     /* Indicates if OpenGL resources have already been safely released by the render main thread. Defaults to false. */
     bool safeToDelete;
 };

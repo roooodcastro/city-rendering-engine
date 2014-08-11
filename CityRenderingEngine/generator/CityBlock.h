@@ -91,7 +91,7 @@ protected:
      * perpendicular to it. The lot is divided using this line and the process continues recursively, until the correct
      * size is reached.
      */
-    std::vector<Building*> splitLots(std::vector<Vector2> &lotPolygon);
+    std::vector<Building*> splitLots(std::vector<Vector2> &lotPolygon, std::vector<Vector2> &originalLot);
 
     /* The Intersections that are "vertices" to this CityBlock. A CityBlock must have at least 3 vertices. */
     std::vector<Intersection*> *vertices;

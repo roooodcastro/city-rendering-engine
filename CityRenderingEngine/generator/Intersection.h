@@ -25,6 +25,8 @@ public:
     Intersection(Vector3 position);
     virtual ~Intersection(void);
 
+    virtual void draw(float millisElapsed);
+
     /* Connects this intersction to another, creating a connection and a road between them. */
     Road *connectTo(Intersection *other);
 

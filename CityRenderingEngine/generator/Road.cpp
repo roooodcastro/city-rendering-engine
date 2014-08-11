@@ -2,9 +2,9 @@
 
 Road::Road(void) : Entity() {
     setModel(Model::getOrCreate(MODEL_ROAD, "resources/meshes/plane.obj", false));
-    model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_1, "resources/textures/road_straight_1.png", false));
-    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC,
-        "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false);
+    model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_1, "resources/textures/road_straight_4.png", false));
+    shader = Shader::getOrCreate(SHADER_LIGHT_ROAD,
+        "resources/shaders/vertRoad.glsl", "resources/shaders/fragRoad.glsl", false);
     pointA = nullptr;
     pointB = nullptr;
     this->numChunksSharing = 0;
@@ -12,9 +12,9 @@ Road::Road(void) : Entity() {
 
 Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
     setModel(Model::getOrCreate(MODEL_ROAD, "resources/meshes/plane.obj", false));
-    model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_1, "resources/textures/road_straight_1.png", false));
-    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC,
-        "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false);
+    model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_1, "resources/textures/road_straight_4.png", false));
+    shader = Shader::getOrCreate(SHADER_LIGHT_ROAD,
+        "resources/shaders/vertRoad.glsl", "resources/shaders/fragRoad.glsl", false);
     this->pointA = pointA;
     this->pointB = pointB;
     this->numChunksSharing = 0;
@@ -28,6 +28,7 @@ Road::Road(Intersection *pointA, Intersection *pointB) : Entity() {
     this->rotation = Vector3(0, angle, 0);
     this->scale = Vector3(10, 0, distance / 2.0f);
     this->setRenderRadius(distance / 2.0f);
+    shader->addShaderParameter("roadScale", PARAMETER_FLOAT, &distance);
 }
 
 Road::~Road(void) {
@@ -39,6 +40,17 @@ Road::~Road(void) {
     }
     pointA = nullptr;
     pointB = nullptr;
+}
+
+void Road::draw(float millisElapsed) {
+    if (model != nullptr) {
+        Naquadah::getInstance()->getCurrentScene()->useShader(shader);
+        Naquadah::getRenderer()->updateShaderMatrix("modelMatrix", modelMatrix);
+        float distance = scale.z * 2.0f;
+        shader->getShaderParameter("roadScale")->setValue(&distance, false);
+        shader->updateShaderParameters(false);
+        model->draw();
+    }
 }
 
 void Road::setPointA(Intersection *pointA) {

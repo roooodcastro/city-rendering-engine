@@ -3,7 +3,6 @@
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
-uniform float time;
 
 in vec3 position;
 in vec4 colour;
@@ -31,8 +30,8 @@ void main(void) {
 	OUT.uv_map = uv_map;
 	OUT.colour = colour;
 
-	mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
+	//mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     
-    OUT.normal = normalize(normalMatrix * normal);
+    OUT.normal = normalize(normal);
     OUT.cameraPos = -(viewMatrix[3].xyz) * mat3(viewMatrix);
 }

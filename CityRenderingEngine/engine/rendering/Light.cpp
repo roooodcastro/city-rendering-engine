@@ -49,23 +49,20 @@ void Light::updateShaderParameters(Shader *shader) {
     if (shader != nullptr) {
         ShaderParameter *parameterPos = shader->getShaderParameter("lightSource.position");
         if (parameterPos == nullptr) {
-            shader->addShaderParameter(new ShaderParameter("lightSource.position", 
-                PARAMETER_VECTOR_3, new Vector3(position)));
-            shader->addShaderParameter(new ShaderParameter("lightSource.direction", 
-                PARAMETER_VECTOR_3, new Vector3(direction)));
+            shader->addShaderParameter(new ShaderParameter("lightSource.position", PARAMETER_VECTOR_3, &position));
+            shader->addShaderParameter(new ShaderParameter("lightSource.direction", PARAMETER_VECTOR_3, &direction));
             shader->addShaderParameter(new ShaderParameter("lightSource.colour", 
                 PARAMETER_VECTOR_3, new Vector3(colour.getColourVec3())));
-            shader->addShaderParameter(new ShaderParameter("lightSource.intensity",
-                PARAMETER_FLOAT, new float(intensity)));
-            shader->addShaderParameter(new ShaderParameter("lightSource.radius", PARAMETER_FLOAT, new float(radius)));
-            shader->addShaderParameter(new ShaderParameter("lightSource.type", PARAMETER_INT, new int(type)));
+            shader->addShaderParameter(new ShaderParameter("lightSource.intensity", PARAMETER_FLOAT, &intensity));
+            shader->addShaderParameter(new ShaderParameter("lightSource.radius", PARAMETER_FLOAT, &radius));
+            shader->addShaderParameter(new ShaderParameter("lightSource.type", PARAMETER_INT, &type));
         } else {
-            parameterPos->setValue(new Vector3(position));
-            shader->getShaderParameter("lightSource.direction")->setValue(new Vector3(direction));
-            shader->getShaderParameter("lightSource.colour")->setValue(new Vector3(colour.getColourVec3()));
-            shader->getShaderParameter("lightSource.radius")->setValue(new float(radius));
-            shader->getShaderParameter("lightSource.intensity")->setValue(new float(intensity));
-            shader->getShaderParameter("lightSource.type")->setValue(new int(type));
+            parameterPos->setValue(&position, false);
+            shader->getShaderParameter("lightSource.direction")->setValue(&direction, false);
+            shader->getShaderParameter("lightSource.colour")->setValue(new Vector3(colour.getColourVec3()), true);
+            shader->getShaderParameter("lightSource.radius")->setValue(&radius, false);
+            shader->getShaderParameter("lightSource.intensity")->setValue(&intensity, false);
+            shader->getShaderParameter("lightSource.type")->setValue(&type, false);
         }
     }
 }

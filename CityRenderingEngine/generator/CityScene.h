@@ -56,7 +56,8 @@ public:
 protected:
 
     /* Control flag to determine if the shaders need to be reloaded. Debug tool. Defaults to false. */
-    bool reload;
+    bool reloadShaders;
+    bool reloadTextures;
 
     /* The City that will be simulated in this CityScene. */
     City *city;

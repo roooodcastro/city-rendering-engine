@@ -21,6 +21,10 @@ Chunk::Chunk(const Vector2 &position, City *city) : Entity(), Resource() {
     this->city = city;
     this->safeToDelete = false;
     this->childEntities->reserve(500);
+    float groundScale = ((float) Chunk::CHUNK_SIZE) / 2.0f;
+    Vector3 groundPos = Vector3(this->position.x, this->position.y - 0.1f, this->position.z);
+    this->ground = new Entity(groundPos, Vector3(0, 0, 0), Vector3(groundScale, 1, groundScale));
+    this->ground->setModel(Model::getOrCreate(MODEL_GROUND, "resources/meshes/plane.obj", false));
 }
 
 Chunk::~Chunk(void) {
@@ -55,6 +59,7 @@ void Chunk::calculateModelMatrix(Vector3 addPos, Vector3 addRot, Vector3 addSiz,
 
 void Chunk::update(float millisElapsed) {
     calculateModelMatrix(Vector3(), Vector3(), Vector3(1, 1, 1), false, false, false);
+    ground->update(millisElapsed);
     // Update the distanceToCamera if that's changed
     if (Naquadah::getInstance()->getCurrentScene()->getCamera()->hasChanged()) {
         Camera *camera = Naquadah::getInstance()->getCurrentScene()->getCamera();
@@ -78,6 +83,15 @@ void Chunk::draw(float millisElapsed) {
             }
         }
     }
+    Texture *grass = Texture::getOrCreate(TEXTURE_GRASS, "resources/textures/grass_1.jpg", true);
+    Naquadah::getInstance()->getCurrentScene()->useShader(Shader::getOrCreate(SHADER_LIGHT_BASIC,
+        "resources/shaders/vertNormal.glsl", "resources/shaders/fragLight.glsl", false));
+    Shader *shader = Naquadah::getRenderer()->getCurrentShader();
+    int numFloors = -1;
+    shader->getShaderParameter("numFloors")->setValue(&numFloors, false);
+    shader->updateShaderParameters(false);
+    grass->bindTexture(shader->getShaderProgram(), TEXTURE0);
+    ground->draw(millisElapsed);
 }
 
 void Chunk::addIntersection(Intersection *intersection) {

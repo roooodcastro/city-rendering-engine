@@ -146,7 +146,7 @@ void Model::generateNormals() {
 
     	Vector3 normal = Vector3::cross(b - a, c - a);
     	normal.normalise();
-        normal.invert();
+        //normal.invert();
 
         normals[i] = Vector3(normal);
     	normals[i + 1] = Vector3(normal);

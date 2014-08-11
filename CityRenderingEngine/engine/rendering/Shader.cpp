@@ -169,7 +169,7 @@ void Shader::updateShaderParameters(bool forceUpdate) {
 
 void Shader::addShaderParameter(ShaderParameter *shaderParameter) {
     bool exists = false;
-    for (int i = 0; i << shaderParameters->size(); i++) {
+    for (int i = 0; i < shaderParameters->size(); i++) {
         if (shaderParameters->at(i)->parameterName == shaderParameter->parameterName) {
             exists = true;
         }
@@ -178,9 +178,21 @@ void Shader::addShaderParameter(ShaderParameter *shaderParameter) {
         shaderParameters->emplace_back(shaderParameter);
     }
 }
+
+void Shader::addShaderParameter(std::string paramName, ParameterType paramType, void *value) {
+    bool exists = false;
+    for (int i = 0; i < shaderParameters->size(); i++) {
+        if (shaderParameters->at(i)->parameterName == paramName) {
+            exists = true;
+        }
+    }
+    if (!exists) {
+        shaderParameters->push_back(new ShaderParameter(paramName, paramType, value));
+    }
+}
     
 void Shader::removeShaderParameter(std::string parameterName) {
-    for (int i = 0; i << shaderParameters->size(); i++) {
+    for (int i = 0; i < shaderParameters->size(); i++) {
         if (shaderParameters->at(i)->parameterName == parameterName) {
             ShaderParameter *shaderParameter = shaderParameters->at(i);
             shaderParameters->erase(shaderParameters->begin() + i);

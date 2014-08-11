@@ -30,7 +30,8 @@ Chunk *ChunkGenerator::generateChunk(City *city, const Vector2 &position) {
             gridLayout.posMin = Vector2(i * subChunkSize, j * subChunkSize);
             gridLayout.posMax = Vector2((i + 1) * subChunkSize, (j + 1) * subChunkSize);
             Vector2 intersectionPos = gridLayout.getIntersectionPosition();
-            if (intersectionPos.x > -99 && intersectionPos.y > -99) {
+            float den = Perlin::getCityBlockDensity(intersectionPos.x + position.x, intersectionPos.y + position.y);
+            if (intersectionPos.x > -99 && intersectionPos.y > -99 && den > 0.0f) {
                 // If there's an intersection in this subchunk, check if it has enough distance from the others
                 intersectionPos += position; // Convert to World Position
                 auto it = chunk->getIntersections()->begin();

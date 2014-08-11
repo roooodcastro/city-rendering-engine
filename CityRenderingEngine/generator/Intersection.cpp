@@ -5,8 +5,8 @@ Intersection::Intersection(void) : Entity() {
     setModel(Model::getOrCreate(MODEL_INTERSECTION, "resources/meshes/plane.obj", false));
     model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_INTERSECTION_1, "resources/textures/road_intersection.png",
         false));
-    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
-        "resources/shaders/fragLight.glsl", false);
+    shader = Shader::getOrCreate(SHADER_LIGHT_ROAD,
+        "resources/shaders/vertRoad.glsl", "resources/shaders/fragRoad.glsl", false);
     // Calculate the plane's model rotation, position and scale
     this->position = Vector3();
     this->rotation = Vector3();
@@ -21,8 +21,8 @@ Intersection::Intersection(Vector3 position) : Entity() {
     setModel(Model::getOrCreate(MODEL_INTERSECTION, "resources/meshes/plane.obj", false));
     model->setTexture(Texture::getOrCreate(TEXTURE_ROAD_INTERSECTION_1, "resources/textures/road_intersection.png",
         false));
-    shader = Shader::getOrCreate(SHADER_LIGHT_BASIC, "resources/shaders/vertNormal.glsl",
-        "resources/shaders/fragLight.glsl", false);
+    shader = Shader::getOrCreate(SHADER_LIGHT_ROAD,
+        "resources/shaders/vertRoad.glsl", "resources/shaders/fragRoad.glsl", false);
     // Calculate the plane's model rotation, position and scale
     this->position = position;
     this->rotation = Vector3();
@@ -43,6 +43,17 @@ Intersection::~Intersection(void) {
         roads->clear();
         delete roads;
         roads = nullptr;
+    }
+}
+
+void Intersection::draw(float millisElapsed) {
+    if (model != nullptr) {
+        Naquadah::getInstance()->getCurrentScene()->useShader(shader);
+        Naquadah::getRenderer()->updateShaderMatrix("modelMatrix", modelMatrix);
+        float distance = scale.z * 2.0f;
+        shader->getShaderParameter("roadScale")->setValue(&distance, false);
+        shader->updateShaderParameters(false);
+        model->draw();
     }
 }
 

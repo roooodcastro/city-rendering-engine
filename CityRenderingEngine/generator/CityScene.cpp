@@ -2,12 +2,14 @@
 
 CityScene::CityScene() : Scene(new CitySceneInterface()) {
     this->city = nullptr;
-    this->reload = false;
+    this->reloadShaders = false;
+    this->reloadTextures = false;
 }
 
 CityScene::CityScene(const CityScene &copy) : Scene(copy) {
     this->city = new City(*(copy.city));
-    this->reload = false;
+    this->reloadShaders = false;
+    this->reloadTextures = false;
 }
 
 CityScene::CityScene(City *city) : Scene(new CitySceneInterface()) {
@@ -19,7 +21,8 @@ CityScene::CityScene(City *city) : Scene(new CitySceneInterface()) {
         "resources/textures/skyboxes/desert/posZ.png",
         "resources/textures/skyboxes/desert/negZ.png",
         ResourcesManager::generateNextName());
-    this->reload = false;
+    this->reloadShaders = false;
+    this->reloadTextures = false;
 }
 
 CityScene::~CityScene(void) {
@@ -30,8 +33,11 @@ CityScene::~CityScene(void) {
 }
 
 void CityScene::onKeyPress(SDL_Keysym key) {
+    if (key.sym == SDLK_F3) {
+        reloadTextures = true;
+    }
     if (key.sym == SDLK_F4) {
-        reload = true;
+        reloadShaders = true;
     }
 }
 
@@ -121,11 +127,24 @@ void CityScene::render(Renderer *renderer, float millisElapsed) {
     // Check debug tools
 
     // Shader reload (F4)
-    if (reload) {
+    if (reloadShaders) {
         ((Shader*) ResourcesManager::getResource(SHADER_LIGHT_BASIC))->reload();
+        ((Shader*) ResourcesManager::getResource(SHADER_LIGHT_ROAD))->reload();
         ((Shader*) ResourcesManager::getResource(SHADER_SKY_BOX))->reload();
         std::cout << "Shaders reloaded!" << std::endl;
-        reload = false;
+        reloadShaders = false;
+    }
+
+    // Textures reload (F3)
+    if (reloadTextures) {
+        for (int i = 1000; i < 1050; i++) {
+            Texture *texture = (Texture*) ResourcesManager::getResource(i);
+            if (texture != nullptr) {
+                texture->unload();
+                texture->load();
+            }
+        }
+        reloadTextures = false;
     }
 
 

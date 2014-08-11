@@ -95,6 +95,12 @@ public:
      */
     void addShaderParameter(ShaderParameter *shaderParameter);
 
+    /*
+     * Adds a ShaderParameter to the list. This ShaderParameter will be destroyed when the Shader is unloaded. If a
+     * ShaderParameter with the same name is already in the list, it won't get added nor created.
+     */
+    void addShaderParameter(std::string paramName, ParameterType paramType, void *value);
+
     /* Removes a ShaderParameter from the list, destroying it. */
     void removeShaderParameter(std::string parameterName);
 

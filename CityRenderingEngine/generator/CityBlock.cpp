@@ -5,10 +5,61 @@ CityBlock::CityBlock(float density) : Entity() {
     //model = Model::getOrCreate("cube", "resources/meshes/cube.obj", false);
     //shader = Shader::getOrCreate("LightShader", "resources/shaders/vertNormal.glsl",
         //"resources/shaders/fragLight.glsl", false);
-    this->maximumPerimeterPerBuilding = 250.0f;
     this->numChunksSharing = 0;
-    this->type = CITY_BLOCK_COMMERCIAL_HIGH;
     this->density = density;
+
+    // Use density info to choose the type of this CityBlock
+    // I guess there's no easy better way to do this except for these ugly ifs ):
+    Vector3 centrePos = getCentralPosition();
+    int posSum = (int) (centrePos.x + centrePos.y + centrePos.z); // Used to choose between types with same density
+    if (density < 0) {
+        type = CITY_BLOCK_VOID;
+        this->maximumPerimeterPerBuilding = 9999.0f; // There won't be anything here, so why split?
+    } else if (density < 0.4f) {
+        // At this point, if may be either a park or low density commercial or residential block
+        // Use mods to choose between the three
+        if (posSum % 7 == 0) {
+            type = CITY_BLOCK_PARK; // 14% chance
+            this->maximumPerimeterPerBuilding = 9999.0f; // We want the park to occupy the whole block
+        }
+        else if (posSum % 3 == 0) {
+            type = CITY_BLOCK_COMMERCIAL_LOW; // 33% chance
+            this->maximumPerimeterPerBuilding = 150.0f;
+        } else {
+            type = CITY_BLOCK_RESIDENTIAL_LOW; // About 53% chance
+            this->maximumPerimeterPerBuilding = 128.0f;
+        }
+    } else if (density < 0.8) {
+        // It can be a park or medium density commercial or residential block
+        if (posSum % 13 == 0) {
+            type = CITY_BLOCK_PARK; // 8% chance
+            this->maximumPerimeterPerBuilding = 9999.0f; // We want the park to occupy the whole block
+        }
+        else if (posSum % 2 == 0) {
+            type = CITY_BLOCK_COMMERCIAL_MEDIUM; // 50% chance
+            this->maximumPerimeterPerBuilding = 256.0f;
+        } else {
+            type = CITY_BLOCK_RESIDENTIAL_MEDIUM; // About 42% chance
+            this->maximumPerimeterPerBuilding = 200.0f;
+        }
+    } else if (density < 0.9) {
+        if (posSum % 3 == 0) {
+            type = CITY_BLOCK_RESIDENTIAL_HIGH; // 33% chance
+            this->maximumPerimeterPerBuilding = 300.0f;
+        } else {
+            type = CITY_BLOCK_COMMERCIAL_HIGH; // About 67% chance
+            this->maximumPerimeterPerBuilding = 400.0f;
+        }
+    } else {
+        // For densities higher than 0.8, we have only a very small chance of having a residential block
+        if (posSum % 11) {
+            type = CITY_BLOCK_RESIDENTIAL_HIGH; // 9% chance
+            this->maximumPerimeterPerBuilding = 400.0f;
+        } else {
+            type = CITY_BLOCK_COMMERCIAL_HIGH; // About 91% chance
+            this->maximumPerimeterPerBuilding = 512.0f;
+        }
+    }
 }
 
 CityBlock::~CityBlock(void) {
@@ -77,7 +128,7 @@ void CityBlock::generateBuildings() {
         usableArea = Geom::insetPolygon(usableArea, roadWidth / 2.0f + pavementWidth);
 
         // Split the usable area into lots
-        std::vector<Building*> buildingLots = splitLots(usableArea);
+        std::vector<Building*> buildingLots = splitLots(usableArea, usableArea);
 
         // TODO: Tell each lot its type, according to its size and the type of this CityBlock, and "build" the Building.
         auto itEnd = buildingLots.end();
@@ -88,7 +139,7 @@ void CityBlock::generateBuildings() {
     }
 }
 
-std::vector<Building*> CityBlock::splitLots(std::vector<Vector2> &lotPolygon) {
+std::vector<Building*> CityBlock::splitLots(std::vector<Vector2> &lotPolygon, std::vector<Vector2> &originalLot) {
     int numSides = (int) lotPolygon.size();
     if (numSides >= 3) { // We need to have at least a triangle to do this
         // Calculate the perimeter of the lot and find the longest side
@@ -107,10 +158,49 @@ std::vector<Building*> CityBlock::splitLots(std::vector<Vector2> &lotPolygon) {
             }
         }
         if (perimeter < maximumPerimeterPerBuilding) {
-            // Create an empty building and return a vector containing it.
-            Building *newBuilding = new Building(lotPolygon, this);
+            // First we iterate through all of the lot sides, and then through all of the CityBlock sides.
+            // We do this to check which lot sides connects to the road, if any.
+            bool connectsToRoad = false;
+            float biggestConnection = 0.0f;
+            int biggestConnAIndex = 0;
+            Vector2 roadNormal = Vector2();
+            for (int i = 1; i < numSides + 1; i++) {
+                if (connectsToRoad) break;
+                Vector2 buildA = lotPolygon.at(i - 1);
+                Vector2 buildB = (i == numSides) ? lotPolygon.at(0) : lotPolygon.at(i);
+                int blockSides = (int) originalLot.size();
+                for (int j = 1; j < blockSides + 1; j++) {
+                    Vector2 blockA = originalLot.at(j - 1);
+                    Vector2 blockB = (j == blockSides) ? originalLot.at(0) : originalLot.at(j);
+                    if (Geom::isPointOnLine(blockA, blockB, buildA) && Geom::isPointOnLine(blockA, blockB, buildB)) {
+                        // If both of the lot side points are on the CityBlock's side line, then this side of the lot
+                        // connects to the road.
+                        connectsToRoad = true;
+                        // We then compare the connections to find the largest conneting side, this will be the front
+                        // of the building.
+                        float sideLength = (buildB - buildA).getLength();
+                        if (sideLength > biggestConnection) {
+                            biggestConnection = sideLength;
+                            biggestConnAIndex = i - 1;
+                            roadNormal = Geom::vec2Normal(buildA, buildB);
+                        }
+                        break;
+                    }
+                }
+            }
+            // Now order the vertices to ensure the first two make up the largest road connection line.
+            std::vector<Vector2> orderedLotPolygon = std::vector<Vector2>();
+            for (int i = biggestConnAIndex; i < numSides + biggestConnAIndex; i++) {
+                int index = i < numSides ? i : i - numSides;
+                orderedLotPolygon.push_back(lotPolygon.at(index));
+            }
+
             std::vector<Building*> buildings = std::vector<Building*>();
-            buildings.push_back(newBuilding);
+            if (connectsToRoad) {
+                // Create an empty building and return a vector containing it.
+                Building *newBuilding = new Building(orderedLotPolygon, this, true, roadNormal);
+                buildings.push_back(newBuilding);
+            }
             return buildings;
         } else {
             // Split this lot into 2 smaller lots and return their combined Building vectors.
@@ -135,8 +225,8 @@ std::vector<Building*> CityBlock::splitLots(std::vector<Vector2> &lotPolygon) {
                 currentIsA ? lotA.push_back(b) : lotB.push_back(b);
             }
             // Now call it recursively and return the join between the 2 lots.
-            std::vector<Building*> buildings = splitLots(lotA);
-            std::vector<Building*> buildingsB = splitLots(lotB);
+            std::vector<Building*> buildings = splitLots(lotA, originalLot);
+            std::vector<Building*> buildingsB = splitLots(lotB, originalLot);
             buildings.reserve(buildings.size() + buildingsB.size());
             buildings.insert(buildings.end(), buildingsB.begin(), buildingsB.end());
             return buildings;

@@ -198,6 +198,7 @@
     <ClCompile Include="generator\GridLayout.cpp" />
     <ClCompile Include="generator\gridlayouts\ManhattanGridLayout.cpp" />
     <ClCompile Include="generator\Intersection.cpp" />
+    <ClCompile Include="generator\math\Perlin.cpp" />
     <ClCompile Include="generator\Road.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

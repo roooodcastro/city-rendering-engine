@@ -22,6 +22,8 @@ public:
     Road(Intersection *pointA, Intersection *pointB);
     virtual ~Road(void);
 
+    virtual void draw(float millisElapsed);
+
     void setPointA(Intersection *pointA);
     void setPointB(Intersection *pointB);
 

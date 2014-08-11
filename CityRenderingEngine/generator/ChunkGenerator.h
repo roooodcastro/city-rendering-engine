@@ -17,6 +17,7 @@
 #include "City.h"
 #include "../engine/input/FileIO.h"
 #include "../engine/math/Vector2.h"
+#include "math/Perlin.h"
 
 class City;
 class Chunk;

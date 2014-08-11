@@ -297,6 +297,11 @@ void Scene::update(float millisElapsed) {
     }
     if (movement.getLength() > EPS) {
         camera->moveCamera(movement * speed * millisElapsed * heightFactor);
+        Vector3 cameraPos = camera->getPosition();
+        if (cameraPos.y < 1.0f) {
+            cameraPos.y = 1.0f;
+            camera->setPosition(cameraPos);
+        }
     }
 
     unsigned numEntities = (unsigned) entities->size();

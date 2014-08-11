@@ -15,6 +15,7 @@ struct LightSource {
 uniform LightSource lightSource;
 
 uniform float time;
+uniform int numFloors;
 
 in Vertex {
 	vec3 worldPos;
@@ -32,9 +33,51 @@ const vec4 fogColour = vec4(0.0, 0.0, 0.0, 0.0);
 const float fogDensity = 0.05;
 
 void main(void) {
+    // Calculate correct uv_map
+    //numFloors = 7;
+    vec2 correctUv = IN.uv_map;
+    float uvY = IN.uv_map.y;
+    if (numFloors >= 3) {
+        if (uvY <= 1) {
+            // Top floor
+            correctUv.y = (4.0 / 7.0) + fract(correctUv.y) / 7.0;
+        } else if (uvY <= (numFloors - 1)) {
+            // Middle floors
+            correctUv.y = (5.0 / 7.0) + fract(correctUv.y) / 7.0;
+        } else {
+            // Ground floor
+            correctUv.y = (6.0 / 7.0) + fract(correctUv.y) / 7.0;
+        }
+    }
+    if (numFloors == 2) {
+        if (uvY <= 1) {
+            // Top floor
+            correctUv.y = (4.0 / 7.0) + fract(correctUv.y) / 7.0;
+        } else {
+            // Ground floor
+            correctUv.y = (6.0 / 7.0) + fract(correctUv.y) / 7.0;
+        }
+    }
+    if (numFloors == 1) {
+        // Only have Ground floor...
+        correctUv.y = (6.0 / 7.0) + fract(correctUv.y) / 7.0;
+    }
+    
+    if (uvY < 0) {
+        // Roof of the building
+        correctUv.x = 1.0 - abs(correctUv.x);
+        correctUv.y = abs(fract(IN.uv_map.y) / 7.0) * 4.0;
+    }
+    
+    if (numFloors < 0) {
+        // It's not a building at all! Leave the uv_map alone!
+        correctUv = IN.uv_map;
+    }
+    
+    
 	vec3 finalColour = vec3(0, 0, 0);
     vec4 finalColourGamma = vec4(0, 0, 0, 0);
-	vec4 texCol = texture(texture0, IN.uv_map);
+	vec4 texCol = texture(texture0, correctUv);
     //vec4 texCol = vec4(1,1,1,1);
 	
 	for(int i = 0; i < 1; i++) {
@@ -89,12 +132,12 @@ void main(void) {
 
             // Calculate ambient, diffuse and specular lighting
             vec3 texLightCol = texCol.rgb * lightSource.colour;
-            vec3 ambient = texLightCol * 0.1;
+            vec3 ambient = texLightCol * 0.2;
             vec3 diffuse = texLightCol * lambert * lightSource.intensity;
             vec3 specular = texLightCol * sFactor * lightSource.intensity;
             
             // Calculate rim lighting
-            float gamma = 1.0/0.6;
+            float gamma = 1.0/0.7;
             vec3 rimColour = vec3(0.15, 0.10, 0.05) + (vec3(0.05, 0.05, 0.05) * texLightCol);
             float rim = 1.0 - max(dot(viewDir, IN.worldNormal), 0.0);
             rim = smoothstep(0.6, 1.0, rim);

@@ -10,6 +10,7 @@
 #pragma once
 
 #include "City.h"
+#include "math/Perlin.h"
 
 class Chunk;
 class Intersection;

@@ -22,7 +22,7 @@ public:
     Building(void);
     Building(CityBlock *cityBlock, Vector3 blockPosition);
     /* Constructor with a vector of Vector2 to delimiter the area that this Building will occupy. */
-    Building(std::vector<Vector2> lotArea, CityBlock *cityBlock);
+    Building(std::vector<Vector2> lotArea, CityBlock *cityBlock, bool connects, const Vector2 &roadNormal);
 
     virtual ~Building(void);
 
@@ -50,4 +50,23 @@ protected:
 
     /* The CtyBlock in which this building is located. */
     CityBlock *cityBlock;
+
+    /* The height in meters of this building. */
+    float height;
+
+    /* The number of floors that this building has. */
+    int numFloors;
+
+    /* The name of the texture that will be used for this Building. */
+    std::string textureName;
+
+    /* A flag indicating whether this Building connects to any road. Defaults to false. */
+    bool connectsToRoad;
+
+    /*
+     * A vector indicating the normal of the lot side that connects to the Road. If this Building connects to multiple
+     * roads, the longest side will be chosen as the front side of the Building, and this vector will be its normal.
+     * Notice that this is a 2D vector, the Y (height) axis is not represented here.
+     */
+    Vector2 roadConnection;
 };

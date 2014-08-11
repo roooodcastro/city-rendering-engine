@@ -127,6 +127,31 @@ public:
         return Vector2((float) MAX_INT, (float) MAX_INT);
     }
 
+    /* Checks and returns true if a given point is within the specified line. */
+    static bool isPointOnLine(Vector2 lineA, Vector2 lineB, Vector2 point) {
+        float xDiff = fabs(lineA.x - lineB.x);
+        float yDiff = fabs(lineA.y - lineB.y);
+        if (xDiff < EPS && yDiff < EPS) //Not a line
+            return false;
+        if(yDiff < EPS) //No gradient
+            return (fabs(lineA.y - point.y) < EPS) ? true : false;
+        if(xDiff < EPS) //Infinite gradient
+            return (fabs(lineA.x - point.x) < EPS) ? true : false;
+        float a = (lineB.y - lineA.y) / (lineB.x - lineA.x);
+        float b = lineA.y - a * lineA.x;
+        if (fabs(point.y - (a * point.x + b)) < 0.1f) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Calculates and returns the normal (perpendicular vector) of a line between A and B. */
+    static Vector2 vec2Normal(const Vector2 &a, const Vector2 &b) {
+        float dx = b.x - a.x;
+        float dy = b.y - a.y;
+        return Vector2(dy, -dx);
+    }
+
 protected:
 
     Geom(void) {};
